@@ -1,8 +1,9 @@
 #![allow(unused)] // TODO: Just for now.
 
+use miniz_oxide::deflate::compress_to_vec;
+
 use pix::Alpha;
 
-#[allow(non_camel_case_types)]
 mod ffi;
 
 mod rustimpl;
@@ -106,8 +107,8 @@ impl ColorMode {
 
     /// is it a greyscale type? (only colortype 0 or 4)
     pub fn is_greyscale_type(&self) -> bool {
-        self.colortype == ColorType::GREY
-            || self.colortype == ColorType::GREY_ALPHA
+        self.colortype == ColorType::Grey
+            || self.colortype == ColorType::GreyAlpha
     }
 
     /// has it got an alpha channel? (only colortype 2 or 6)
@@ -117,7 +118,7 @@ impl ColorMode {
 
     /// has it got a palette? (only colortype 3)
     pub fn is_palette_type(&self) -> bool {
-        self.colortype == ColorType::PALETTE
+        self.colortype == ColorType::Palette
     }
 
     /// only returns true if there is a palette and there is a value in the palette with alpha < 255.
@@ -183,7 +184,7 @@ impl Default for ColorMode {
     fn default() -> Self {
         Self {
             key: None,
-            colortype: ColorType::RGBA,
+            colortype: ColorType::Rgba,
             bitdepth: 8,
             palette: Vec::with_capacity(256),
         }
@@ -204,10 +205,10 @@ impl ColorType {
     /// channels * bytes per channel = bytes per pixel
     pub fn channels(&self) -> u8 {
         match *self {
-            ColorType::GREY | ColorType::PALETTE => 1,
-            ColorType::GREY_ALPHA => 2,
-            ColorType::BGR | ColorType::RGB => 3,
-            ColorType::BGRA | ColorType::BGRX | ColorType::RGBA => 4,
+            ColorType::Grey | ColorType::Palette => 1,
+            ColorType::GreyAlpha => 2,
+            ColorType::Bgr | ColorType::Rgb => 3,
+            ColorType::Bgra | ColorType::Bgrx | ColorType::Rgba => 4,
         }
     }
 }
@@ -483,7 +484,7 @@ impl Decoder {
     //  # use png_pong::*; let mut state = State::new();
     //  # let slice = [0u8]; #[allow(unused_variables)] fn do_stuff<T>(_buf: T) {}
     //
-    //  state.info_raw_mut().colortype = ColorType::RGBA;
+    //  state.info_raw_mut().colortype = ColorType::Rgba;
     //  match state.decode(&slice) {
     //      Ok(Image::RGBA(with_alpha)) => do_stuff(with_alpha),
     //      _ => panic!("¯\\_(ツ)_/¯")
@@ -585,7 +586,7 @@ impl State {
     //  # use png_pong::*; let mut state = State::new();
     //  # let slice = [0u8]; #[allow(unused_variables)] fn do_stuff<T>(_buf: T) {}
     //
-    //  state.info_raw_mut().colortype = ColorType::RGBA;
+    //  state.info_raw_mut().colortype = ColorType::Rgba;
     //  match state.decode(&slice) {
     //      Ok(Image::RGBA(with_alpha)) => do_stuff(with_alpha),
     //      _ => panic!("¯\\_(ツ)_/¯")
@@ -698,13 +699,13 @@ fn new_bitmap(
     let height = h as u32;
 
     match (colortype, bitdepth) {
-        (ColorType::RGBA, 8) => Image::RGBA(
+        (ColorType::Rgba, 8) => Image::RGBA(
             pix::RasterBuilder::new().with_u8_buffer(width, height, out),
         ),
-        (ColorType::RGB, 8) => Image::RGB(
+        (ColorType::Rgb, 8) => Image::RGB(
             pix::RasterBuilder::new().with_u8_buffer(width, height, out),
         ),
-        (ColorType::RGBA, 16) => {
+        (ColorType::Rgba, 16) => {
             let out: Vec<u16> = out
                 .chunks_exact(2)
                 .into_iter()
@@ -715,7 +716,7 @@ fn new_bitmap(
                 pix::RasterBuilder::new().with_u16_buffer(width, height, out),
             )
         }
-        (ColorType::RGB, 16) => {
+        (ColorType::Rgb, 16) => {
             let out: Vec<u16> = out
                 .chunks_exact(2)
                 .into_iter()
@@ -726,10 +727,10 @@ fn new_bitmap(
                 pix::RasterBuilder::new().with_u16_buffer(width, height, out),
             )
         }
-        (ColorType::GREY, 8) => Image::Grey(
+        (ColorType::Grey, 8) => Image::Grey(
             pix::RasterBuilder::new().with_u8_buffer(width, height, out),
         ),
-        (ColorType::GREY, 16) => {
+        (ColorType::Grey, 16) => {
             let out: Vec<u16> = out
                 .chunks_exact(2)
                 .into_iter()
@@ -739,10 +740,10 @@ fn new_bitmap(
                 pix::RasterBuilder::new().with_u16_buffer(width, height, out),
             )
         }
-        (ColorType::GREY_ALPHA, 8) => Image::GreyAlpha(
+        (ColorType::GreyAlpha, 8) => Image::GreyAlpha(
             pix::RasterBuilder::new().with_u8_buffer(width, height, out),
         ),
-        (ColorType::GREY_ALPHA, 16) => {
+        (ColorType::GreyAlpha, 16) => {
             let out: Vec<u16> = out
                 .chunks_exact(2)
                 .into_iter()
@@ -798,7 +799,7 @@ pub fn decode_memory<Bytes: AsRef<[u8]>>(
 pub fn decode32<Bytes: AsRef<[u8]>>(
     input: Bytes,
 ) -> Result<pix::Raster<pix::Rgba8>, Error> {
-    match decode_memory(input, ColorType::RGBA, 8)? {
+    match decode_memory(input, ColorType::Rgba, 8)? {
         Image::RGBA(img) => Ok(img),
         _ => Err(Error(56)), // given output image colortype or bitdepth not supported for color conversion
     }
@@ -833,14 +834,14 @@ pub fn encode_memory<PixelType: Copy + pix::Format>(
 pub fn encode32<PixelType: Copy + pix::Format>(
     raster: &pix::Raster<PixelType>,
 ) -> Result<Vec<u8>, Error> {
-    encode_memory(raster, ColorType::RGBA, 8)
+    encode_memory(raster, ColorType::Rgba, 8)
 }
 
 /// Same as `encode_memory`, but always encodes from 24-bit RGB raw image
 pub fn encode24<PixelType: Copy + pix::Format>(
     raster: &pix::Raster<PixelType>,
 ) -> Result<Vec<u8>, Error> {
-    encode_memory(raster, ColorType::RGB, 8)
+    encode_memory(raster, ColorType::Rgb, 8)
 }
 
 /// Converts raw pixel data into a PNG file on disk.
@@ -862,7 +863,7 @@ pub fn encode32_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
     filepath: P,
     raster: &pix::Raster<PixelType>,
 ) -> Result<(), Error> {
-    encode_file(filepath, raster, ColorType::RGBA, 8)
+    encode_file(filepath, raster, ColorType::Rgba, 8)
 }
 
 /// Same as `encode_file`, but always encodes from 24-bit RGB raw image
@@ -870,7 +871,7 @@ pub fn encode24_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
     filepath: P,
     raster: &pix::Raster<PixelType>,
 ) -> Result<(), Error> {
-    encode_file(filepath, raster, ColorType::RGB, 8)
+    encode_file(filepath, raster, ColorType::Rgb, 8)
 }
 
 impl<'a> ChunkRef<'a> {
@@ -951,7 +952,13 @@ pub fn deflate(
     input: &[u8],
     settings: &CompressSettings,
 ) -> Result<Vec<u8>, Error> {
-    Ok(rustimpl::lodepng_deflatev(input, settings)?)
+    if settings.btype > 2 {
+        Err(Error(61))
+    } else if settings.btype == 0 {
+        Ok(compress_to_vec(input, 0))
+    } else {
+        Ok(compress_to_vec(input, 10))
+    }
 }
 
 impl CompressSettings {
@@ -1017,7 +1024,7 @@ impl Default for EncoderSettings {
         Self {
             zlibsettings: CompressSettings::new(),
             filter_palette_zero: 1,
-            filter_strategy: FilterStrategy::MINSUM,
+            filter_strategy: FilterStrategy::Minsum,
             auto_convert: 1,
             force_palette: 0,
             add_id: 0,
@@ -1058,8 +1065,8 @@ mod test {
     #[test]
     fn test_pal() {
         let mut state = State::new();
-        state.info_raw_mut().colortype = ColorType::PALETTE;
-        assert_eq!(state.info_raw().colortype(), ColorType::PALETTE);
+        state.info_raw_mut().colortype = ColorType::Palette;
+        assert_eq!(state.info_raw().colortype(), ColorType::Palette);
         state
             .info_raw_mut()
             .palette_add(pix::Rgba8::with_alpha(

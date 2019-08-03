@@ -8,17 +8,17 @@ pub(super) fn check_png_color_validity(
 ) -> Result<(), super::Error> {
     /*allowed color type / bits combination*/
     match colortype {
-        ColorType::GREY => {
+        ColorType::Grey => {
             if !(bd == 1 || bd == 2 || bd == 4 || bd == 8 || bd == 16) {
                 return Err(super::Error(37));
             }
         }
-        ColorType::PALETTE => {
+        ColorType::Palette => {
             if !(bd == 1 || bd == 2 || bd == 4 || bd == 8) {
                 return Err(super::Error(37));
             }
         }
-        ColorType::RGB | ColorType::GREY_ALPHA | ColorType::RGBA => {
+        ColorType::Rgb | ColorType::GreyAlpha | ColorType::Rgba => {
             if !(bd == 8 || bd == 16) {
                 return Err(super::Error(37));
             }
@@ -33,7 +33,7 @@ pub(super) fn check_lode_color_validity(
     bd: u32,
 ) -> Result<(), super::Error> {
     match colortype {
-        ColorType::BGRA | ColorType::BGRX | ColorType::BGR if bd == 8 => Ok(()),
+        ColorType::Bgra | ColorType::Bgrx | ColorType::Bgr if bd == 8 => Ok(()),
         ct => check_png_color_validity(ct, bd),
     }
 }

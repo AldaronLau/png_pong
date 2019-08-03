@@ -142,7 +142,7 @@ pub(super) fn rgba8_to_pixel(
     /*for palette*/ rgba: [u8; 4],
 ) -> Result<(), Error> {
     match mode.colortype {
-        ColorType::GREY => {
+        ColorType::Grey => {
             let grey = rgba[0]; /*((unsigned short)r + g + b) / 3*/
             if mode.bitdepth() == 8 {
                 out[i] = grey; /*take the most significant bits of grey*/
@@ -157,7 +157,7 @@ pub(super) fn rgba8_to_pixel(
                 add_color_bits(out, i, mode.bitdepth(), grey.into());
             };
         }
-        ColorType::RGB => {
+        ColorType::Rgb => {
             if mode.bitdepth() == 8 {
                 out[i * 3 + 0] = rgba[0];
                 out[i * 3 + 1] = rgba[1];
@@ -171,7 +171,7 @@ pub(super) fn rgba8_to_pixel(
                 out[i * 6 + 5] = rgba[2];
             }
         }
-        ColorType::PALETTE => {
+        ColorType::Palette => {
             let [red, green, blue, alpha] = rgba;
             let index =
                 *tree.get(&(red, green, blue, alpha)).ok_or(Error(82))?;
@@ -181,7 +181,7 @@ pub(super) fn rgba8_to_pixel(
                 add_color_bits(out, i, mode.bitdepth(), u32::from(index));
             };
         }
-        ColorType::GREY_ALPHA => {
+        ColorType::GreyAlpha => {
             let grey = rgba[0];
             let alpha = rgba[3];
             if mode.bitdepth() == 8 {
@@ -194,7 +194,7 @@ pub(super) fn rgba8_to_pixel(
                 out[i * 4 + 3] = alpha;
             }
         }
-        ColorType::RGBA => {
+        ColorType::Rgba => {
             if mode.bitdepth() == 8 {
                 out[i * 4 + 0] = rgba[0];
                 out[i * 4 + 1] = rgba[1];
@@ -211,7 +211,7 @@ pub(super) fn rgba8_to_pixel(
                 out[i * 8 + 7] = rgba[3];
             }
         }
-        ColorType::BGRA | ColorType::BGR | ColorType::BGRX => {
+        ColorType::Bgra | ColorType::Bgr | ColorType::Bgrx => {
             return Err(Error(31));
         }
     };
@@ -230,12 +230,12 @@ pub(super) fn rgba16_to_pixel(
     a: u16,
 ) {
     match mode.colortype {
-        ColorType::GREY => {
+        ColorType::Grey => {
             let grey = r;
             out[i * 2 + 0] = (grey >> 8) as u8;
             out[i * 2 + 1] = grey as u8;
         }
-        ColorType::RGB => {
+        ColorType::Rgb => {
             out[i * 6 + 0] = (r >> 8) as u8;
             out[i * 6 + 1] = r as u8;
             out[i * 6 + 2] = (g >> 8) as u8;
@@ -243,14 +243,14 @@ pub(super) fn rgba16_to_pixel(
             out[i * 6 + 4] = (b >> 8) as u8;
             out[i * 6 + 5] = b as u8;
         }
-        ColorType::GREY_ALPHA => {
+        ColorType::GreyAlpha => {
             let grey = r;
             out[i * 4 + 0] = (grey >> 8) as u8;
             out[i * 4 + 1] = grey as u8;
             out[i * 4 + 2] = (a >> 8) as u8;
             out[i * 4 + 3] = a as u8;
         }
-        ColorType::RGBA => {
+        ColorType::Rgba => {
             out[i * 8 + 0] = (r >> 8) as u8;
             out[i * 8 + 1] = r as u8;
             out[i * 8 + 2] = (g >> 8) as u8;
@@ -260,10 +260,10 @@ pub(super) fn rgba16_to_pixel(
             out[i * 8 + 6] = (a >> 8) as u8;
             out[i * 8 + 7] = a as u8;
         }
-        ColorType::BGR
-        | ColorType::BGRA
-        | ColorType::BGRX
-        | ColorType::PALETTE => unreachable!(),
+        ColorType::Bgr
+        | ColorType::Bgra
+        | ColorType::Bgrx
+        | ColorType::Palette => unreachable!(),
     };
 }
 
@@ -274,7 +274,7 @@ pub(super) fn get_pixel_color_rgba8(
     mode: &ColorMode,
 ) -> (u8, u8, u8, u8) {
     match mode.colortype {
-        ColorType::GREY => {
+        ColorType::Grey => {
             if mode.bitdepth() == 8 {
                 let t = inp[i];
                 let a = if mode.key()
@@ -312,7 +312,7 @@ pub(super) fn get_pixel_color_rgba8(
                 (t, t, t, a)
             }
         }
-        ColorType::RGB => {
+        ColorType::Rgb => {
             if mode.bitdepth() == 8 {
                 let r = inp[i * 3 + 0];
                 let g = inp[i * 3 + 1];
@@ -344,7 +344,7 @@ pub(super) fn get_pixel_color_rgba8(
                 )
             }
         }
-        ColorType::PALETTE => {
+        ColorType::Palette => {
             let index = if mode.bitdepth() == 8 {
                 inp[i] as usize
             } else {
@@ -370,7 +370,7 @@ pub(super) fn get_pixel_color_rgba8(
                 )
             }
         }
-        ColorType::GREY_ALPHA => {
+        ColorType::GreyAlpha => {
             if mode.bitdepth() == 8 {
                 let t = inp[i * 2 + 0];
                 (t, t, t, inp[i * 2 + 1])
@@ -379,7 +379,7 @@ pub(super) fn get_pixel_color_rgba8(
                 (t, t, t, inp[i * 4 + 2])
             }
         }
-        ColorType::RGBA => {
+        ColorType::Rgba => {
             if mode.bitdepth() == 8 {
                 (
                     inp[i * 4 + 0],
@@ -396,13 +396,13 @@ pub(super) fn get_pixel_color_rgba8(
                 )
             }
         }
-        ColorType::BGRA => (
+        ColorType::Bgra => (
             inp[i * 4 + 2],
             inp[i * 4 + 1],
             inp[i * 4 + 0],
             inp[i * 4 + 3],
         ),
-        ColorType::BGR => {
+        ColorType::Bgr => {
             let b = inp[i * 3 + 0];
             let g = inp[i * 3 + 1];
             let r = inp[i * 3 + 2];
@@ -415,7 +415,7 @@ pub(super) fn get_pixel_color_rgba8(
             };
             (r, g, b, a)
         }
-        ColorType::BGRX => {
+        ColorType::Bgrx => {
             let b = inp[i * 4 + 0];
             let g = inp[i * 4 + 1];
             let r = inp[i * 4 + 2];
@@ -444,7 +444,7 @@ pub(super) fn get_pixel_colors_rgba8(
 ) {
     let num_channels = if has_alpha { 4 } else { 3 };
     match mode.colortype {
-        ColorType::GREY => {
+        ColorType::Grey => {
             if mode.bitdepth() == 8 {
                 for (i, buffer) in
                     buffer.chunks_mut(num_channels).take(numpixels).enumerate()
@@ -502,7 +502,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 }
             };
         }
-        ColorType::RGB => {
+        ColorType::Rgb => {
             if mode.bitdepth() == 8 {
                 for (i, buffer) in
                     buffer.chunks_mut(num_channels).take(numpixels).enumerate()
@@ -546,7 +546,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 }
             };
         }
-        ColorType::PALETTE => {
+        ColorType::Palette => {
             let mut j = 0;
             for (i, buffer) in
                 buffer.chunks_mut(num_channels).take(numpixels).enumerate()
@@ -581,7 +581,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 };
             }
         }
-        ColorType::GREY_ALPHA => {
+        ColorType::GreyAlpha => {
             if mode.bitdepth() == 8 {
                 for (i, buffer) in
                     buffer.chunks_mut(num_channels).take(numpixels).enumerate()
@@ -606,7 +606,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 }
             }
         }
-        ColorType::RGBA => {
+        ColorType::Rgba => {
             if mode.bitdepth() == 8 {
                 for (i, buffer) in
                     buffer.chunks_mut(num_channels).take(numpixels).enumerate()
@@ -631,7 +631,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 }
             }
         }
-        ColorType::BGR => {
+        ColorType::Bgr => {
             for (i, buffer) in
                 buffer.chunks_mut(num_channels).take(numpixels).enumerate()
             {
@@ -652,7 +652,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 };
             }
         }
-        ColorType::BGRX => {
+        ColorType::Bgrx => {
             for (i, buffer) in
                 buffer.chunks_mut(num_channels).take(numpixels).enumerate()
             {
@@ -673,7 +673,7 @@ pub(super) fn get_pixel_colors_rgba8(
                 };
             }
         }
-        ColorType::BGRA => {
+        ColorType::Bgra => {
             for (i, buffer) in
                 buffer.chunks_mut(num_channels).take(numpixels).enumerate()
             {
@@ -696,7 +696,7 @@ pub(super) fn get_pixel_color_rgba16(
     mode: &ColorMode,
 ) -> (u16, u16, u16, u16) {
     match mode.colortype {
-        ColorType::GREY => {
+        ColorType::Grey => {
             let t = 256 * inp[i * 2 + 0] as u16 + inp[i * 2 + 1] as u16;
             (
                 t,
@@ -709,7 +709,7 @@ pub(super) fn get_pixel_color_rgba16(
                 },
             )
         }
-        ColorType::RGB => {
+        ColorType::Rgb => {
             let r = 256 * inp[i * 6 + 0] as u16 + inp[i * 6 + 1] as u16;
             let g = 256 * inp[i * 6 + 2] as u16 + inp[i * 6 + 3] as u16;
             let b = 256 * inp[i * 6 + 4] as u16 + inp[i * 6 + 5] as u16;
@@ -720,21 +720,21 @@ pub(super) fn get_pixel_color_rgba16(
             };
             (r, g, b, a)
         }
-        ColorType::GREY_ALPHA => {
+        ColorType::GreyAlpha => {
             let t = 256 * inp[i * 4 + 0] as u16 + inp[i * 4 + 1] as u16;
             let a = 256 * inp[i * 4 + 2] as u16 + inp[i * 4 + 3] as u16;
             (t, t, t, a)
         }
-        ColorType::RGBA => (
+        ColorType::Rgba => (
             256 * inp[i * 8 + 0] as u16 + inp[i * 8 + 1] as u16,
             256 * inp[i * 8 + 2] as u16 + inp[i * 8 + 3] as u16,
             256 * inp[i * 8 + 4] as u16 + inp[i * 8 + 5] as u16,
             256 * inp[i * 8 + 6] as u16 + inp[i * 8 + 7] as u16,
         ),
-        ColorType::BGR
-        | ColorType::BGRA
-        | ColorType::BGRX
-        | ColorType::PALETTE => unreachable!(),
+        ColorType::Bgr
+        | ColorType::Bgra
+        | ColorType::Bgrx
+        | ColorType::Palette => unreachable!(),
     }
 }
 
@@ -772,7 +772,7 @@ pub(super) fn read_chunk_trns(
     color: &mut ColorMode,
     data: &[u8],
 ) -> Result<(), Error> {
-    if color.colortype == ColorType::PALETTE {
+    if color.colortype == ColorType::Palette {
         let pal = color.palette_mut();
         if data.len() > pal.len() {
             return Err(Error(38));
@@ -785,13 +785,13 @@ pub(super) fn read_chunk_trns(
                 Ch8::new(d),
             );
         }
-    } else if color.colortype == ColorType::GREY {
+    } else if color.colortype == ColorType::Grey {
         if data.len() != 2 {
             return Err(Error(30));
         }
         let t = 256 * data[0] as u16 + data[1] as u16;
         color.set_key(t, t, t);
-    } else if color.colortype == ColorType::RGB {
+    } else if color.colortype == ColorType::Rgb {
         if data.len() != 6 {
             return Err(Error(41));
         }
@@ -812,7 +812,7 @@ pub(super) fn read_chunk_bkgd(
     data: &[u8],
 ) -> Result<(), Error> {
     let chunk_length = data.len();
-    if info.color.colortype == ColorType::PALETTE {
+    if info.color.colortype == ColorType::Palette {
         /*error: this chunk must be 1 byte for indexed color image*/
         if chunk_length != 1 {
             return Err(Error(43)); /*error: this chunk must be 2 bytes for greyscale image*/
@@ -825,8 +825,8 @@ pub(super) fn read_chunk_bkgd(
             };
             info.background_g
         };
-    } else if info.color.colortype == ColorType::GREY
-        || info.color.colortype == ColorType::GREY_ALPHA
+    } else if info.color.colortype == ColorType::Grey
+        || info.color.colortype == ColorType::GreyAlpha
     {
         if chunk_length != 2 {
             return Err(Error(44));
@@ -839,8 +839,8 @@ pub(super) fn read_chunk_bkgd(
             };
             info.background_g
         };
-    } else if info.color.colortype == ColorType::RGB
-        || info.color.colortype == ColorType::RGBA
+    } else if info.color.colortype == ColorType::Rgb
+        || info.color.colortype == ColorType::Rgba
     {
         if chunk_length != 6 {
             return Err(Error(45));
@@ -1063,13 +1063,13 @@ pub(super) fn add_chunk_bkgd(
     info: &Info,
 ) -> Result<(), Error> {
     let mut bkgd = Vec::new();
-    if info.color.colortype == ColorType::GREY
-        || info.color.colortype == ColorType::GREY_ALPHA
+    if info.color.colortype == ColorType::Grey
+        || info.color.colortype == ColorType::GreyAlpha
     {
         bkgd.push((info.background_r >> 8) as u8);
         bkgd.push((info.background_r & 255) as u8);
-    } else if info.color.colortype == ColorType::RGB
-        || info.color.colortype == ColorType::RGBA
+    } else if info.color.colortype == ColorType::Rgb
+        || info.color.colortype == ColorType::Rgba
     {
         bkgd.push((info.background_r >> 8) as u8);
         bkgd.push((info.background_r & 255) as u8);
@@ -1077,7 +1077,7 @@ pub(super) fn add_chunk_bkgd(
         bkgd.push((info.background_g & 255) as u8);
         bkgd.push((info.background_b >> 8) as u8);
         bkgd.push((info.background_b & 255) as u8);
-    } else if info.color.colortype == ColorType::PALETTE {
+    } else if info.color.colortype == ColorType::Palette {
         bkgd.push((info.background_r & 255) as u8);
     }
     add_chunk(out, b"bKGD", &bkgd)
@@ -1107,7 +1107,7 @@ pub(super) fn add_chunk_trns(
     info: &ColorMode,
 ) -> Result<(), Error> {
     let mut trns = Vec::new();
-    if info.colortype == ColorType::PALETTE {
+    if info.colortype == ColorType::Palette {
         let palette = info.palette();
         let mut amount = palette.len();
         /*the tail of palette values that all have 255 as alpha, does not have to be encoded*/
@@ -1124,12 +1124,12 @@ pub(super) fn add_chunk_trns(
         for p in &palette[0..amount] {
             trns.push(p.alpha().value().into());
         }
-    } else if info.colortype == ColorType::GREY {
+    } else if info.colortype == ColorType::Grey {
         if let Some((r, _, _)) = info.key() {
             trns.push((r >> 8) as u8);
             trns.push((r & 255) as u8);
         };
-    } else if info.colortype == ColorType::RGB {
+    } else if info.colortype == ColorType::Rgb {
         if let Some((r, g, b)) = info.key() {
             trns.push((r >> 8) as u8);
             trns.push((r & 255) as u8);

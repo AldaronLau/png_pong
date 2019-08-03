@@ -1,4 +1,6 @@
-//! Zlib                                                                   / */
+//! Zlib     
+use miniz_oxide::inflate::decompress_to_vec;
+
 use super::*;
 
 pub(crate) fn lodepng_zlib_decompress(
@@ -25,7 +27,15 @@ pub(crate) fn lodepng_zlib_decompress(
         "The additional flags shall not specify a preset dictionary."*/
         return Err(Error(26));
     }
-    let out = inflate(&inp[2..], settings)?;
+
+    let out = match decompress_to_vec(&inp[2..]) {
+        Ok(rtn) => rtn,
+        Err(e) => {
+            eprintln!("Inflate Failure: {:?}", e);
+            return Err(Error(52));
+        }
+    };
+
     if (!cfg!(fuzzing)) && settings.check_adler32 {
         let adler32_val = lodepng_read32bit_int(&inp[(inp.len() - 4)..]);
         let checksum = adler32(&out);

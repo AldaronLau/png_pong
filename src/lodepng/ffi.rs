@@ -21,22 +21,22 @@ pub struct Error(pub u32);
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ColorType {
     /// greyscale: 1, 2, 4, 8, 16 bit
-    GREY = 0,
+    Grey = 0,
     /// RGB: 8, 16 bit
-    RGB = 2,
+    Rgb = 2,
     /// palette: 1, 2, 4, 8 bit
-    PALETTE = 3,
+    Palette = 3,
     /// greyscale with alpha: 8, 16 bit
-    GREY_ALPHA = 4,
+    GreyAlpha = 4,
     /// RGB with alpha: 8, 16 bit
-    RGBA = 6,
+    Rgba = 6,
 
     /// Not PNG standard, for internal use only. BGRA with alpha, 8 bit
-    BGRA = 6 | 64,
+    Bgra = 6 | 64,
     /// Not PNG standard, for internal use only. BGR no alpha, 8 bit
-    BGR = 2 | 64,
+    Bgr = 2 | 64,
     /// Not PNG standard, for internal use only. BGR no alpha, padded, 8 bit
-    BGRX = 3 | 64,
+    Bgrx = 3 | 64,
 }
 
 /// Color mode of an image. Contains all information required to decode the pixel
@@ -186,15 +186,15 @@ pub(crate) struct DecoderSettings {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum FilterStrategy {
     /// every filter at zero
-    ZERO = 0,
+    Zero = 0,
     /// Use filter that gives minumum sum, as described in the official PNG filter heuristic.
-    MINSUM,
+    Minsum,
     /// Use the filter type that gives smallest Shannon entropy for this scanline. Depending
     /// on the image, this is better or worse than minsum.
-    ENTROPY,
+    Entropy,
     /// Brute-force-search PNG filters by compressing each filter for each scanline.
     /// Experimental, very slow, and only rarely gives better compression than MINSUM.
-    BRUTE_FORCE,
+    BruteForce,
 }
 
 #[repr(C)]

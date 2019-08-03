@@ -36,11 +36,11 @@ pub(crate) fn lodepng_inspect(
     }
     info_png.color.set_bitdepth(inp[24] as u32);
     info_png.color.colortype = match inp[25] {
-        0 => ColorType::GREY,
-        2 => ColorType::RGB,
-        3 => ColorType::PALETTE,
-        4 => ColorType::GREY_ALPHA,
-        6 => ColorType::RGBA,
+        0 => ColorType::Grey,
+        2 => ColorType::Rgb,
+        3 => ColorType::Palette,
+        4 => ColorType::GreyAlpha,
+        6 => ColorType::Rgba,
         _ => return Err(Error(31)),
     };
     info_png.compression_method = inp[26] as u32;
@@ -233,8 +233,8 @@ pub(crate) fn lodepng_decode(
     } else {
         /*TODO: check if this works according to the statement in the documentation: "The converter can convert
         from greyscale input color type, to 8-bit greyscale or greyscale with alpha"*/
-        if !(state.info_raw.colortype == ColorType::RGB
-            || state.info_raw.colortype == ColorType::RGBA)
+        if !(state.info_raw.colortype == ColorType::Rgb
+            || state.info_raw.colortype == ColorType::Rgba)
             && (state.info_raw.bitdepth() != 8)
         {
             return Err(Error(56)); /*unsupported color mode conversion*/
@@ -285,7 +285,7 @@ pub(crate) fn lodepng_encode(
     let h = h as usize;
 
     let mut info = state.info_png.clone();
-    if (info.color.colortype == ColorType::PALETTE
+    if (info.color.colortype == ColorType::Palette
         || state.encoder.force_palette != 0)
         && (info.color.palette().is_empty() || info.color.palette().len() > 256)
     {
@@ -339,23 +339,23 @@ pub(crate) fn lodepng_encode(
     if let Some(chunks) = info.unknown_chunks_data(ChunkPosition::IHDR) {
         add_unknown_chunks(&mut outv, chunks)?;
     }
-    if info.color.colortype == ColorType::PALETTE {
+    if info.color.colortype == ColorType::Palette {
         add_chunk_plte(&mut outv, &info.color)?;
     }
     if state.encoder.force_palette != 0
-        && (info.color.colortype == ColorType::RGB
-            || info.color.colortype == ColorType::RGBA)
+        && (info.color.colortype == ColorType::Rgb
+            || info.color.colortype == ColorType::Rgba)
     {
         add_chunk_plte(&mut outv, &info.color)?;
     }
-    if info.color.colortype == ColorType::PALETTE
+    if info.color.colortype == ColorType::Palette
         && get_palette_translucency(info.color.palette())
             != PaletteTranslucency::Opaque
     {
         add_chunk_trns(&mut outv, &info.color)?;
     }
-    if (info.color.colortype == ColorType::GREY
-        || info.color.colortype == ColorType::RGB)
+    if (info.color.colortype == ColorType::Grey
+        || info.color.colortype == ColorType::Rgb)
         && info.color.key().is_some()
     {
         add_chunk_trns(&mut outv, &info.color)?;
@@ -648,9 +648,9 @@ pub(crate) fn auto_choose_color(
         for p in pal {
             mode_out.palette_add(*p)?;
         }
-        mode_out.colortype = ColorType::PALETTE;
+        mode_out.colortype = ColorType::Palette;
         mode_out.set_bitdepth(palettebits);
-        if mode_in.colortype == ColorType::PALETTE
+        if mode_in.colortype == ColorType::Palette
             && mode_in.palette().len() >= mode_out.palette().len()
             && mode_in.bitdepth() == mode_out.bitdepth()
         {
@@ -661,14 +661,14 @@ pub(crate) fn auto_choose_color(
         mode_out.set_bitdepth(prof.bits);
         mode_out.colortype = if prof.alpha {
             if prof.colored != 0 {
-                ColorType::RGBA
+                ColorType::Rgba
             } else {
-                ColorType::GREY_ALPHA
+                ColorType::GreyAlpha
             }
         } else if prof.colored != 0 {
-            ColorType::RGB
+            ColorType::Rgb
         } else {
-            ColorType::GREY
+            ColorType::Grey
         };
         if let Some((key_r, key_g, key_b)) = prof.key {
             let mask = ((1 << mode_out.bitdepth()) - 1) as u16;

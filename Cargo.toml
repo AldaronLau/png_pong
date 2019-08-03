@@ -19,8 +19,7 @@ travis-ci = { repository = "Aldarobot/png_pong" }
 
 [dependencies]
 pix = "0.6"
-deflate = { optional = true, version = "0.7" }
-inflate = { optional = true, version = "0.4" }
+miniz_oxide = { optional = true, version = "0.3" }
 
 [[example]]
 name = "read"
@@ -42,4 +41,4 @@ opt-level = 2
 
 [features]
 default = ["flate"]
-flate = ["deflate", "inflate"]
+flate = ["miniz_oxide"]

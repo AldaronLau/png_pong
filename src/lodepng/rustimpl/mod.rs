@@ -5,8 +5,6 @@ mod bitmath;
 mod chunks;
 mod colors;
 mod crc32;
-mod decompressor;
-mod deflate;
 mod huffman;
 mod png_decoder;
 mod zlib;
@@ -16,8 +14,6 @@ pub(crate) use self::{
     chunks::*,
     colors::*,
     crc32::*,
-    decompressor::*,
-    deflate::*,
     huffman::*,
     png_decoder::*,
     zlib::*,
@@ -222,9 +218,9 @@ fn filter(
     heuristic is used.
     */
     let strategy = if settings.filter_palette_zero != 0
-        && (info.colortype == ColorType::PALETTE || info.bitdepth() < 8)
+        && (info.colortype == ColorType::Palette || info.bitdepth() < 8)
     {
-        FilterStrategy::ZERO
+        FilterStrategy::Zero
     } else {
         settings.filter_strategy
     };
@@ -232,7 +228,7 @@ fn filter(
         return Err(Error(31));
     }
     match strategy {
-        FilterStrategy::ZERO => {
+        FilterStrategy::Zero => {
             for y in 0..h {
                 let outindex = (1 + linebytes) * y;
                 let inindex = linebytes * y;
@@ -248,7 +244,7 @@ fn filter(
                 prevline = Some(&inp[inindex..]);
             }
         }
-        FilterStrategy::MINSUM => {
+        FilterStrategy::Minsum => {
             let mut sum: [usize; 5] = [0, 0, 0, 0, 0];
             let mut attempt = [
                 vec![0u8; linebytes],
@@ -299,7 +295,7 @@ fn filter(
                 } /*try the 5 filter types*/
             } /*the filter type itself is part of the scanline*/
         }
-        FilterStrategy::ENTROPY => {
+        FilterStrategy::Entropy => {
             let mut sum: [f32; 5] = [0., 0., 0., 0., 0.];
             let mut smallest = 0.;
             let mut best_type = 0;
@@ -344,7 +340,7 @@ fn filter(
                 }
             }
         }
-        FilterStrategy::BRUTE_FORCE => {
+        FilterStrategy::BruteForce => {
             /*brute force filter chooser.
             deflate the scanline after every filter attempt to see which one deflates best.
             This is very slow and gives only slightly smaller, sometimes even larger, result*/

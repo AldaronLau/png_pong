@@ -85,7 +85,7 @@ pub fn lodepng_convert(
         return Ok(());
     }
     let mut tree = ColorTree::new();
-    if mode_out.colortype == ColorType::PALETTE {
+    if mode_out.colortype == ColorType::Palette {
         let mut palette = mode_out.palette();
         let palsize = 1 << mode_out.bitdepth();
         /*if the user specified output palette but did not give the values, assume
@@ -109,10 +109,10 @@ pub fn lodepng_convert(
             let (r, g, b, a) = get_pixel_color_rgba16(inp, i, mode_in);
             rgba16_to_pixel(out, i, mode_out, r, g, b, a);
         }
-    } else if mode_out.bitdepth() == 8 && mode_out.colortype == ColorType::RGBA
+    } else if mode_out.bitdepth() == 8 && mode_out.colortype == ColorType::Rgba
     {
         get_pixel_colors_rgba8(out, numpixels as usize, true, inp, mode_in);
-    } else if mode_out.bitdepth() == 8 && mode_out.colortype == ColorType::RGB {
+    } else if mode_out.bitdepth() == 8 && mode_out.colortype == ColorType::Rgb {
         get_pixel_colors_rgba8(out, numpixels as usize, false, inp, mode_in);
     } else {
         for i in 0..numpixels {
