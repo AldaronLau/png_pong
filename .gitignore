@@ -1,6 +1,10 @@
-*.o
-*.rlib
-*.a
-lodepng.c
-lodepng.h
-example
+target/
+.lock
+/Cargo.lock
+write_test.png
+doc/lodepng/
+doc/src/
+doc/*.woff
+doc/*.css
+doc/*.js
+doc/implementors/

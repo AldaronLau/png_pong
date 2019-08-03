@@ -1,0 +1,45 @@
+[package]
+name = "png_pong"
+version = "0.0.1"
+authors = ["Jeron Aldaron Lau <jeronlau@plopgrizzly.com>"]
+edition = "2018"
+
+categories = ["multimedia::encoding", "multimedia::images"]
+description = "Reading and writing PNG/APNG files without system dependencies."
+documentation = "https://docs.rs/png_pong/"
+homepage = "https://crates.rs/crates/png_pong/"
+include = ["src/**/*", "COPYRIGHT", "README.md", "Cargo.toml"]
+keywords = ["PNG","lodepng","encoder","decoder"]
+license = "Zlib / MIT / BSL-1.0"
+readme = "README.md"
+repository = "https://github.com/Aldarobot/png_pong.git"
+
+[badges]
+travis-ci = { repository = "Aldarobot/png_pong" }
+
+[dependencies]
+pix = "0.6"
+deflate = { optional = true, version = "0.7" }
+inflate = { optional = true, version = "0.4" }
+
+[[example]]
+name = "read"
+
+[[example]]
+name = "write"
+
+[[example]]
+name = "passthrough"
+
+[[example]]
+name = "read_advanced"
+
+[profile.test]
+opt-level = 2
+
+[profile.dev]
+opt-level = 2
+
+[features]
+default = ["flate"]
+flate = ["deflate", "inflate"]
