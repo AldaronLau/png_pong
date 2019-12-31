@@ -18,7 +18,6 @@ use std::cmp;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
-use std::os::raw::c_uint;
 use std::path::Path;
 use std::ptr;
 
@@ -193,7 +192,7 @@ impl Default for ColorMode {
 
 impl ColorType {
     /// Create color mode with given type and bitdepth
-    pub fn to_color_mode(&self, bitdepth: c_uint) -> ColorMode {
+    pub fn to_color_mode(&self, bitdepth: u32) -> ColorMode {
         ColorMode {
             colortype: *self,
             bitdepth,
@@ -517,7 +516,7 @@ impl State {
     }
 
     pub fn set_auto_convert(&mut self, mode: bool) {
-        self.encoder.auto_convert = mode as c_uint;
+        self.encoder.auto_convert = mode as u32;
     }
 
     pub fn set_filter_strategy(
@@ -628,8 +627,8 @@ impl State {
     ) -> Result<Vec<u8>, Error> {
         Ok(rustimpl::lodepng_encode(
             raster.as_u8_slice(),
-            raster.width() as c_uint,
-            raster.height() as c_uint,
+            raster.width() as u32,
+            raster.height() as u32,
             self,
         )?)
     }
@@ -692,7 +691,7 @@ fn new_bitmap(
     w: usize,
     h: usize,
     colortype: ColorType,
-    bitdepth: c_uint,
+    bitdepth: u32,
 ) -> Image {
     // TODO as parameters instead of casting.
     let width = w as u32;
@@ -785,7 +784,7 @@ fn load_file<P: AsRef<Path>>(filepath: P) -> Result<Vec<u8>, Error> {
 pub fn decode_memory<Bytes: AsRef<[u8]>>(
     input: Bytes,
     colortype: ColorType,
-    bitdepth: c_uint,
+    bitdepth: u32,
 ) -> Result<Image, Error> {
     let input = input.as_ref();
 
@@ -819,7 +818,7 @@ pub fn decode32<Bytes: AsRef<[u8]>>(
 pub fn encode_memory<PixelType: Copy + pix::Format>(
     raster: &pix::Raster<PixelType>,
     colortype: ColorType,
-    bitdepth: c_uint,
+    bitdepth: u32,
 ) -> Result<Vec<u8>, Error> {
     Ok(rustimpl::lodepng_encode_memory(
         raster.as_u8_slice(),
@@ -852,7 +851,7 @@ pub fn encode_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
     filepath: P,
     raster: &pix::Raster<PixelType>,
     colortype: ColorType,
-    bitdepth: c_uint,
+    bitdepth: u32,
 ) -> Result<(), Error> {
     let encoded = encode_memory(raster, colortype, bitdepth)?;
     save_file(filepath, encoded.as_ref())

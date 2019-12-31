@@ -85,17 +85,17 @@ pub(crate) struct DecompressSettings {
 #[derive(Clone)]
 pub struct CompressSettings {
     /// the block type for LZ (0, 1, 2 or 3, see zlib standard). Should be 2 for proper compression.
-    pub btype: c_uint,
+    pub btype: u32,
     /// whether or not to use LZ77. Should be 1 for proper compression.
-    pub use_lz77: c_uint,
+    pub use_lz77: u32,
     /// must be a power of two <= 32768. higher compresses more but is slower. Typical value: 2048.
-    pub windowsize: c_uint,
+    pub windowsize: u32,
     /// mininum lz77 length. 3 is normally best, 6 can be better for some PNGs. Default: 0
-    pub minmatch: c_uint,
+    pub minmatch: u32,
     /// stop searching if >= this length found. Set to 258 for best compression. Default: 128
-    pub nicematch: c_uint,
+    pub nicematch: u32,
     /// use lazy matching: better compression but a bit slower. Default: true
-    pub lazymatching: c_uint,
+    pub lazymatching: u32,
     /// optional custom settings for custom functions
     pub custom_context: *const c_void,
 }
@@ -104,12 +104,12 @@ pub struct CompressSettings {
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Time {
-    pub year: c_uint,
-    pub month: c_uint,
-    pub day: c_uint,
-    pub hour: c_uint,
-    pub minute: c_uint,
-    pub second: c_uint,
+    pub year: u32,
+    pub month: u32,
+    pub day: u32,
+    pub hour: u32,
+    pub minute: u32,
+    pub second: u32,
 }
 
 /// Information about the PNG image, except pixels, width and height
@@ -117,11 +117,11 @@ pub struct Time {
 #[derive(Debug)]
 pub struct Info {
     /// compression method of the original file. Always 0.
-    pub compression_method: c_uint,
+    pub compression_method: u32,
     /// filter method of the original file
-    pub filter_method: c_uint,
+    pub filter_method: u32,
     /// interlace method of the original file
-    pub interlace_method: c_uint,
+    pub interlace_method: u32,
     /// color type and bits, palette and transparency of the PNG file
     pub color: ColorMode,
 
@@ -134,13 +134,13 @@ pub struct Info {
     ///  the palette in background_r, the other two are then ignored.
     ///
     ///  The decoder does not use this background color to edit the color of pixels.
-    pub background_defined: c_uint,
+    pub background_defined: u32,
     /// red component of suggested background color
-    pub background_r: c_uint,
+    pub background_r: u32,
     /// green component of suggested background color
-    pub background_g: c_uint,
+    pub background_g: u32,
     /// blue component of suggested background color
-    pub background_b: c_uint,
+    pub background_b: u32,
 
     /// Text chunks.
     pub text: Vec<TextChunk>,
@@ -148,18 +148,18 @@ pub struct Info {
     pub itext: Vec<ITextChunk>,
 
     /// set to 1 to make the encoder generate a tIME chunk
-    pub time_defined: c_uint,
+    pub time_defined: u32,
     /// time chunk (tIME)
     pub time: Time,
 
     /// if 0, there is no pHYs chunk and the values below are undefined, if 1 else there is one
-    pub phys_defined: c_uint,
+    pub phys_defined: u32,
     /// pixels per unit in x direction
-    pub phys_x: c_uint,
+    pub phys_x: u32,
     /// pixels per unit in y direction
-    pub phys_y: c_uint,
+    pub phys_y: u32,
     /// may be 0 (unknown unit) or 1 (metre)
-    pub phys_unit: c_uint,
+    pub phys_unit: u32,
 
     /// unknown chunks
     /// There are 3 buffers, one for each position in the PNG where unknown chunks can appear
@@ -178,7 +178,7 @@ pub(crate) struct DecoderSettings {
     pub(crate) zlibsettings: DecompressSettings,
     /// check CRC checksums
     pub(crate) check_crc: bool,
-    pub(crate) color_convert: c_uint,
+    pub(crate) color_convert: u32,
 }
 
 /// automatically use color type with less bits per pixel if losslessly possible. Default: `AUTO`
@@ -203,23 +203,23 @@ pub struct EncoderSettings {
     /// settings for the zlib encoder, such as window size, ...
     pub zlibsettings: CompressSettings,
     /// how to automatically choose output PNG color type, if at all
-    pub auto_convert: c_uint,
+    pub auto_convert: u32,
     /// If true, follows the official PNG heuristic: if the PNG uses a palette or lower than
     /// 8 bit depth, set all filters to zero. Otherwise use the filter_strategy. Note that to
     /// completely follow the official PNG heuristic, filter_palette_zero must be true and
     /// filter_strategy must be FilterStrategy::MINSUM
-    pub filter_palette_zero: c_uint,
+    pub filter_palette_zero: u32,
     /// Which filter strategy to use when not using zeroes due to filter_palette_zero.
     /// Set filter_palette_zero to 0 to ensure always using your chosen strategy. Default: FilterStrategy::MINSUM
     pub filter_strategy: FilterStrategy,
 
     /// force creating a `PLTE` chunk if colortype is 2 or 6 (= a suggested palette).
     /// If colortype is 3, `PLTE` is _always_ created
-    pub force_palette: c_uint,
+    pub force_palette: u32,
     /// add LodePNG identifier and version as a text chunk, for debugging
-    pub add_id: c_uint,
+    pub add_id: u32,
     /// encode text chunks as zTXt chunks instead of tEXt chunks, and use compression in iTXt chunks
-    pub text_compression: c_uint,
+    pub text_compression: u32,
 }
 
 /// The settings, state and information for extended encoding and decoding
@@ -241,7 +241,7 @@ pub(crate) struct State {
 #[repr(C)]
 pub struct ColorProfile {
     /// not greyscale
-    pub colored: c_uint,
+    pub colored: u32,
     /// image is not opaque - use color key instead of full alpha
     ///
     /// key values, always as 16-bit, in 8-bit case the byte is duplicated, e.g.
