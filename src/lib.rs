@@ -168,23 +168,28 @@ where
     }
 }
 
+use std::marker::PhantomData;
+
 /// Encoder for writing [`Raster`](chunk/enum.Raster.html)s into a PNG file.
-pub struct RasterEncoder<'a, W>
+pub struct RasterEncoder<'a, W, F>
 where
     W: std::io::Write,
+    F: pix::Format,
 {
     state: &'a mut lodepng::State,
     bytes: W,
+    _phantom: PhantomData<F>,
 }
 
-impl<'a, W> RasterEncoder<'a, W>
+impl<'a, W, F> RasterEncoder<'a, W, F>
 where
     W: std::io::Write,
+    F: pix::Format,
 {
     /// Add a frame to the animation or still.
     pub fn add_frame(
         &mut self,
-        raster: &pix::Raster<pix::Rgba8>,
+        raster: &pix::Raster<F>,
         nanos: u64,
     ) -> Result<(), EncodeError> {
         let _ = nanos; // TODO
@@ -276,13 +281,15 @@ impl EncoderBuilder {
     }
 
     /// Convert into a raster encoder.
-    pub fn encode_rasters<'a, W>(&'a mut self, bytes: W) -> RasterEncoder<'a, W>
+    pub fn encode_rasters<'a, W, F>(&'a mut self, bytes: W) -> RasterEncoder<'a, W, F>
     where
         W: std::io::Write,
+        F: pix::Format,
     {
         RasterEncoder {
             state: &mut self.state,
             bytes,
+            _phantom: PhantomData,
         }
     }
 }
