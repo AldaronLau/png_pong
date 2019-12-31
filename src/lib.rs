@@ -263,6 +263,11 @@ where
     ) -> Result<(), EncodeError> {
         let _ = nanos; // TODO
 
+        self.state.info_raw.colortype = F::PNG_COLOR;
+        self.state.info_raw.set_bitdepth(F::BIT_DEPTH);
+        self.state.info_png.color.colortype = F::PNG_COLOR;
+        self.state.info_png.color.set_bitdepth(F::BIT_DEPTH);
+
         let bytes = match self.state.encode(raster) {
             Ok(o) => o,
             Err(e) => return Err(EncodeError::ParseError(e)),
