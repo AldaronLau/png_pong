@@ -1,6 +1,6 @@
 Zlib License
 
-Copyright © 2019 Jeron Aldaron Lau
+Copyright © 2019-2020 Jeron Aldaron Lau
 Copyright © 2014-2017 Kornel Lesiński
 Copyright © 2005-2016 Lode Vandevenne
 

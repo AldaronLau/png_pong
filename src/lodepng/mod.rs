@@ -10,7 +10,7 @@ mod rustimpl;
 use rustimpl::*;
 
 mod error;
-pub use error::*;
+pub use self::error::Error;
 mod iter;
 use iter::*;
 
@@ -26,7 +26,6 @@ pub use ffi::CompressSettings;
 pub(crate) use ffi::DecoderSettings;
 pub(crate) use ffi::DecompressSettings;
 pub use ffi::EncoderSettings;
-pub use ffi::Error;
 pub use ffi::FilterStrategy;
 pub(crate) use ffi::State;
 pub use ffi::Time;

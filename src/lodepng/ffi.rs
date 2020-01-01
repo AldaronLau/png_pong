@@ -13,10 +13,6 @@ use crate::lodepng::rustimpl::*;
 use crate::chunk::{TextChunk, ITextChunk};
 use pix::Rgba8;
 
-/// A lame error code.
-#[derive(Copy, Clone, Eq, PartialEq)]
-pub struct Error(pub u32);
-
 /// Type for `decode`, `encode`, etc. Same as standard PNG color types.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -234,7 +230,7 @@ pub(crate) struct State {
     pub(crate) info_raw: ColorMode,
     /// info of the PNG image obtained after decoding
     pub(crate) info_png: Info,
-    pub(crate) error: Error,
+    pub(crate) error: super::Error,
 }
 
 /// Gives characteristics about the colors of the image, which helps decide which color model to use for encoding.

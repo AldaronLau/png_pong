@@ -1,13 +1,29 @@
 # PNG Pong - A pure Rust PNG encoder & decoder
-This is a pure Rust PNG image decoder and encoder based on lodepng.  This crate allows easy reading and writing of PNG files without any system dependencies.
+This is a pure Rust PNG image decoder and encoder based on lodepng.
+This crate allows easy reading and writing of PNG files without any
+system dependencies.
 
 # Why another PNG crate?
 These are the 3 Rust PNG encoder/decoder crates I know of:
-- [png](https://crates.io/crates/png) - The one everyone uses, is very limited in which PNGs it can open.
-- [lodepng](https://crates.io/crates/lodepng) - Lots of features, code is ported from C, therefore code is hard read & maintain, also uses slow implementation of deflate/inflate algorithm.
-- [imagefmt](https://crates.io/crates/imagefmt) - Abandoned, just as limited as png, but with a lot less lines of code.
+- [png](https://crates.io/crates/png) - The one everyone uses, is very
+  limited in which PNGs it can open.
+- [lodepng](https://crates.io/crates/lodepng) - Lots of features, code
+  is ported from C, therefore code is hard read & maintain, also uses
+  slow implementation of deflate/inflate algorithm.
+- [imagefmt](https://crates.io/crates/imagefmt) - Abandoned, just as
+  limited as png, but with a lot less lines of code.
 
-Originally I made the [aci_png](https://crates.io/crates/aci_png) based on imagefmt, and intended to add more features.  That task seemed possible at first, but just became daunting after a while.  That's why I decided to take `lodepng` which has more features (and more low level features) and clean up the code, upgrade to 2018 edition of Rust, depend on inflate and deflate crates (because they can do it faster than lodepng) and get rid of the libc dependency so it *actually* becomes pure Rust (lodepng claims to be, but calls C's malloc and free).  I also decided to model the API after the [gift](https://crates.io/crates/gift) crate, so I'm using [pix](https://crates.io/crates/pix) instead of [rgb](https://crates.io/crates/rgb).
+Originally I made the [aci_png](https://crates.io/crates/aci_png) based
+on imagefmt, and intended to add more features.  That task seemed
+possible at first, but just became daunting after a while.  That's why I
+decided to take `lodepng` which has more features (and more low level
+features) and clean up the code, upgrade to 2018 edition of Rust, depend
+on the miniz\_oxide crate (because it can do it faster than lodepng) and
+get rid of the libc dependency so it *actually* becomes pure Rust
+(lodepng claims to be, but calls C's malloc and free).  I also decided
+to model the API after the [gift](https://crates.io/crates/gift) crate,
+so I'm using [pix](https://crates.io/crates/pix) instead of
+[rgb](https://crates.io/crates/rgb).
 
 ## Goals
 - Forbid unsafe.

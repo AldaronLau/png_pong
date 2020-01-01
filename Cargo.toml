@@ -1,6 +1,6 @@
 [package]
 name = "png_pong"
-version = "0.0.2"
+version = "0.1.0"
 authors = ["Jeron Aldaron Lau <jeronlau@plopgrizzly.com>"]
 edition = "2018"
 
@@ -9,29 +9,17 @@ description = "Reading and writing PNG/APNG files without system dependencies."
 documentation = "https://docs.rs/png_pong/"
 homepage = "https://crates.rs/crates/png_pong/"
 include = ["src/**/*", "COPYRIGHT", "README.md", "Cargo.toml"]
-keywords = ["PNG","lodepng","encoder","decoder"]
+keywords = ["PNG", "lodepng", "encoder", "decoder", "APNG"]
 license = "Zlib / MIT / BSL-1.0"
 readme = "README.md"
-repository = "https://github.com/Aldarobot/png_pong.git"
+repository = "https://github.com/LordAldaron/png_pong.git"
 
 [badges]
-travis-ci = { repository = "Aldarobot/png_pong" }
+travis-ci = { repository = "LordAldaron/png_pong" }
 
 [dependencies]
 pix = "0.7"
 miniz_oxide = { optional = true, version = "0.3" }
-
-[[example]]
-name = "read"
-
-[[example]]
-name = "write"
-
-[[example]]
-name = "passthrough"
-
-[[example]]
-name = "read_advanced"
 
 [profile.test]
 opt-level = 2

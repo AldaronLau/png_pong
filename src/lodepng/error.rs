@@ -3,7 +3,9 @@ use std::error;
 use std::fmt;
 use std::io;
 
-use crate::lodepng::ffi::Error;
+/// A lame error code.
+#[derive(Copy, Clone, Eq, PartialEq)]
+pub struct Error(pub u32);
 
 impl Error {
     /// Returns an English description of the numerical error code.
