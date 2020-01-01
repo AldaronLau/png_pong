@@ -1,6 +1,7 @@
 //! CRC32
 
 use pix::Alpha;
+use std::convert::TryInto;
 
 use super::*;
 
@@ -136,23 +137,23 @@ NOTE: the in buffer will be overwritten with intermediate data!
 pub(super) fn postprocess_scanlines(
     out: &mut [u8],
     inp: &mut [u8],
-    w: usize,
-    h: usize,
+    w: u32,
+    h: u32,
     info_png: &Info,
 ) -> Result<(), Error> {
-    let bpp = info_png.color.bpp() as usize;
+    let bpp = info_png.color.bpp();
     if bpp == 0 {
         return Err(Error(31));
     }
     if info_png.interlace_method == 0 {
-        if bpp < 8 && w as usize * bpp != ((w as usize * bpp + 7) / 8) * 8 {
-            unfilter_aliased(inp, 0, 0, w, h, bpp)?;
+        if bpp < 8 && w as usize * bpp as usize != ((w as usize * bpp as usize + 7) / 8) * 8 {
+            unfilter_aliased(inp, 0, 0, w as usize, h as usize, bpp as usize)?;
             remove_padding_bits(
                 out,
                 inp,
-                w as usize * bpp,
-                ((w as usize * bpp + 7) / 8) * 8,
-                h,
+                w as usize * bpp as usize,
+                ((w as usize * bpp as usize + 7) / 8) * 8,
+                h as usize,
             );
         } else {
             unfilter(out, inp, w, h, bpp)?;
@@ -163,26 +164,26 @@ pub(super) fn postprocess_scanlines(
         for i in 0..7 {
             unfilter_aliased(
                 inp,
-                padded_passstart[i],
-                filter_passstart[i],
+                padded_passstart[i] as usize,
+                filter_passstart[i] as usize,
                 passw[i] as usize,
                 passh[i] as usize,
-                bpp,
+                bpp as usize,
             )?;
             if bpp < 8 {
                 /*remove padding bits in scanlines; after this there still may be padding
                 bits between the different reduced images: each reduced image still starts nicely at a byte*/
                 remove_padding_bits_aliased(
                     inp,
-                    passstart[i],
-                    padded_passstart[i],
-                    passw[i] as usize * bpp,
-                    ((passw[i] as usize * bpp + 7) / 8) * 8,
+                    passstart[i] as usize,
+                    padded_passstart[i] as usize,
+                    passw[i] as usize * bpp as usize,
+                    ((passw[i] as usize * bpp as usize + 7) / 8) * 8,
                     passh[i] as usize,
                 );
             };
         }
-        adam7_deinterlace(out, inp, w, h, bpp);
+        adam7_deinterlace(out, inp, w, h, bpp.try_into().unwrap());
     }
     Ok(())
 }
@@ -197,21 +198,23 @@ in and out are allowed to be the same memory address (but aren't the same size s
 fn unfilter(
     out: &mut [u8],
     inp: &[u8],
-    w: usize,
-    h: usize,
-    bpp: usize,
+    w: u32,
+    h: u32,
+    bpp: u32,
 ) -> Result<(), Error> {
+    use std::convert::TryInto;
+
     let mut prevline = None;
 
     /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
-    let bytewidth = (bpp + 7) / 8;
-    let linebytes = (w * bpp + 7) / 8;
+    let bytewidth = (bpp as usize + 7) / 8;
+    let linebytes = (w as usize * bpp as usize + 7) / 8;
     let in_linebytes = 1 + linebytes; /*the extra filterbyte added to each row*/
 
     for (out_line, in_line) in out
         .chunks_mut(linebytes)
         .zip(inp.chunks(in_linebytes))
-        .take(h)
+        .take(h as usize)
     {
         let filter_type = in_line[0];
         unfilter_scanline(
@@ -480,12 +483,12 @@ NOTE: comments about padding bits are only relevant if bpp < 8
 pub(super) fn adam7_interlace(
     out: &mut [u8],
     inp: &[u8],
-    w: usize,
-    h: usize,
-    bpp: usize,
+    w: u32,
+    h: u32,
+    bpp: u32,
 ) {
     let (passw, passh, _, _, passstart) = adam7_get_pass_values(w, h, bpp);
-    let bpp = bpp;
+    let bpp = bpp as usize;
     if bpp >= 8 {
         for i in 0..7 {
             let bytewidth = bpp / 8;
@@ -498,7 +501,7 @@ pub(super) fn adam7_interlace(
                         + x * ADAM7_DX[i] as usize)
                         * bytewidth;
                     let pixeloutstart =
-                        passstart[i] + (y * passw[i] as usize + x) * bytewidth;
+                        passstart[i] as usize + (y * passw[i] as usize + x) * bytewidth;
                     out[pixeloutstart..(bytewidth + pixeloutstart)]
                         .clone_from_slice(
                             &inp[pixelinstart..(bytewidth + pixelinstart)],
@@ -509,7 +512,7 @@ pub(super) fn adam7_interlace(
     } else {
         for i in 0..7 {
             let ilinebits = bpp * passw[i] as usize;
-            let olinebits = bpp * w;
+            let olinebits = bpp * w as usize;
             for y in 0..passh[i] as usize {
                 for x in 0..passw[i] as usize {
                     let mut ibp = (ADAM7_IY[i] as usize
@@ -518,7 +521,7 @@ pub(super) fn adam7_interlace(
                         + (ADAM7_IX[i] as usize + x * ADAM7_DX[i] as usize)
                             * bpp;
                     let mut obp =
-                        (8 * passstart[i]) + (y * ilinebits + x * bpp);
+                        ((8 * passstart[i] as usize) + (y * ilinebits + x * bpp)) as usize;
                     for _ in 0..bpp {
                         let bit = read_bit_from_reversed_stream(&mut ibp, inp);
                         set_bit_of_reversed_stream(&mut obp, out, bit);

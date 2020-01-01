@@ -13,11 +13,10 @@
 //! ## Examples
 //! - Say you want to read a PNG file into a raster:
 //! ```rust,no_run
-//! let mut decoder_builder = png_pong::DecoderBuilder::new();
 //! let data = std::fs::read("graphic.png").expect("Failed to open PNG");
 //! let data = std::io::Cursor::new(data);
-//! let decoder = decoder_builder.decode_rasters(data);
-//! let (raster, _nanos) = decoder
+//! let decoder = png_pong::FrameDecoder::<_, pix::Rgba8>::new(data);
+//! let png_pong::Frame { raster, delay } = decoder
 //!     .last()
 //!     .expect("No frames in PNG")
 //!     .expect("PNG parsing error");
@@ -34,9 +33,9 @@
 //!     )][..]
 //! );
 //! let mut out_data = Vec::new();
-//! let mut encoder = png_pong::EncoderBuilder::new();
-//! let mut encoder = encoder.encode_rasters(&mut out_data);
-//! encoder.add_frame(&raster, 0).expect("Failed to add frame");
+//! let mut encoder = png_pong::FrameEncoder::<_, pix::Rgba8>::new(&mut out_data);
+//! let frame = png_pong::Frame{ raster, delay: 0 };
+//! encoder.encode(&frame).expect("Failed to add frame");
 //! std::fs::write("graphic.png", out_data).expect("Failed to save image");
 //! ```
 //!
@@ -60,310 +59,22 @@ mod lodepng;
 ///
 pub mod chunk;
 
-/// Prelude.
-pub mod prelude;
-
 pub use crate::lodepng::Error as ParseError;
 pub use pix::{Raster, RasterBuilder};
 
-/// Decoding Errors.
-#[derive(Debug)]
-pub enum DecodeError {
-    /// Couldn't parse file.
-    ParseError(ParseError),
-    /// Couldn't convert to requested format.
-    ConversionError,
-    /// Failed to read data.
-    ReadError,
-}
+// Modules
+mod format;
+mod frame;
+mod error;
+mod chunk_encoder;
+mod chunk_decoder;
+mod frame_encoder;
+mod frame_decoder;
 
-/// Encoding Errors.
-#[derive(Debug)]
-pub enum EncodeError {
-    /// Couldn't parse file.
-    ParseError(ParseError),
-    /// Failed to read data.
-    WriteError(std::io::Error),
-}
-
-/// Metadata for raster.
-pub struct Meta {}
-
-/// Decoder for iterating [`Chunk`](chunk/enum.Chunk.html)s within a PNG file.
-///
-/// build with
-/// `Decoder.`[`into_chunk_decoder()`](struct.Decoder.html#method.into_chunk_decoder).
-#[allow(unused)] // TODO
-pub struct ChunkDecoder<'a, R>
-where
-    R: std::io::Read,
-{
-    state: &'a mut lodepng::State,
-    bytes: R,
-}
-
-/// Encoder for writing [`Chunk`](chunk/enum.Chunk.html)s into a PNG file.
-#[allow(unused)] // TODO
-pub struct ChunkEncoder<'a, W>
-where
-    W: std::io::Write,
-{
-    state: &'a mut lodepng::State,
-    bytes: W,
-}
-
-/// Decoder for iterating [`Raster`](chunk/enum.Raster.html)s within a PNG file.
-///
-/// build with
-/// `Decoder.`[`into_raster_decoder()`](struct.Decoder.html#method.into_raster_decoder).
-pub struct RasterDecoder<'a, R>
-where
-    R: std::io::Read,
-{
-    state: &'a mut lodepng::State,
-    bytes: R,
-    has_decoded: bool,
-}
-
-impl<'a, R> RasterDecoder<'a, R>
-where
-    R: std::io::Read,
-{
-    /// Get metadata from Raster.
-    pub fn meta(&self) -> Meta {
-        Meta {}
-    }
-}
-
-impl<'a, R> Iterator for RasterDecoder<'a, R>
-where
-    R: std::io::Read,
-{
-    /// First element in tuple is the Raster.  The second is nanoseconds between
-    /// this frame and the next (0 for stills).
-    type Item = Result<(pix::Raster<pix::Rgba8>, u64), DecodeError>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.has_decoded {
-            return None;
-        }
-
-        self.has_decoded = true;
-
-        let mut bytes: Vec<u8> = vec![];
-
-        let raster = if self.bytes.read_to_end(&mut bytes).is_ok() {
-            match self.state.decode(bytes) {
-                Ok(o) => match o {
-                    lodepng::Image::RGBA(img) => Ok((img, 0)),
-                    _ => Err(DecodeError::ConversionError),
-                },
-                Err(e) => Err(DecodeError::ParseError(e)),
-            }
-        } else {
-            Err(DecodeError::ReadError)
-        };
-
-        Some(raster)
-    }
-}
-
-use std::marker::PhantomData;
-use lodepng::ColorType;
-
-/// PNG compatible subset of pix `Format`s.
-pub trait Format: pix::Format {
-    /// Format to save as.
-    const PNG_COLOR: ColorType;
-    /// Bit Depth to save as.
-    const BIT_DEPTH: u32;
-}
-
-impl Format for pix::Gray8 {
-    const PNG_COLOR: ColorType = ColorType::Grey;
-    const BIT_DEPTH: u32 = 8;
-}
-
-impl Format for pix::Gray16 {
-    const PNG_COLOR: ColorType = ColorType::Grey;
-    const BIT_DEPTH: u32 = 16;
-}
-
-impl Format for pix::Gray32 {
-    const PNG_COLOR: ColorType = ColorType::Grey;
-    const BIT_DEPTH: u32 = 32;
-}
-
-impl Format for pix::GrayAlpha8 {
-    const PNG_COLOR: ColorType = ColorType::GreyAlpha;
-    const BIT_DEPTH: u32 = 8;
-}
-
-impl Format for pix::GrayAlpha16 {
-    const PNG_COLOR: ColorType = ColorType::GreyAlpha;
-    const BIT_DEPTH: u32 = 16;
-}
-
-impl Format for pix::GrayAlpha32 {
-    const PNG_COLOR: ColorType = ColorType::GreyAlpha;
-    const BIT_DEPTH: u32 = 32;
-}
-
-impl Format for pix::Rgb8 {
-    const PNG_COLOR: ColorType = ColorType::Rgb;
-    const BIT_DEPTH: u32 = 8;
-}
-
-impl Format for pix::Rgb16 {
-    const PNG_COLOR: ColorType = ColorType::Rgb;
-    const BIT_DEPTH: u32 = 16;
-}
-
-impl Format for pix::Rgb32 {
-    const PNG_COLOR: ColorType = ColorType::Rgb;
-    const BIT_DEPTH: u32 = 32;
-}
-
-impl Format for pix::Rgba8 {
-    const PNG_COLOR: ColorType = ColorType::Rgba;
-    const BIT_DEPTH: u32 = 8;
-}
-
-impl Format for pix::Rgba16 {
-    const PNG_COLOR: ColorType = ColorType::Rgba;
-    const BIT_DEPTH: u32 = 16;
-}
-
-impl Format for pix::Rgba32 {
-    const PNG_COLOR: ColorType = ColorType::Rgba;
-    const BIT_DEPTH: u32 = 32;
-}
-
-/// Encoder for writing [`Raster`](chunk/enum.Raster.html)s into a PNG file.
-pub struct RasterEncoder<'a, W, F>
-where
-    W: std::io::Write,
-    F: Format,
-{
-    state: &'a mut lodepng::State,
-    bytes: W,
-    _phantom: PhantomData<F>,
-}
-
-impl<'a, W, F> RasterEncoder<'a, W, F>
-where
-    W: std::io::Write,
-    F: Format,
-{
-    /// Add a frame to the animation or still.
-    pub fn add_frame(
-        &mut self,
-        raster: &pix::Raster<F>,
-        nanos: u64,
-    ) -> Result<(), EncodeError> {
-        let _ = nanos; // TODO
-
-        self.state.info_raw.colortype = F::PNG_COLOR;
-        self.state.info_raw.set_bitdepth(F::BIT_DEPTH);
-        self.state.info_png.color.colortype = F::PNG_COLOR;
-        self.state.info_png.color.set_bitdepth(F::BIT_DEPTH);
-
-        let bytes = match self.state.encode(raster) {
-            Ok(o) => o,
-            Err(e) => return Err(EncodeError::ParseError(e)),
-        };
-
-        match self.bytes.write(&bytes) {
-            Ok(_size) => Ok(()),
-            Err(e) => return Err(EncodeError::WriteError(e)),
-        }
-    }
-}
-
-/// Builder for PNG decoders.
-/// - [`ChunkDecoder`](struct.ChunkDecoder.html) - low-level, [`Chunk`](chunk/enum.Chunk.html)s
-/// - [`RasterDecoder`](struct.RasterDecoder.html) - high-level, [`Raster`](struct.Raster.html)s
-#[derive(Default)]
-pub struct DecoderBuilder {
-    state: lodepng::State,
-}
-
-impl DecoderBuilder {
-    /// Create a new Decoder.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Check CRC checksum.  CRC checksums are ignored by default for speed.
-    pub fn check_crc(mut self) -> Self {
-        self.state.decoder.check_crc = true;
-        self
-    }
-
-    /// Check Adler32 checksum.  Adler32 checksums are ignored by default for
-    /// speed.
-    pub fn check_adler32(mut self) -> Self {
-        self.state.decoder.zlibsettings.check_adler32 = true;
-        self
-    }
-
-    /// Convert into a chunk decoder.
-    pub fn decode_chunks<'a, R>(&'a mut self, bytes: R) -> ChunkDecoder<'a, R>
-    where
-        R: std::io::Read,
-    {
-        ChunkDecoder {
-            state: &mut self.state,
-            bytes,
-        }
-    }
-
-    /// Convert into a raster decoder.
-    pub fn decode_rasters<'a, R>(&'a mut self, bytes: R) -> RasterDecoder<'a, R>
-    where
-        R: std::io::Read,
-    {
-        RasterDecoder {
-            state: &mut self.state,
-            bytes,
-            has_decoded: false,
-        }
-    }
-}
-
-/// Builder for PNG encoders.
-#[derive(Default)]
-pub struct EncoderBuilder {
-    state: lodepng::State,
-}
-
-impl EncoderBuilder {
-    /// Create a new encoder.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Convert into a chunk encoder.
-    pub fn encode_chunks<'a, W>(&'a mut self, bytes: W) -> ChunkEncoder<'a, W>
-    where
-        W: std::io::Write,
-    {
-        ChunkEncoder {
-            state: &mut self.state,
-            bytes,
-        }
-    }
-
-    /// Convert into a raster encoder.
-    pub fn encode_rasters<'a, W, F>(&'a mut self, bytes: W) -> RasterEncoder<'a, W, F>
-    where
-        W: std::io::Write,
-        F: Format,
-    {
-        RasterEncoder {
-            state: &mut self.state,
-            bytes,
-            _phantom: PhantomData,
-        }
-    }
-}
+pub use format::Format;
+pub use frame::Frame;
+pub use error::{EncodeError, DecodeError};
+pub use chunk_encoder::ChunkEncoder;
+pub use chunk_decoder::ChunkDecoder;
+pub use frame_encoder::FrameEncoder;
+pub use frame_decoder::FrameDecoder;

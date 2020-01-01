@@ -34,7 +34,10 @@ pub use ffi::Time;
 pub use ffi::ColorMode;
 pub use ffi::Info;
 
-use crate::prelude::*;
+use pix::{Rgba8, Rgb8, Raster};
+use crate::chunk::{TextChunk, ITextChunk};
+use crate::error::DecodeError;
+use crate::Format;
 
 impl ColorMode {
     pub fn new() -> Self {
@@ -150,9 +153,9 @@ impl ColorMode {
     }
 
     /*in an idat chunk, each scanline is a multiple of 8 bits, unlike the lodepng output buffer*/
-    pub(crate) fn raw_size_idat(&self, w: usize, h: usize) -> usize {
+    pub(crate) fn raw_size_idat(&self, w: u32, h: u32) -> u32 {
         /*will not overflow for any color type if roughly w * h < 268435455*/
-        let bpp = self.bpp() as usize;
+        let bpp = self.bpp();
         let line = ((w / 8) * bpp) + ((w & 7) * bpp + 7) / 8;
         h * line
     }
@@ -490,22 +493,25 @@ impl Decoder {
     //  }
     //  ```
     #[inline]
-    pub(crate) fn decode<Bytes: AsRef<[u8]>>(
+    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelFormat: Format<Chan = pix::Ch8>>(
         &mut self,
         input: Bytes,
-    ) -> Result<Image, Error> {
+    ) -> Result<Raster<PixelFormat>, DecodeError> {
         self.state.decode(input)
     }
 
-    pub fn decode_file<P: AsRef<Path>>(
+    pub fn decode_file<P: AsRef<Path>, PixelFormat: Format<Chan = pix::Ch8>>(
         &mut self,
         filepath: P,
-    ) -> Result<Image, Error> {
-        self.state.decode_file(filepath)
+    ) -> Result<Raster<PixelFormat>, DecodeError> {
+        match self.state.decode_file(filepath) {
+            Ok(ret) => Ok(ret),
+            Err(error) => Err(error)
+        }
     }
 
     /// Updates `info_png`. Returns (width, height)
-    pub fn inspect(&mut self, input: &[u8]) -> Result<(usize, usize), Error> {
+    pub fn inspect(&mut self, input: &[u8]) -> Result<(u32, u32), Error> {
         self.state.inspect(input)
     }
 }
@@ -591,31 +597,37 @@ impl State {
     //      _ => panic!("¯\\_(ツ)_/¯")
     //  }
     //  ```
-    pub(crate) fn decode<Bytes: AsRef<[u8]>>(
+    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::Ch8>>(
         &mut self,
         input: Bytes,
-    ) -> Result<Image, Error> {
+    ) -> Result<Raster<PixelType>, DecodeError> {
         let input = input.as_ref();
-        let (v, w, h) = rustimpl::lodepng_decode(self, input)?;
+        let (v, w, h) = match rustimpl::lodepng_decode(self, input) {
+            Ok(image) => image,
+            Err(error) => return Err(DecodeError::ParseError(error)),
+        };
 
-        Ok(new_bitmap(
+        new_bitmap(
             v,
             w,
             h,
             self.info_raw.colortype,
             self.info_raw.bitdepth,
-        ))
+        )
     }
 
-    pub fn decode_file<P: AsRef<Path>>(
+    pub fn decode_file<P: AsRef<Path>, PixelType: Format<Chan = pix::Ch8>>(
         &mut self,
         filepath: P,
-    ) -> Result<Image, Error> {
-        self.decode(&load_file(filepath)?)
+    ) -> Result<Raster<PixelType>, DecodeError> {
+        self.decode(match load_file(filepath) {
+            Ok(ret) => ret,
+            Err(error) => return Err(DecodeError::ParseError(error)),
+        })
     }
 
     /// Updates `info_png`. Returns (width, height)
-    pub fn inspect(&mut self, input: &[u8]) -> Result<(usize, usize), Error> {
+    pub fn inspect(&mut self, input: &[u8]) -> Result<(u32, u32), Error> {
         let (info, w, h) = rustimpl::lodepng_inspect(&self.decoder, input)?;
         self.info_png = info;
         Ok((w, h))
@@ -627,8 +639,8 @@ impl State {
     ) -> Result<Vec<u8>, Error> {
         Ok(rustimpl::lodepng_encode(
             raster.as_u8_slice(),
-            raster.width() as u32,
-            raster.height() as u32,
+            raster.width(),
+            raster.height(),
             self,
         )?)
     }
@@ -686,76 +698,19 @@ pub struct ChunkRef<'a> {
     data: &'a [u8],
 }
 
-fn new_bitmap(
+fn new_bitmap<PixelType: Format<Chan = pix::Ch8>>(
     out: Vec<u8>,
-    w: usize,
-    h: usize,
+    width: u32,
+    height: u32,
     colortype: ColorType,
     bitdepth: u32,
-) -> Image {
-    // TODO as parameters instead of casting.
-    let width = w as u32;
-    let height = h as u32;
-
-    match (colortype, bitdepth) {
-        (ColorType::Rgba, 8) => Image::RGBA(
-            pix::RasterBuilder::new().with_u8_buffer(width, height, out),
-        ),
-        (ColorType::Rgb, 8) => Image::RGB(
-            pix::RasterBuilder::new().with_u8_buffer(width, height, out),
-        ),
-        (ColorType::Rgba, 16) => {
-            let out: Vec<u16> = out
-                .chunks_exact(2)
-                .into_iter()
-                .map(|a| u16::from_ne_bytes([a[0], a[1]]))
-                .collect();
-
-            Image::RGBA16(
-                pix::RasterBuilder::new().with_u16_buffer(width, height, out),
-            )
-        }
-        (ColorType::Rgb, 16) => {
-            let out: Vec<u16> = out
-                .chunks_exact(2)
-                .into_iter()
-                .map(|a| u16::from_ne_bytes([a[0], a[1]]))
-                .collect();
-
-            Image::RGB16(
-                pix::RasterBuilder::new().with_u16_buffer(width, height, out),
-            )
-        }
-        (ColorType::Grey, 8) => Image::Grey(
-            pix::RasterBuilder::new().with_u8_buffer(width, height, out),
-        ),
-        (ColorType::Grey, 16) => {
-            let out: Vec<u16> = out
-                .chunks_exact(2)
-                .into_iter()
-                .map(|a| u16::from_ne_bytes([a[0], a[1]]))
-                .collect();
-            Image::Grey16(
-                pix::RasterBuilder::new().with_u16_buffer(width, height, out),
-            )
-        }
-        (ColorType::GreyAlpha, 8) => Image::GreyAlpha(
-            pix::RasterBuilder::new().with_u8_buffer(width, height, out),
-        ),
-        (ColorType::GreyAlpha, 16) => {
-            let out: Vec<u16> = out
-                .chunks_exact(2)
-                .into_iter()
-                .map(|a| u16::from_ne_bytes([a[0], a[1]]))
-                .collect();
-            Image::GreyAlpha16(
-                pix::RasterBuilder::new().with_u16_buffer(width, height, out),
-            )
-        }
-        (_, 0) => panic!("Invalid depth"),
-        (_c, _b) => Image::RawData(
-            pix::RasterBuilder::new().with_u8_buffer(width, height, out),
-        ),
+) -> Result<Raster<PixelType>, DecodeError> {
+    if colortype != PixelType::PNG_COLOR {
+        Err(DecodeError::Color)
+    } else if bitdepth != PixelType::BIT_DEPTH {
+        Err(DecodeError::BitDepth)
+    } else {
+        Ok(pix::RasterBuilder::new().with_u8_buffer(width, height, out))
     }
 }
 
@@ -781,27 +736,19 @@ fn load_file<P: AsRef<Path>>(filepath: P) -> Result<Vec<u8>, Error> {
 /// * `in`: Memory buffer with the PNG file.
 /// * `colortype`: the desired color type for the raw output image. See `ColorType`.
 /// * `bitdepth`: the desired bit depth for the raw output image. 1, 2, 4, 8 or 16. Typically 8.
-pub fn decode_memory<Bytes: AsRef<[u8]>>(
+pub fn decode_memory<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::Ch8>>(
     input: Bytes,
     colortype: ColorType,
     bitdepth: u32,
-) -> Result<Image, Error> {
+) -> Result<Raster<PixelType>, DecodeError> {
     let input = input.as_ref();
 
     assert!(bitdepth > 0 && bitdepth <= 16);
-    let (v, w, h) =
-        rustimpl::lodepng_decode_memory(input, colortype, bitdepth)?;
-    Ok(new_bitmap(v, w, h, colortype, bitdepth))
-}
-
-/// Same as `decode_memory`, but always decodes to 32-bit RGBA raw image
-pub fn decode32<Bytes: AsRef<[u8]>>(
-    input: Bytes,
-) -> Result<pix::Raster<pix::Rgba8>, Error> {
-    match decode_memory(input, ColorType::Rgba, 8)? {
-        Image::RGBA(img) => Ok(img),
-        _ => Err(Error(56)), // given output image colortype or bitdepth not supported for color conversion
-    }
+    let (v, w, h) = match rustimpl::lodepng_decode_memory(input, colortype, bitdepth) {
+        Ok(ret) => ret,
+        Err(error) => return Err(DecodeError::ParseError(error)),
+    };
+    new_bitmap(v, w, h, colortype, bitdepth)
 }
 
 /// Converts raw pixel data into a PNG image in memory. The colortype and bitdepth
@@ -1147,7 +1094,7 @@ mod test {
             pix::RasterBuilder::new().with_u8_buffer(1, 1, &[0u8, 0, 0, 0][..]);
         let img = state.encode(&raster).unwrap();
         let mut dec = State::new();
-        dec.decode(img).unwrap();
+        dec.decode::<_, Rgba8>(img).unwrap();
         let chunk = dec
             .info_png()
             .unknown_chunks(ChunkPosition::IHDR)
@@ -1160,7 +1107,7 @@ mod test {
     #[test]
     fn read_icc() {
         let mut s = State::new();
-        let f = s.decode_file("tests/profile.png");
+        let f = s.decode_file::<_, Rgba8>("tests/profile.png");
         f.unwrap();
         let icc = s.info_png().get("iCCP").unwrap();
         assert_eq!(275, icc.len());

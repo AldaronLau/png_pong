@@ -18,7 +18,7 @@ repository = "https://github.com/Aldarobot/png_pong.git"
 travis-ci = { repository = "Aldarobot/png_pong" }
 
 [dependencies]
-pix = "0.6"
+pix = "0.7"
 miniz_oxide = { optional = true, version = "0.3" }
 
 [[example]]

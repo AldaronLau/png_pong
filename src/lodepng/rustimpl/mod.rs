@@ -111,13 +111,13 @@ fn add_padding_bits(
 return value is error**/
 fn pre_process_scanlines(
     inp: &[u8],
-    w: usize,
-    h: usize,
+    width: u32,
+    height: u32,
     info_png: &Info,
     settings: &EncoderSettings,
 ) -> Result<Vec<u8>, Error> {
-    let h = h as usize;
-    let w = w as usize;
+    let h = height as usize;
+    let w = width as usize;
     /*
     This function converts the pure 2D image with the PNG's colortype, into filtered-padded-interlaced data. Steps:
     *) if no Adam7: 1) add padding bits (= posible extra bits per scanline if bpp < 8) 2) filter
@@ -144,25 +144,25 @@ fn pre_process_scanlines(
         Ok(out)
     } else {
         let (passw, passh, filter_passstart, padded_passstart, passstart) =
-            adam7_get_pass_values(w, h, bpp);
+            adam7_get_pass_values(width, height, bpp as u32);
         let outsize = filter_passstart[7];
         /*image size plus an extra byte per scanline + possible padding bits*/
-        let mut out = vec![0u8; outsize];
-        let mut adam7 = vec![0u8; passstart[7] + 1];
-        adam7_interlace(&mut adam7, inp, w, h, bpp);
+        let mut out = vec![0u8; (outsize as usize)];
+        let mut adam7 = vec![0u8; passstart[7] as usize + 1];
+        adam7_interlace(&mut adam7, inp, width, height, bpp as u32);
         for i in 0..7 {
             if bpp < 8 {
                 let mut padded =
-                    vec![0u8; padded_passstart[i + 1] - padded_passstart[i]];
+                    vec![0u8; (padded_passstart[i + 1] - padded_passstart[i]) as usize];
                 add_padding_bits(
                     &mut padded,
-                    &adam7[passstart[i]..],
+                    &adam7[passstart[i] as usize..],
                     ((passw[i] as usize * bpp + 7) / 8) * 8,
                     passw[i] as usize * bpp,
                     passh[i] as usize,
                 );
                 filter(
-                    &mut out[filter_passstart[i]..],
+                    &mut out[filter_passstart[i] as usize..],
                     &padded,
                     passw[i] as usize,
                     passh[i] as usize,
@@ -171,8 +171,8 @@ fn pre_process_scanlines(
                 )?;
             } else {
                 filter(
-                    &mut out[filter_passstart[i]..],
-                    &adam7[padded_passstart[i]..],
+                    &mut out[filter_passstart[i] as usize..],
+                    &adam7[padded_passstart[i] as usize..],
                     passw[i] as usize,
                     passh[i] as usize,
                     &info_png.color,

@@ -1216,15 +1216,15 @@ pub const ADAM7_DX: [u32; 7] = [8, 8, 4, 4, 2, 2, 1];
 pub const ADAM7_DY: [u32; 7] = [8, 8, 8, 4, 4, 2, 2];
 
 pub(super) fn adam7_get_pass_values(
-    w: usize,
-    h: usize,
-    bpp: usize,
-) -> ([u32; 7], [u32; 7], [usize; 8], [usize; 8], [usize; 8]) {
+    w: u32,
+    h: u32,
+    bpp: u32,
+) -> ([u32; 7], [u32; 7], [u32; 8], [u32; 8], [u32; 8]) {
     let mut passw: [u32; 7] = [0; 7];
     let mut passh: [u32; 7] = [0; 7];
-    let mut filter_passstart: [usize; 8] = [0; 8];
-    let mut padded_passstart: [usize; 8] = [0; 8];
-    let mut passstart: [usize; 8] = [0; 8];
+    let mut filter_passstart: [u32; 8] = [0; 8];
+    let mut padded_passstart: [u32; 8] = [0; 8];
+    let mut passstart: [u32; 8] = [0; 8];
 
     /*the passstart values have 8 values: the 8th one indicates the byte after the end of the 7th (= last) pass*/
     /*calculate width and height in pixels of each pass*/
@@ -1244,14 +1244,14 @@ pub(super) fn adam7_get_pass_values(
     for i in 0..7 {
         filter_passstart[i + 1] = filter_passstart[i]
             + if passw[i] != 0 && passh[i] != 0 {
-                passh[i] as usize * (1 + (passw[i] as usize * bpp + 7) / 8)
+                passh[i] * (1 + (passw[i] * bpp + 7) / 8)
             } else {
                 0
             };
         padded_passstart[i + 1] = padded_passstart[i]
-            + passh[i] as usize * ((passw[i] as usize * bpp + 7) / 8) as usize;
+            + passh[i] * ((passw[i] * bpp + 7) / 8);
         passstart[i + 1] = passstart[i]
-            + (passh[i] as usize * passw[i] as usize * bpp + 7) / 8;
+            + (passh[i] * passw[i] * bpp + 7) / 8;
     }
     (passw, passh, filter_passstart, padded_passstart, passstart)
 }
@@ -1270,9 +1270,9 @@ NOTE: comments about padding bits are only relevant if bpp < 8
 pub(super) fn adam7_deinterlace(
     out: &mut [u8],
     inp: &[u8],
-    w: usize,
-    h: usize,
-    bpp: usize,
+    w: u32,
+    h: u32,
+    bpp: u32,
 ) {
     let (passw, passh, _, _, passstart) = adam7_get_pass_values(w, h, bpp);
     if bpp >= 8 {
@@ -1281,11 +1281,12 @@ pub(super) fn adam7_deinterlace(
             for y in 0..passh[i] {
                 for x in 0..passw[i] {
                     let pixelinstart =
-                        passstart[i] + (y * passw[i] + x) as usize * bytewidth;
+                        (passstart[i] + (y * passw[i] + x) * bytewidth) as usize;
+                    let bytewidth = bytewidth as usize;
                     let pixeloutstart =
-                        ((ADAM7_IY[i] + y * ADAM7_DY[i]) as usize * w
-                            + ADAM7_IX[i] as usize
-                            + x as usize * ADAM7_DX[i] as usize)
+                        ((ADAM7_IY[i] + y * ADAM7_DY[i]) * w
+                            + ADAM7_IX[i]
+                            + x * ADAM7_DX[i]) as usize
                             * bytewidth;
 
                     out[pixeloutstart..(bytewidth + pixeloutstart)]
@@ -1297,16 +1298,16 @@ pub(super) fn adam7_deinterlace(
         }
     } else {
         for i in 0..7 {
-            let ilinebits = bpp * passw[i] as usize;
+            let ilinebits = bpp * passw[i];
             let olinebits = bpp * w;
-            for y in 0..passh[i] as usize {
-                for x in 0..passw[i] as usize {
+            for y in 0..passh[i] {
+                for x in 0..passw[i] {
                     let mut ibp =
-                        (8 * passstart[i]) + (y * ilinebits + x * bpp) as usize;
-                    let mut obp = ((ADAM7_IY[i] as usize
-                        + y * ADAM7_DY[i] as usize)
+                        ((8 * passstart[i]) + (y * ilinebits + x * bpp)) as usize;
+                    let mut obp = ((ADAM7_IY[i]
+                        + y * ADAM7_DY[i])
                         * olinebits
-                        + (ADAM7_IX[i] as usize + x * ADAM7_DX[i] as usize)
+                        + (ADAM7_IX[i] + x * ADAM7_DX[i])
                             * bpp) as usize;
                     for _ in 0..bpp {
                         let bit = read_bit_from_reversed_stream(&mut ibp, inp);

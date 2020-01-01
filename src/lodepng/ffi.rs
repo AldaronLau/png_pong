@@ -10,7 +10,8 @@ use std::os::raw::*;
 
 use crate::lodepng::rustimpl::*;
 
-use crate::prelude::*;
+use crate::chunk::{TextChunk, ITextChunk};
+use pix::Rgba8;
 
 /// A lame error code.
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -252,7 +253,7 @@ pub struct ColorProfile {
     /// amount of colors, up to 257. Not valid if bits == 16.
     pub numcolors: u32,
     /// Remembers up to the first 256 RGBA colors, in no particular order
-    pub palette: [pix::Rgba8; 256],
+    pub palette: [Rgba8; 256],
     /// bits per channel (not for palette). 1,2 or 4 for greyscale only. 16 if 16-bit per channel required.
     pub bits: u32,
 }

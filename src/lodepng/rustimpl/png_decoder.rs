@@ -8,7 +8,7 @@ use super::*;
 pub(crate) fn lodepng_inspect(
     decoder: &DecoderSettings,
     inp: &[u8],
-) -> Result<(Info, usize, usize), Error> {
+) -> Result<(Info, u32, u32), Error> {
     if inp.len() < 33 {
         /*error: the data length is smaller than the length of a PNG header*/
         return Err(Error(27));
@@ -28,8 +28,8 @@ pub(crate) fn lodepng_inspect(
         return Err(Error(29));
     }
     /*read the values given in the header*/
-    let w = lodepng_read32bit_int(&inp[16..]) as usize;
-    let h = lodepng_read32bit_int(&inp[20..]) as usize;
+    let w = lodepng_read32bit_int(&inp[16..]);
+    let h = lodepng_read32bit_int(&inp[20..]);
     let bitdepth = inp[24];
     if bitdepth == 0 || bitdepth > 16 {
         return Err(Error(29));
@@ -79,7 +79,7 @@ pub(crate) fn lodepng_inspect(
 pub(super) fn decode_generic(
     state: &mut State,
     inp: &[u8],
-) -> Result<(Vec<u8>, usize, usize), Error> {
+) -> Result<(Vec<u8>, u32, u32), Error> {
     let mut found_iend = false; /*the data from idat chunks*/
     /*for unknown chunk order*/
     let mut unknown = false;
@@ -182,34 +182,34 @@ pub(super) fn decode_generic(
         /*Adam-7 interlaced: predicted size is the sum of the 7 sub-images sizes*/
         let color = &state.info_png.color;
         let mut predict = color.raw_size_idat((w + 7) >> 3, (h + 7) >> 3)
-            + ((h + 7) >> 3) as usize;
+            + ((h + 7) >> 3);
         if w > 4 {
             predict += color.raw_size_idat((w + 3) >> 3, (h + 7) >> 3)
-                + ((h + 7) >> 3) as usize;
+                + ((h + 7) >> 3);
         }
         predict += color.raw_size_idat((w + 3) >> 2, (h + 3) >> 3)
-            + ((h + 3) >> 3) as usize;
+            + ((h + 3) >> 3);
         if w > 2 {
             predict += color.raw_size_idat((w + 1) >> 2, (h + 3) >> 2)
-                + ((h + 3) >> 2) as usize;
+                + ((h + 3) >> 2);
         }
         predict += color.raw_size_idat((w + 1) >> 1, (h + 1) >> 2)
-            + ((h + 1) >> 2) as usize;
+            + ((h + 1) >> 2);
         if w > 1 {
             predict += color.raw_size_idat((w + 0) >> 1, (h + 1) >> 1)
-                + ((h + 1) >> 1) as usize;
+                + ((h + 1) >> 1);
         }
         predict +=
-            color.raw_size_idat(w + 0, (h + 0) >> 1) + ((h + 0) >> 1) as usize;
+            color.raw_size_idat(w + 0, (h + 0) >> 1) + ((h + 0) >> 1);
         predict
     };
     let mut scanlines = zlib_decompress(&idat, &state.decoder.zlibsettings)?;
-    if scanlines.len() != predict {
+    if scanlines.len() != predict as usize {
         /*decompressed size doesn't match prediction*/
         return Err(Error(91));
     }
     let mut out = Vec::new();
-    out.resize(state.info_png.color.raw_size(w as u32, h as u32), 0);
+    out.resize(state.info_png.color.raw_size(w, h), 0);
     postprocess_scanlines(&mut out, &mut scanlines, w, h, &state.info_png)?;
     Ok((out, w, h))
 }
@@ -217,7 +217,7 @@ pub(super) fn decode_generic(
 pub(crate) fn lodepng_decode(
     state: &mut State,
     inp: &[u8],
-) -> Result<(Vec<u8>, usize, usize), Error> {
+) -> Result<(Vec<u8>, u32, u32), Error> {
     let (decoded, w, h) = decode_generic(state, inp)?;
 
     if state.decoder.color_convert == 0
@@ -257,7 +257,7 @@ pub(crate) fn lodepng_decode_memory(
     inp: &[u8],
     colortype: ColorType,
     bitdepth: u32,
-) -> Result<(Vec<u8>, usize, usize), Error> {
+) -> Result<(Vec<u8>, u32, u32), Error> {
     let mut state = State::new();
     state.info_raw.colortype = colortype;
     state.info_raw.set_bitdepth(bitdepth);
@@ -277,12 +277,12 @@ fn add_unknown_chunks(
 
 pub(crate) fn lodepng_encode(
     image: &[u8],
-    w: u32,
-    h: u32,
+    width: u32,
+    height: u32,
     state: &mut State,
 ) -> Result<Vec<u8>, Error> {
-    let w = w as usize;
-    let h = h as usize;
+    let w = width as usize;
+    let h = height as usize;
 
     let mut info = state.info_png.clone();
     if (info.color.colortype == ColorType::Palette
@@ -317,12 +317,12 @@ pub(crate) fn lodepng_encode(
             image,
             &info.color,
             &state.info_raw,
-            w as u32,
-            h as u32,
+            width,
+            height,
         )?;
-        pre_process_scanlines(&converted, w, h, &info, &state.encoder)?
+        pre_process_scanlines(&converted, width, height, &info, &state.encoder)?
     } else {
-        pre_process_scanlines(image, w, h, &info, &state.encoder)?
+        pre_process_scanlines(image, width, height, &info, &state.encoder)?
     };
 
     let mut outv = Vec::new();
