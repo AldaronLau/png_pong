@@ -24,7 +24,7 @@
 //!
 //! - Say you want to save a raster as a PNG file.
 //! ```rust,no_run
-//! let raster = png_pong::RasterBuilder::new().with_pixels(1, 1, &[
+//! let raster = pix::RasterBuilder::new().with_pixels(1, 1, &[
 //!     pix::Rgba8::with_alpha(
 //!         pix::Ch8::new(0),
 //!         pix::Ch8::new(0),
