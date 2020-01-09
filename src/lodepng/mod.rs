@@ -33,7 +33,7 @@ pub use ffi::Time;
 pub use ffi::ColorMode;
 pub use ffi::Info;
 
-use pix::{Rgba8, Rgb8, Raster};
+use pix::{Rgba8, SepSRgba8, SepSRgb8, Raster};
 use crate::chunk::{TextChunk, ITextChunk};
 use crate::error::DecodeError;
 use crate::Format;
@@ -62,7 +62,7 @@ impl ColorMode {
     }
 
     /// add 1 color to the palette
-    pub fn palette_add(&mut self, p: Rgba8) -> Result<(), Error> {
+    pub fn palette_add(&mut self, p: SepSRgba8) -> Result<(), Error> {
         if self.palette.len() >= 256 {
             return Err(Error(38));
         }
@@ -71,11 +71,11 @@ impl ColorMode {
         Ok(())
     }
 
-    pub fn palette(&self) -> &[Rgba8] {
+    pub fn palette(&self) -> &[SepSRgba8] {
         self.palette.as_slice()
     }
 
-    pub fn palette_mut(&mut self) -> &mut [Rgba8] {
+    pub fn palette_mut(&mut self) -> &mut [SepSRgba8] {
         self.palette.as_mut_slice()
     }
 
@@ -673,14 +673,14 @@ impl Default for State {
 pub enum Image {
     /// Bytes of the image. See bpp how many pixels per element there are
     RawData(pix::Raster<pix::Mask8>),
-    Grey(pix::Raster<pix::Gray8>),
-    Grey16(pix::Raster<pix::Gray16>),
-    GreyAlpha(pix::Raster<pix::GrayAlpha8>),
-    GreyAlpha16(pix::Raster<pix::GrayAlpha16>),
-    RGBA(pix::Raster<Rgba8>),
-    RGB(pix::Raster<Rgb8>),
-    RGBA16(pix::Raster<pix::Rgba16>),
-    RGB16(pix::Raster<pix::Rgb16>),
+    Grey(pix::Raster<pix::SepSGray8>),
+    Grey16(pix::Raster<pix::SepSGray16>),
+    GreyAlpha(pix::Raster<pix::SepSGrayAlpha8>),
+    GreyAlpha16(pix::Raster<pix::SepSGrayAlpha16>),
+    RGBA(pix::Raster<pix::SepSRgba8>),
+    RGB(pix::Raster<pix::SepSRgb8>),
+    RGBA16(pix::Raster<pix::SepSRgba16>),
+    RGB16(pix::Raster<pix::SepSRgb16>),
 }
 
 /// Position in the file section after…

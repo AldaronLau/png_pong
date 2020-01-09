@@ -8,62 +8,62 @@ pub trait Format: pix::Format {
     const BIT_DEPTH: u32;
 }
 
-impl Format for pix::Gray8 {
+impl Format for pix::SepSGray8 {
     const PNG_COLOR: ColorType = ColorType::Grey;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::Gray16 {
+impl Format for pix::SepSGray16 {
     const PNG_COLOR: ColorType = ColorType::Grey;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::Gray32 {
+impl Format for pix::SepSGray32 {
     const PNG_COLOR: ColorType = ColorType::Grey;
     const BIT_DEPTH: u32 = 32;
 }
 
-impl Format for pix::GrayAlpha8 {
+impl Format for pix::SepSGrayAlpha8 {
     const PNG_COLOR: ColorType = ColorType::GreyAlpha;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::GrayAlpha16 {
+impl Format for pix::SepSGrayAlpha16 {
     const PNG_COLOR: ColorType = ColorType::GreyAlpha;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::GrayAlpha32 {
+impl Format for pix::SepSGrayAlpha32 {
     const PNG_COLOR: ColorType = ColorType::GreyAlpha;
     const BIT_DEPTH: u32 = 32;
 }
 
-impl Format for pix::Rgb8 {
+impl Format for pix::SepSRgb8 {
     const PNG_COLOR: ColorType = ColorType::Rgb;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::Rgb16 {
+impl Format for pix::SepSRgb16 {
     const PNG_COLOR: ColorType = ColorType::Rgb;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::Rgb32 {
+impl Format for pix::SepSRgb32 {
     const PNG_COLOR: ColorType = ColorType::Rgb;
     const BIT_DEPTH: u32 = 32;
 }
 
-impl Format for pix::Rgba8 {
+impl Format for pix::SepSRgba8 {
     const PNG_COLOR: ColorType = ColorType::Rgba;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::Rgba16 {
+impl Format for pix::SepSRgba16 {
     const PNG_COLOR: ColorType = ColorType::Rgba;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::Rgba32 {
+impl Format for pix::SepSRgba32 {
     const PNG_COLOR: ColorType = ColorType::Rgba;
     const BIT_DEPTH: u32 = 32;
 }

@@ -52,7 +52,7 @@ returns 0 if the palette is opaque,
 returns 1 if the palette has a single color with alpha 0 ==> color key
 returns 2 if the palette is semi-translucent.
 */
-fn get_palette_translucency(palette: &[Rgba8]) -> PaletteTranslucency {
+fn get_palette_translucency(palette: &[SepSRgba8]) -> PaletteTranslucency {
     let mut key = PaletteTranslucency::Opaque;
     let mut r = 0;
     let mut g = 0;
