@@ -9,8 +9,8 @@ description = "Reading and writing PNG/APNG files without system dependencies."
 documentation = "https://docs.rs/png_pong/"
 homepage = "https://crates.rs/crates/png_pong/"
 include = ["src/**/*", "COPYRIGHT", "README.md", "Cargo.toml"]
-keywords = ["PNG", "lodepng", "encoder", "decoder", "APNG"]
-license = "Zlib / MIT / BSL-1.0"
+keywords = ["png", "lodepng", "encoder", "decoder", "apng"]
+license = "Zlib / MIT OR BSL-1.0"
 readme = "README.md"
 repository = "https://github.com/LordAldaron/png_pong.git"
 

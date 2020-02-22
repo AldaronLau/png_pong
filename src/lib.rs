@@ -15,7 +15,7 @@
 //! ```rust,no_run
 //! let data = std::fs::read("graphic.png").expect("Failed to open PNG");
 //! let data = std::io::Cursor::new(data);
-//! let decoder = png_pong::FrameDecoder::<_, pix::Rgba8>::new(data);
+//! let decoder = png_pong::FrameDecoder::<_, pix::SepSRgba8>::new(data);
 //! let png_pong::Frame { raster, delay } = decoder
 //!     .last()
 //!     .expect("No frames in PNG")
@@ -25,7 +25,7 @@
 //! - Say you want to save a raster as a PNG file.
 //! ```rust,no_run
 //! let raster = pix::RasterBuilder::new().with_pixels(1, 1, &[
-//!     pix::Rgba8::with_alpha(
+//!     pix::SepSRgba8::with_alpha(
 //!         pix::Ch8::new(0),
 //!         pix::Ch8::new(0),
 //!         pix::Ch8::new(0),
@@ -33,7 +33,9 @@
 //!     )][..]
 //! );
 //! let mut out_data = Vec::new();
-//! let mut encoder = png_pong::FrameEncoder::<_, pix::Rgba8>::new(&mut out_data);
+//! let mut encoder = png_pong::FrameEncoder::<_, pix::SepSRgba8>::new(
+//!     &mut out_data
+//! );
 //! let frame = png_pong::Frame{ raster, delay: 0 };
 //! encoder.encode(&frame).expect("Failed to add frame");
 //! std::fs::write("graphic.png", out_data).expect("Failed to save image");

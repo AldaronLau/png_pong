@@ -986,10 +986,10 @@ mod test {
 
     #[test]
     fn pixel_sizes() {
-        assert_eq!(4, mem::size_of::<pix::Rgba8>());
-        assert_eq!(3, mem::size_of::<pix::Rgb8>());
-        assert_eq!(2, mem::size_of::<pix::GrayAlpha8>());
-        assert_eq!(1, mem::size_of::<pix::Gray8>());
+        assert_eq!(4, mem::size_of::<pix::SepSRgba8>());
+        assert_eq!(3, mem::size_of::<pix::SepSRgb8>());
+        assert_eq!(2, mem::size_of::<pix::SepSGrayAlpha8>());
+        assert_eq!(1, mem::size_of::<pix::SepSGray8>());
     }
 
     #[test]
@@ -1089,11 +1089,11 @@ mod test {
             info.get("foob").unwrap();
         }
 
-        let raster: pix::Raster<pix::Rgba8> =
+        let raster: pix::Raster<pix::SepSRgba8> =
             pix::RasterBuilder::new().with_u8_buffer(1, 1, &[0u8, 0, 0, 0][..]);
         let img = state.encode(&raster).unwrap();
         let mut dec = State::new();
-        dec.decode::<_, Rgba8>(img).unwrap();
+        dec.decode::<_, SepSRgba8>(img).unwrap();
         let chunk = dec
             .info_png()
             .unknown_chunks(ChunkPosition::IHDR)
@@ -1106,7 +1106,7 @@ mod test {
     #[test]
     fn read_icc() {
         let mut s = State::new();
-        let f = s.decode_file::<_, Rgba8>("tests/profile.png");
+        let f = s.decode_file::<_, SepSRgba8>("tests/profile.png");
         f.unwrap();
         let icc = s.info_png().get("iCCP").unwrap();
         assert_eq!(275, icc.len());
