@@ -104,10 +104,12 @@ to facilitate upgrading this crate as a dependency.
 
 ## License
 Licensed under either of
- - Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
-   https://www.apache.org/licenses/LICENSE-2.0)
- - Zlib License, ([LICENSE-ZLIB](LICENSE-ZLIB) or
-   https://opensource.org/licenses/Zlib)
+ - Apache License, Version 2.0,
+   ([LICENSE-APACHE](https://github.com/RedAldaron/png_pong/blob/master/LICENSE-APACHE)
+   or https://www.apache.org/licenses/LICENSE-2.0)
+ - Zlib License,
+   ([LICENSE-ZLIB](https://github.com/RedAldaron/png_pong/blob/master/LICENSE-ZLIB)
+   or https://opensource.org/licenses/Zlib)
 
 at your option.
 
