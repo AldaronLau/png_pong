@@ -990,10 +990,10 @@ mod test {
 
     #[test]
     fn pixel_sizes() {
-        assert_eq!(4, mem::size_of::<pix::SRgba8>());
-        assert_eq!(3, mem::size_of::<pix::SRgb8>());
-        assert_eq!(2, mem::size_of::<pix::SGraya8>());
-        assert_eq!(1, mem::size_of::<pix::SGray8>());
+        assert_eq!(4, mem::size_of::<SRgba8>());
+        assert_eq!(3, mem::size_of::<SRgb8>());
+        assert_eq!(2, mem::size_of::<SGraya8>());
+        assert_eq!(1, mem::size_of::<SGray8>());
     }
 
     #[test]
@@ -1073,7 +1073,7 @@ mod test {
             info.get("foob").unwrap();
         }
 
-        let raster: Raster<pix::SRgba8> =
+        let raster: Raster<SRgba8> =
             RasterBuilder::new().with_u8_buffer(1, 1, &[0u8, 0, 0, 0][..]);
         let img = state.encode(&raster).unwrap();
         let mut dec = State::new();
