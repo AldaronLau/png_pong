@@ -1,4 +1,4 @@
-// png-pong
+// PNG Pong
 //
 // Copyright © 2019-2020 Jeron Aldaron Lau
 // Copyright © 2014-2017 Kornel Lesiński

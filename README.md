@@ -1,8 +1,8 @@
 # PNG Pong
 
-[![Build Status](https://api.travis-ci.org/RedAldaron/png-pong.svg?branch=master)](https://travis-ci.org/RedAldaron/png-pong)
+[![Build Status](https://api.travis-ci.org/RedAldaron/png_pong.svg?branch=master)](https://travis-ci.org/RedAldaron/png_pong)
 [![Docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
-[![crates.io](https://img.shields.io/crates/v/png-pong.svg)](https://crates.io/crates/png-pong)
+[![crates.io](https://img.shields.io/crates/v/png_pong.svg)](https://crates.io/crates/png_pong)
 
 > A pure Rust PNG/APNG encoder & decoder
 
@@ -62,7 +62,7 @@ Add the following to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-png-pong = "0.2.0"
+png_pong = "0.2.0"
 ```
 
 ### Example
@@ -94,16 +94,16 @@ std::fs::write("graphic.png", out_data).expect("Failed to save image");
 ```
 
 ### API
-API documentation can be found on [docs.rs](https://docs.rs/png-pong).
+API documentation can be found on [docs.rs](https://docs.rs/png_pong).
 
 ### Features
 There is one optional feature "flate" which is enabled by default,
-allowing png-pong to read compressed PNG files (which is most of them).
+allowing png\_pong to read compressed PNG files (which is most of them).
 This pulls in the miniz\_oxide dependency.
 
 ## Upgrade
 You can use the
-[changelog](https://github.com/RedAldaron/png-pong/blob/master/CHANGELOG.md)
+[changelog](https://github.com/RedAldaron/png_pong/blob/master/CHANGELOG.md)
 to facilitate upgrading this crate as a dependency.
 
 ## License
@@ -121,6 +121,6 @@ for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
 Before contributing, check out the
-[contribution guidelines](https://github.com/RedAldaron/png-pong/blob/master/CONTRIBUTING.md),
+[contribution guidelines](https://github.com/RedAldaron/png_pong/blob/master/CONTRIBUTING.md),
 and, as always, make sure to always follow the
-[code of conduct](https://github.com/RedAldaron/png-pong/blob/master/CODEOFCONDUCT.md).
+[code of conduct](https://github.com/RedAldaron/png_pong/blob/master/CODEOFCONDUCT.md).

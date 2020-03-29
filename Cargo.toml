@@ -1,4 +1,4 @@
-# png-pong
+# PNG Pong
 #
 # Copyright © 2019-2020 Jeron Aldaron Lau
 # Copyright © 2014-2017 Kornel Lesiński
@@ -10,15 +10,15 @@
 # copied, modified, or distributed except according to those terms.
 
 [package]
-name = "png-pong"
+name = "png_pong"
 version = "0.2.0"
 authors = ["Jeron Aldaron Lau <jeronlau@plopgrizzly.com>"]
 license = "Apache-2.0 OR Zlib"
 
 description = "A pure Rust PNG/APNG encoder & decoder"
-repository = "https://github.com/RedAldaron/png-pong"
-documentation = "https://docs.rs/png-pong"
-homepage = "https://github.com/RedAldaron/png-pong/blob/master/CHANGELOG.md"
+repository = "https://github.com/RedAldaron/png_pong"
+documentation = "https://docs.rs/png_pong"
+homepage = "https://github.com/RedAldaron/png_pong/blob/master/CHANGELOG.md"
 include = ["Cargo.toml", "LICENSE-ZLIB", "LICENSE-APACHE", "src/*"]
 categories = ["multimedia::encoding", "multimedia::images"]
 keywords = ["png", "lodepng", "encoder", "decoder", "apng"]
@@ -26,9 +26,9 @@ readme = "README.md"
 edition = "2018"
 
 [badges]
-travis-ci = { repository = "RedAldaron/png-pong" }
-is-it-maintained-issue-resolution = { repository = "RedAldaron/png-pong" }
-is-it-maintained-open-issues = { repository = "RedAldaron/png-pong" }
+travis-ci = { repository = "RedAldaron/png_pong" }
+is-it-maintained-issue-resolution = { repository = "RedAldaron/png_pong" }
+is-it-maintained-open-issues = { repository = "RedAldaron/png_pong" }
 maintenance = { status = "actively-developed" }
 
 [dependencies.pix]
