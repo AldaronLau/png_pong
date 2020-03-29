@@ -1,10 +1,10 @@
 # PNG Pong
 
+#### A pure Rust PNG/APNG encoder & decoder
+
 [![Build Status](https://api.travis-ci.org/RedAldaron/png_pong.svg?branch=master)](https://travis-ci.org/RedAldaron/png_pong)
 [![Docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
 [![crates.io](https://img.shields.io/crates/v/png_pong.svg)](https://crates.io/crates/png_pong)
-
-> A pure Rust PNG/APNG encoder & decoder
 
 This is a pure Rust PNG image decoder and encoder based on lodepng.
 This crate allows easy reading and writing of PNG files without any
