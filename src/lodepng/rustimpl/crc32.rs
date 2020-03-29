@@ -1,6 +1,5 @@
 //! CRC32
 
-use pix::Alpha;
 use std::convert::TryInto;
 
 use super::*;
@@ -97,10 +96,10 @@ pub fn lodepng_convert(
         }
         palette = &palette[0..palette.len().min(palsize)];
         for (i, p) in palette.iter().enumerate() {
-            let red = p.red().into();
-            let green = p.green().into();
-            let blue = p.blue().into();
-            let alpha = p.alpha().value().into();
+            let red = pix::RgbModel::red(*p).into();
+            let green = pix::RgbModel::green(*p).into();
+            let blue = pix::RgbModel::blue(*p).into();
+            let alpha = pix::RgbModel::alpha(*p).into();
 
             tree.insert((red, green, blue, alpha), i as u16);
         }

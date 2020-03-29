@@ -18,7 +18,7 @@ repository = "https://github.com/LordAldaron/png_pong.git"
 travis-ci = { repository = "LordAldaron/png_pong" }
 
 [dependencies]
-pix = "0.8"
+pix = "0.10"
 miniz_oxide = { optional = true, version = "0.3" }
 
 [profile.test]

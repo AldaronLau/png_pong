@@ -57,7 +57,7 @@ pub struct ColorMode {
     /// fills the palette colors in the pixels of the raw RGBA output.
     ///
     /// The palette is only supported for color type 3.
-    pub(crate) palette: Vec<pix::SepSRgba8>,
+    pub(crate) palette: Vec<pix::SRgba8>,
 
     /// transparent color key (`tRNS`)
     ///
@@ -249,7 +249,7 @@ pub struct ColorProfile {
     /// amount of colors, up to 257. Not valid if bits == 16.
     pub numcolors: u32,
     /// Remembers up to the first 256 RGBA colors, in no particular order
-    pub palette: [pix::SepSRgba8; 256],
+    pub palette: [pix::SRgba8; 256],
     /// bits per channel (not for palette). 1,2 or 4 for greyscale only. 16 if 16-bit per channel required.
     pub bits: u32,
 }

@@ -1,7 +1,6 @@
 //! Deflate - Huffman
 
-use pix::Alpha;
-use pix::Ch8;
+use pix::channel::Ch8;
 
 use crate::chunk::ITextChunk;
 use crate::chunk::TextChunk;
@@ -363,10 +362,10 @@ pub(super) fn get_pixel_color_rgba8(
             } else {
                 let p = pal[index];
                 (
-                    p.red().into(),
-                    p.green().into(),
-                    p.blue().into(),
-                    p.alpha().value().into(),
+                    pix::RgbModel::red(p).into(),
+                    pix::RgbModel::green(p).into(),
+                    pix::RgbModel::blue(p).into(),
+                    pix::RgbModel::alpha(p).into(),
                 )
             }
         }
@@ -572,11 +571,11 @@ pub(super) fn get_pixel_colors_rgba8(
                     }
                 } else {
                     let p = pal[index as usize];
-                    buffer[0] = p.red().into();
-                    buffer[1] = p.green().into();
-                    buffer[2] = p.blue().into();
+                    buffer[0] = pix::RgbModel::red(p).into();
+                    buffer[1] = pix::RgbModel::green(p).into();
+                    buffer[2] = pix::RgbModel::blue(p).into();
                     if has_alpha {
-                        buffer[3] = p.alpha().value().into();
+                        buffer[3] = pix::RgbModel::alpha(p).into();
                     }
                 };
             }
@@ -758,7 +757,7 @@ pub(super) fn read_chunk_plte(
 ) -> Result<(), Error> {
     color.palette_clear();
     for c in data.chunks(3).take(data.len() / 3) {
-        color.palette_add(Rgba8::with_alpha(
+        color.palette_add(SRgba8::new(
             Ch8::new(c[0]),
             Ch8::new(c[1]),
             Ch8::new(c[2]),
@@ -778,10 +777,10 @@ pub(super) fn read_chunk_trns(
             return Err(Error(38));
         }
         for (i, &d) in data.iter().enumerate() {
-            pal[i] = Rgba8::with_alpha(
-                pal[i].red(),
-                pal[i].green(),
-                pal[i].blue(),
+            pal[i] = SRgba8::new(
+                pix::RgbModel::red(pal[i]),
+                pix::RgbModel::green(pal[i]),
+                pix::RgbModel::blue(pal[i]),
                 Ch8::new(d),
             );
         }
@@ -1113,7 +1112,7 @@ pub(super) fn add_chunk_trns(
         /*the tail of palette values that all have 255 as alpha, does not have to be encoded*/
         let mut i = palette.len();
         while i != 0 {
-            let byte: u8 = palette[i - 1].alpha().value().into();
+            let byte: u8 = pix::RgbModel::alpha(palette[i - 1]).into();
             if byte == 255 {
                 amount -= 1;
             } else {
@@ -1122,7 +1121,7 @@ pub(super) fn add_chunk_trns(
             i -= 1;
         }
         for p in &palette[0..amount] {
-            trns.push(p.alpha().value().into());
+            trns.push(pix::RgbModel::alpha(*p).into());
         }
     } else if info.colortype == ColorType::Grey {
         if let Some((r, _, _)) = info.key() {
@@ -1148,9 +1147,9 @@ pub(super) fn add_chunk_plte(
 ) -> Result<(), Error> {
     let mut plte = Vec::new();
     for p in info.palette() {
-        plte.push(p.red().into());
-        plte.push(p.green().into());
-        plte.push(p.blue().into());
+        plte.push(pix::RgbModel::red(*p).into());
+        plte.push(pix::RgbModel::green(*p).into());
+        plte.push(pix::RgbModel::blue(*p).into());
     }
     add_chunk(out, b"PLTE", &plte)
 }

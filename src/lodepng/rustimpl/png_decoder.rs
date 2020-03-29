@@ -1,6 +1,6 @@
 //! PNG Decoder
 
-use pix::Ch8;
+use pix::channel::Ch8;
 
 use super::*;
 
@@ -561,7 +561,7 @@ pub(crate) fn get_color_profile(
                 tree.insert((r, g, b, a), profile.numcolors as u16);
                 if profile.numcolors < 256 {
                     profile.palette[profile.numcolors as usize] =
-                        Rgba8::with_alpha(
+                        SRgba8::new(
                             Ch8::new(r),
                             Ch8::new(g),
                             Ch8::new(b),
@@ -702,7 +702,7 @@ impl ColorProfile {
             alpha: false,
             numcolors: 0,
             bits: 1,
-            palette: [Rgba8::with_alpha(
+            palette: [SRgba8::new(
                 Ch8::new(0),
                 Ch8::new(0),
                 Ch8::new(0),

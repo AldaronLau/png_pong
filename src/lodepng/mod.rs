@@ -2,8 +2,6 @@
 
 use miniz_oxide::deflate::compress_to_vec;
 
-use pix::Alpha;
-
 mod ffi;
 
 mod rustimpl;
@@ -33,7 +31,7 @@ pub use ffi::Time;
 pub use ffi::ColorMode;
 pub use ffi::Info;
 
-use pix::{Rgba8, SepSRgba8, SepSRgb8, Raster};
+use pix::{Rgba8, SRgba8, SRgb8, Raster, ColorModel};
 use crate::chunk::{TextChunk, ITextChunk};
 use crate::error::DecodeError;
 use crate::Format;
@@ -62,7 +60,7 @@ impl ColorMode {
     }
 
     /// add 1 color to the palette
-    pub fn palette_add(&mut self, p: SepSRgba8) -> Result<(), Error> {
+    pub fn palette_add(&mut self, p: SRgba8) -> Result<(), Error> {
         if self.palette.len() >= 256 {
             return Err(Error(38));
         }
@@ -71,11 +69,11 @@ impl ColorMode {
         Ok(())
     }
 
-    pub fn palette(&self) -> &[SepSRgba8] {
+    pub fn palette(&self) -> &[SRgba8] {
         self.palette.as_slice()
     }
 
-    pub fn palette_mut(&mut self) -> &mut [SepSRgba8] {
+    pub fn palette_mut(&mut self) -> &mut [SRgba8] {
         self.palette.as_mut_slice()
     }
 
@@ -126,9 +124,7 @@ impl ColorMode {
     /// Loops through the palette to check this.
     pub fn has_palette_alpha(&self) -> bool {
         self.palette().iter().any(|p| {
-            let alpha = p.alpha();
-            let value = alpha.value();
-            let byte: u8 = value.into();
+            let byte: u8 = pix::RgbModel::alpha(*p).into();
 
             byte < 255
         })
@@ -419,7 +415,7 @@ impl Encoder {
     }
 
     #[inline]
-    pub fn encode<PixelType: Copy + pix::Format>(
+    pub fn encode<PixelType: Copy + pix::Pixel>(
         &mut self,
         raster: &pix::Raster<PixelType>,
     ) -> Result<Vec<u8>, Error> {
@@ -427,7 +423,7 @@ impl Encoder {
     }
 
     #[inline]
-    pub fn encode_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
+    pub fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
         &mut self,
         filepath: P,
         raster: &pix::Raster<PixelType>,
@@ -492,14 +488,14 @@ impl Decoder {
     //  }
     //  ```
     #[inline]
-    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelFormat: Format<Chan = pix::Ch8>>(
+    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelFormat: Format<Chan = pix::channel::Ch8>>(
         &mut self,
         input: Bytes,
     ) -> Result<Raster<PixelFormat>, DecodeError> {
         self.state.decode(input)
     }
 
-    pub fn decode_file<P: AsRef<Path>, PixelFormat: Format<Chan = pix::Ch8>>(
+    pub fn decode_file<P: AsRef<Path>, PixelFormat: Format<Chan = pix::channel::Ch8>>(
         &mut self,
         filepath: P,
     ) -> Result<Raster<PixelFormat>, DecodeError> {
@@ -596,7 +592,7 @@ impl State {
     //      _ => panic!("¯\\_(ツ)_/¯")
     //  }
     //  ```
-    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::Ch8>>(
+    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::channel::Ch8>>(
         &mut self,
         input: Bytes,
     ) -> Result<Raster<PixelType>, DecodeError> {
@@ -615,7 +611,7 @@ impl State {
         )
     }
 
-    pub fn decode_file<P: AsRef<Path>, PixelType: Format<Chan = pix::Ch8>>(
+    pub fn decode_file<P: AsRef<Path>, PixelType: Format<Chan = pix::channel::Ch8>>(
         &mut self,
         filepath: P,
     ) -> Result<Raster<PixelType>, DecodeError> {
@@ -632,7 +628,7 @@ impl State {
         Ok((w, h))
     }
 
-    pub fn encode<PixelType: Copy + pix::Format>(
+    pub fn encode<PixelType: Copy + pix::Pixel>(
         &mut self,
         raster: &pix::Raster<PixelType>,
     ) -> Result<Vec<u8>, Error> {
@@ -644,7 +640,7 @@ impl State {
         )?)
     }
 
-    pub fn encode_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
+    pub fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
         &mut self,
         filepath: P,
         raster: &pix::Raster<PixelType>,
@@ -673,14 +669,14 @@ impl Default for State {
 pub enum Image {
     /// Bytes of the image. See bpp how many pixels per element there are
     RawData(pix::Raster<pix::Mask8>),
-    Grey(pix::Raster<pix::SepSGray8>),
-    Grey16(pix::Raster<pix::SepSGray16>),
-    GreyAlpha(pix::Raster<pix::SepSGrayAlpha8>),
-    GreyAlpha16(pix::Raster<pix::SepSGrayAlpha16>),
-    RGBA(pix::Raster<pix::SepSRgba8>),
-    RGB(pix::Raster<pix::SepSRgb8>),
-    RGBA16(pix::Raster<pix::SepSRgba16>),
-    RGB16(pix::Raster<pix::SepSRgb16>),
+    Grey(pix::Raster<pix::SGray8>),
+    Grey16(pix::Raster<pix::SGray16>),
+    GreyAlpha(pix::Raster<pix::SGraya8>),
+    GreyAlpha16(pix::Raster<pix::SGraya16>),
+    RGBA(pix::Raster<pix::SRgba8>),
+    RGB(pix::Raster<pix::SRgb8>),
+    RGBA16(pix::Raster<pix::SRgba16>),
+    RGB16(pix::Raster<pix::SRgb16>),
 }
 
 /// Position in the file section after…
@@ -697,7 +693,7 @@ pub struct ChunkRef<'a> {
     data: &'a [u8],
 }
 
-fn new_bitmap<PixelType: Format<Chan = pix::Ch8>>(
+fn new_bitmap<PixelType: Format<Chan = pix::channel::Ch8>>(
     out: Vec<u8>,
     width: u32,
     height: u32,
@@ -735,7 +731,7 @@ fn load_file<P: AsRef<Path>>(filepath: P) -> Result<Vec<u8>, Error> {
 /// * `in`: Memory buffer with the PNG file.
 /// * `colortype`: the desired color type for the raw output image. See `ColorType`.
 /// * `bitdepth`: the desired bit depth for the raw output image. 1, 2, 4, 8 or 16. Typically 8.
-pub fn decode_memory<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::Ch8>>(
+pub fn decode_memory<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::channel::Ch8>>(
     input: Bytes,
     colortype: ColorType,
     bitdepth: u32,
@@ -761,7 +757,7 @@ pub fn decode_memory<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::Ch8>>(
 /// * `h`: height of the raw pixel data in pixels.
 /// * `colortype`: the color type of the raw input image. See `ColorType`.
 /// * `bitdepth`: the bit depth of the raw input image. 1, 2, 4, 8 or 16. Typically 8.
-pub fn encode_memory<PixelType: Copy + pix::Format>(
+pub fn encode_memory<PixelType: Copy + pix::Pixel>(
     raster: &pix::Raster<PixelType>,
     colortype: ColorType,
     bitdepth: u32,
@@ -776,14 +772,14 @@ pub fn encode_memory<PixelType: Copy + pix::Format>(
 }
 
 /// Same as `encode_memory`, but always encodes from 32-bit RGBA raw image
-pub fn encode32<PixelType: Copy + pix::Format>(
+pub fn encode32<PixelType: Copy + pix::Pixel>(
     raster: &pix::Raster<PixelType>,
 ) -> Result<Vec<u8>, Error> {
     encode_memory(raster, ColorType::Rgba, 8)
 }
 
 /// Same as `encode_memory`, but always encodes from 24-bit RGB raw image
-pub fn encode24<PixelType: Copy + pix::Format>(
+pub fn encode24<PixelType: Copy + pix::Pixel>(
     raster: &pix::Raster<PixelType>,
 ) -> Result<Vec<u8>, Error> {
     encode_memory(raster, ColorType::Rgb, 8)
@@ -793,7 +789,7 @@ pub fn encode24<PixelType: Copy + pix::Format>(
 /// Same as the other encode functions, but instead takes a file path as output.
 ///
 /// NOTE: This overwrites existing files without warning!
-pub fn encode_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
+pub fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
     filepath: P,
     raster: &pix::Raster<PixelType>,
     colortype: ColorType,
@@ -804,7 +800,7 @@ pub fn encode_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
 }
 
 /// Same as `encode_file`, but always encodes from 32-bit RGBA raw image
-pub fn encode32_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
+pub fn encode32_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
     filepath: P,
     raster: &pix::Raster<PixelType>,
 ) -> Result<(), Error> {
@@ -812,7 +808,7 @@ pub fn encode32_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
 }
 
 /// Same as `encode_file`, but always encodes from 24-bit RGB raw image
-pub fn encode24_file<PixelType: Copy + pix::Format, P: AsRef<Path>>(
+pub fn encode24_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
     filepath: P,
     raster: &pix::Raster<PixelType>,
 ) -> Result<(), Error> {
@@ -981,15 +977,15 @@ impl Default for EncoderSettings {
 #[cfg(test)]
 mod test {
     use super::*;
-    use pix::Ch8;
+    use pix::channel::Ch8;
     use std::mem;
 
     #[test]
     fn pixel_sizes() {
-        assert_eq!(4, mem::size_of::<pix::SepSRgba8>());
-        assert_eq!(3, mem::size_of::<pix::SepSRgb8>());
-        assert_eq!(2, mem::size_of::<pix::SepSGrayAlpha8>());
-        assert_eq!(1, mem::size_of::<pix::SepSGray8>());
+        assert_eq!(4, mem::size_of::<pix::SRgba8>());
+        assert_eq!(3, mem::size_of::<pix::SRgb8>());
+        assert_eq!(2, mem::size_of::<pix::SGraya8>());
+        assert_eq!(1, mem::size_of::<pix::SGray8>());
     }
 
     #[test]
@@ -1014,7 +1010,7 @@ mod test {
         assert_eq!(state.info_raw().colortype(), ColorType::Palette);
         state
             .info_raw_mut()
-            .palette_add(pix::Rgba8::with_alpha(
+            .palette_add(pix::SRgba8::new(
                 Ch8::new(1),
                 Ch8::new(2),
                 Ch8::new(3),
@@ -1023,7 +1019,7 @@ mod test {
             .unwrap();
         state
             .info_raw_mut()
-            .palette_add(pix::Rgba8::with_alpha(
+            .palette_add(pix::SRgba8::new(
                 Ch8::new(5),
                 Ch8::new(6),
                 Ch8::new(7),
@@ -1032,13 +1028,13 @@ mod test {
             .unwrap();
         assert_eq!(
             &[
-                pix::Rgba8::with_alpha(
+                pix::SRgba8::new(
                     Ch8::new(1u8),
                     Ch8::new(2),
                     Ch8::new(3),
                     Ch8::new(4)
                 ),
-                pix::Rgba8::with_alpha(
+                pix::SRgba8::new(
                     Ch8::new(5u8),
                     Ch8::new(6),
                     Ch8::new(7),
@@ -1089,11 +1085,11 @@ mod test {
             info.get("foob").unwrap();
         }
 
-        let raster: pix::Raster<pix::SepSRgba8> =
+        let raster: pix::Raster<pix::SRgba8> =
             pix::RasterBuilder::new().with_u8_buffer(1, 1, &[0u8, 0, 0, 0][..]);
         let img = state.encode(&raster).unwrap();
         let mut dec = State::new();
-        dec.decode::<_, SepSRgba8>(img).unwrap();
+        dec.decode::<_, SRgba8>(img).unwrap();
         let chunk = dec
             .info_png()
             .unknown_chunks(ChunkPosition::IHDR)
@@ -1106,7 +1102,7 @@ mod test {
     #[test]
     fn read_icc() {
         let mut s = State::new();
-        let f = s.decode_file::<_, SepSRgba8>("tests/profile.png");
+        let f = s.decode_file::<_, SRgba8>("tests/profile.png");
         f.unwrap();
         let icc = s.info_png().get("iCCP").unwrap();
         assert_eq!(275, icc.len());

@@ -23,7 +23,7 @@ impl<R: Read, F: Format> FrameDecoder<R, F> {
 impl<R, F> Iterator for FrameDecoder<R, F>
 where
     R: std::io::Read,
-    F: Format<Chan = pix::Ch8>, // FIXME
+    F: Format<Chan = pix::channel::Ch8>, // FIXME
 {
     type Item = Result<Frame<F>, DecodeError>;
 

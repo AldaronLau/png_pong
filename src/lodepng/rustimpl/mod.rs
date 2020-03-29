@@ -1,5 +1,3 @@
-use pix::Alpha;
-
 mod adler32;
 mod bitmath;
 mod chunks;
@@ -52,7 +50,7 @@ returns 0 if the palette is opaque,
 returns 1 if the palette has a single color with alpha 0 ==> color key
 returns 2 if the palette is semi-translucent.
 */
-fn get_palette_translucency(palette: &[SepSRgba8]) -> PaletteTranslucency {
+fn get_palette_translucency(palette: &[SRgba8]) -> PaletteTranslucency {
     let mut key = PaletteTranslucency::Opaque;
     let mut r = 0;
     let mut g = 0;
@@ -60,11 +58,11 @@ fn get_palette_translucency(palette: &[SepSRgba8]) -> PaletteTranslucency {
     /*the value of the color with alpha 0, so long as color keying is possible*/
     let mut i = 0;
     while i < palette.len() {
-        let byte: u8 = palette[i].alpha().value().into();
+        let byte: u8 = pix::RgbModel::alpha(palette[i]).into();
         if key == PaletteTranslucency::Opaque && byte == 0 {
-            r = palette[i].red().into();
-            g = palette[i].green().into();
-            b = palette[i].blue().into();
+            r = pix::RgbModel::red(palette[i]).into();
+            g = pix::RgbModel::green(palette[i]).into();
+            b = pix::RgbModel::blue(palette[i]).into();
             key = PaletteTranslucency::Key;
             i = 0;
             /*restart from beginning, to detect earlier opaque colors with key's value*/
@@ -72,9 +70,9 @@ fn get_palette_translucency(palette: &[SepSRgba8]) -> PaletteTranslucency {
         } else if byte != 255 {
             return PaletteTranslucency::Semi;
         } else if key == PaletteTranslucency::Key
-            && r == palette[i].red().into()
-            && g == palette[i].green().into()
-            && b == palette[i].blue().into()
+            && r == pix::RgbModel::red(palette[i]).into()
+            && g == pix::RgbModel::green(palette[i]).into()
+            && b == pix::RgbModel::blue(palette[i]).into()
         {
             /*when key, no opaque RGB may have key's RGB*/
             return PaletteTranslucency::Semi;
