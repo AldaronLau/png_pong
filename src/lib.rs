@@ -1,53 +1,38 @@
-//! # PNG Pong - A pure Rust PNG encoder & decoder
-//! This is a pure Rust PNG image decoder and encoder based on lodepng.  This crate allows easy reading and writing of PNG files without any system dependencies.
-//!
-//! ## Goals
-//! - Forbid unsafe.
-//! - APNG support as iterator.
-//! - Fast.
-//! - Compatible with pix / gift-style API.
-//! - Load all PNG files crushed with pngcrush.
-//! - Save crushed PNG files.
-//! - Clean, well-documented, concise code.
-//!
-//! ## Examples
-//! - Say you want to read a PNG file into a raster:
-//! ```rust,no_run
-//! let data = std::fs::read("graphic.png").expect("Failed to open PNG");
-//! let data = std::io::Cursor::new(data);
-//! let decoder = png_pong::FrameDecoder::<_, pix::SRgba8>::new(data);
-//! let png_pong::Frame { raster, delay } = decoder
-//!     .last()
-//!     .expect("No frames in PNG")
-//!     .expect("PNG parsing error");
-//! ```
-//!
-//! - Say you want to save a raster as a PNG file.
-//! ```rust,no_run
-//! let raster = pix::RasterBuilder::new().with_pixels(1, 1, &[
-//!     pix::SRgba8::new(0, 0, 0, 0)][..]
-//! );
-//! let mut out_data = Vec::new();
-//! let mut encoder = png_pong::FrameEncoder::<_, pix::SRgba8>::new(
-//!     &mut out_data
-//! );
-//! let frame = png_pong::Frame{ raster, delay: 0 };
-//! encoder.encode(&frame).expect("Failed to add frame");
-//! std::fs::write("graphic.png", out_data).expect("Failed to save image");
-//! ```
-//!
-//! ## TODO
-//! - Implement APNG reading.
-//! - Implement Chunk reading (with all the different chunk structs).
-//! - RasterDecoder should wrap ChunkDecoder & RasterEncoder should wrap ChunkEncoder
-//! - Replace `ParseError` with Rust-style enum instead of having a C integer.
-//! - More test cases to test against.
+// png-pong
+//
+// Copyright © 2019-2020 Jeron Aldaron Lau
+// Copyright © 2014-2017 Kornel Lesiński
+// Copyright © 2005-2016 Lode Vandevenne
+//
+// Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
+// https://apache.org/licenses/LICENSE-2.0>, or the Zlib License, <LICENSE-ZLIB
+// or http://opensource.org/licenses/Zlib>, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-#![forbid(unsafe_code)]
-#![warn(missing_docs)]
+#![cfg_attr(feature = "external_doc", feature(external_doc))]
+#![cfg_attr(feature = "external_doc", doc(include = "../README.md"))]
+#![doc = ""]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![doc(
-    html_logo_url = "https://plopgrizzly.com/icon.svg",
-    html_favicon_url = "https://plopgrizzly.com/icon.svg"
+    html_logo_url = "https://libcala.github.io/logo.svg",
+    html_favicon_url = "https://libcala.github.io/icon.svg",
+    html_root_url = "https://docs.rs/png_pong"
+)]
+#![forbid(unsafe_code)]
+#![warn(
+    anonymous_parameters,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    missing_docs,
+    nonstandard_style,
+    rust_2018_idioms,
+    single_use_lifetimes,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unused_extern_crates,
+    unused_qualifications,
+    variant_size_differences
 )]
 
 mod lodepng;

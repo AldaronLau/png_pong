@@ -1,6 +1,24 @@
 language: rust
+sudo: false
+
+cache: cargo
+
 rust:
-  - stable
-  - nightly
+  - beta
+
+matrix:
+    fast_finish: true
+    include:
+      - os: linux
+        rust: stable
+        compiler: gcc
+
+      - os: windows
+        rust: stable
+
+      - os: osx
+        rust: stable
+
 script:
-  - cargo test --verbose --all
+  - cargo update
+  - cargo test --all --all-features

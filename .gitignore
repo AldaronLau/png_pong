@@ -1,10 +1,4 @@
-target/
-.lock
+/target/
+/.cargo-ok
 /Cargo.lock
-write_test.png
-doc/lodepng/
-doc/src/
-doc/*.woff
-doc/*.css
-doc/*.js
-doc/implementors/
+/**/*.rs.bk
