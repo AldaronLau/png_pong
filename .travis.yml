@@ -5,6 +5,7 @@ cache: cargo
 
 rust:
   - beta
+  - nightly
 
 matrix:
     fast_finish: true

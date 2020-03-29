@@ -10,7 +10,7 @@ This is a pure Rust PNG image decoder and encoder based on lodepng.
 This crate allows easy reading and writing of PNG files without any
 system dependencies.
 
-# Why another PNG crate?
+### Why another PNG crate?
 These are the 3 Rust PNG encoder/decoder crates I know of:
 - [png](https://crates.io/crates/png) - The one everyone uses, is very
   limited in which PNGs it can open.
@@ -32,7 +32,7 @@ to model the API after the [gift](https://crates.io/crates/gift) crate,
 so I'm using [pix](https://crates.io/crates/pix) instead of
 [rgb](https://crates.io/crates/rgb).
 
-## Goals
+### Goals
 - Forbid unsafe.
 - APNG support as iterator.
 - Fast.
@@ -40,6 +40,13 @@ so I'm using [pix](https://crates.io/crates/pix) instead of
 - Load all PNG files crushed with pngcrush.
 - Save crushed PNG files.
 - Clean, well-documented, concise code.
+
+### TODO
+ - Implement APNG reading.
+ - Implement Chunk reading (with all the different chunk structs).
+ - RasterDecoder should wrap ChunkDecoder & RasterEncoder should wrap ChunkEncoder
+ - Replace `ParseError` with Rust-style enum instead of having a C integer.
+ - More test cases to test against.
 
 ## Table of Contents
 - [Getting Started](#getting-started)
