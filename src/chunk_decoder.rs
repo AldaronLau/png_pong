@@ -13,7 +13,7 @@ use std::io::Read;
 use crate::{DecodeError, lodepng, chunk::Chunk};
 
 /// Chunk Decoder for PNG files.
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct ChunkDecoder<R: Read> {
     // FIXME: use .decode() instead of pub(crate).
     pub(crate) state: lodepng::State,

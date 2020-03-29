@@ -139,7 +139,7 @@ fn add_color_bits(out: &mut [u8], index: usize, bits: u32, mut inp: u32) {
     }
 }
 
-pub type ColorTree = HashMap<(u8, u8, u8, u8), u16>;
+pub(crate) type ColorTree = HashMap<(u8, u8, u8, u8), u16>;
 
 #[inline(always)]
 pub(super) fn rgba8_to_pixel(
@@ -305,7 +305,7 @@ pub(super) fn get_pixel_color_rgba8(
             } else {
                 let highest = (1 << mode.bitdepth()) - 1;
                 /*highest possible value for this bit depth*/
-                let mut j = i as usize * mode.bitdepth() as usize;
+                let mut j = i * mode.bitdepth() as usize;
                 let value = read_bits_from_reversed_stream(
                     &mut j,
                     inp,
@@ -356,7 +356,7 @@ pub(super) fn get_pixel_color_rgba8(
             let index = if mode.bitdepth() == 8 {
                 inp[i] as usize
             } else {
-                let mut j = i as usize * mode.bitdepth() as usize;
+                let mut j = i * mode.bitdepth() as usize;
                 read_bits_from_reversed_stream(
                     &mut j,
                     inp,
@@ -579,7 +579,7 @@ pub(super) fn get_pixel_colors_rgba8(
                         buffer[3] = 255u8;
                     }
                 } else {
-                    let p = pal[index as usize];
+                    let p = pal[index];
                     buffer[0] = pix::RgbModel::red(p).into();
                     buffer[1] = pix::RgbModel::green(p).into();
                     buffer[2] = pix::RgbModel::blue(p).into();
@@ -1191,7 +1191,7 @@ pub(crate) fn add_chunk(
     type_: &[u8; 4],
     data: &[u8],
 ) -> Result<(), Error> {
-    let length = data.len() as usize;
+    let length = data.len();
     if length > (1 << 31) {
         return Err(Error(77));
     }
@@ -1210,13 +1210,13 @@ pub(crate) fn add_chunk(
 }
 
 /*shared values used by multiple Adam7 related functions*/
-pub const ADAM7_IX: [u32; 7] = [0, 4, 0, 2, 0, 1, 0];
+pub(crate) const ADAM7_IX: [u32; 7] = [0, 4, 0, 2, 0, 1, 0];
 /*x start values*/
-pub const ADAM7_IY: [u32; 7] = [0, 0, 4, 0, 2, 0, 1];
+pub(crate) const ADAM7_IY: [u32; 7] = [0, 0, 4, 0, 2, 0, 1];
 /*y start values*/
-pub const ADAM7_DX: [u32; 7] = [8, 8, 4, 4, 2, 2, 1];
+pub(crate) const ADAM7_DX: [u32; 7] = [8, 8, 4, 4, 2, 2, 1];
 /*x delta values*/
-pub const ADAM7_DY: [u32; 7] = [8, 8, 8, 4, 4, 2, 2];
+pub(crate) const ADAM7_DY: [u32; 7] = [8, 8, 8, 4, 4, 2, 2];
 
 pub(super) fn adam7_get_pass_values(
     w: u32,
@@ -1232,8 +1232,8 @@ pub(super) fn adam7_get_pass_values(
     /*the passstart values have 8 values: the 8th one indicates the byte after the end of the 7th (= last) pass*/
     /*calculate width and height in pixels of each pass*/
     for i in 0..7 {
-        passw[i] = (w as u32 + ADAM7_DX[i] - ADAM7_IX[i] - 1) / ADAM7_DX[i]; /*if passw[i] is 0, it's 0 bytes, not 1 (no filter_type-byte)*/
-        passh[i] = (h as u32 + ADAM7_DY[i] - ADAM7_IY[i] - 1) / ADAM7_DY[i]; /*bits padded if needed to fill full byte at end of each scanline*/
+        passw[i] = (w + ADAM7_DX[i] - ADAM7_IX[i] - 1) / ADAM7_DX[i]; /*if passw[i] is 0, it's 0 bytes, not 1 (no filter_type-byte)*/
+        passh[i] = (h + ADAM7_DY[i] - ADAM7_IY[i] - 1) / ADAM7_DY[i]; /*bits padded if needed to fill full byte at end of each scanline*/
         if passw[i] == 0 {
             passh[i] = 0; /*only padded at end of reduced image*/
         }

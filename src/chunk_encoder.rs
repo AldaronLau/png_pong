@@ -13,7 +13,7 @@ use std::io::Write;
 use crate::{EncodeError, lodepng, chunk::Chunk};
 
 /// Chunk Encoder for PNG files.
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct ChunkEncoder<W: Write> {
     // FIXME: use .encode() instead of pub(crate).
     pub(crate) state: lodepng::State,

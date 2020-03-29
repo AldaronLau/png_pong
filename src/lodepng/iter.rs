@@ -12,7 +12,7 @@
 use super::ChunkRef;
 use crate::lodepng::rustimpl;
 
-pub struct ChunksIter<'a> {
+pub(crate) struct ChunksIter<'a> {
     pub(crate) data: &'a [u8],
 }
 

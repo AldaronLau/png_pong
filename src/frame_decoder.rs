@@ -13,6 +13,7 @@ use std::{io::Read, marker::PhantomData};
 use crate::{Frame, ChunkDecoder, Format, DecodeError};
 
 /// Frame Encoder for PNG files.
+#[derive(Debug)]
 pub struct FrameDecoder<R: Read, F: Format> {
     decoder: ChunkDecoder<R>,
     _phantom: PhantomData<F>,
@@ -33,7 +34,7 @@ impl<R: Read, F: Format> FrameDecoder<R, F> {
 
 impl<R, F> Iterator for FrameDecoder<R, F>
 where
-    R: std::io::Read,
+    R: Read,
     F: Format<Chan = pix::channel::Ch8>, // FIXME
 {
     type Item = Result<Frame<F>, DecodeError>;
@@ -58,7 +59,7 @@ where
                 Ok(raster) => Ok(Frame { raster, delay: 0 }),
                 Err(error) => Err(error),
             }
-            Err(e) => Err(DecodeError::Io(e))
+            Err(e) => Err(DecodeError::Io(e.kind()))
         };
 
         Some(raster)

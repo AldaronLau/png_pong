@@ -12,10 +12,10 @@
 use crate::ParseError;
 
 /// Decoding Errors.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum DecodeError {
     /// A wrapped I/O error.
-    Io(std::io::Error),
+    Io(std::io::ErrorKind),
     /// Couldn't parse file.
     ParseError(ParseError),
     /// PNG file has different color `Format` than `Raster`.
@@ -25,10 +25,10 @@ pub enum DecodeError {
 }
 
 /// Decoding Errors.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum EncodeError {
     /// A wrapped I/O error.
-    Io(std::io::Error),
+    Io(std::io::ErrorKind),
     /// Chunks arranged in invalid sequence.
     InvalidChunkSequence,
 }

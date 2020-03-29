@@ -249,14 +249,14 @@ pub(crate) fn lodepng_decode(
             return Err(Error(56)); /*unsupported color mode conversion*/
         }
         let mut out = Vec::new();
-        out.resize(state.info_raw.raw_size(w as u32, h as u32), 0);
+        out.resize(state.info_raw.raw_size(w, h), 0);
         lodepng_convert(
             &mut out,
             &decoded,
             &state.info_raw,
             &state.info_png.color,
-            w as u32,
-            h as u32,
+            w,
+            h,
         )?;
         Ok((out, w, h))
     }
@@ -699,7 +699,7 @@ pub(crate) fn lodepng_encode_memory(
 }
 
 impl ColorProfile {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             colored: 0,
             key: None,

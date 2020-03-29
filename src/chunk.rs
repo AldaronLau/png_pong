@@ -41,6 +41,7 @@ pub struct ITextChunk {
 }
 
 /// A chunk within a PNG file.
+#[derive(Debug)]
 pub enum Chunk {
     /// Non-International text chunk.
     Text(TextChunk),

@@ -19,3 +19,9 @@ pub struct Frame<F: Format> {
     /// TODO: Delay associated with this frame.
     pub delay: u32,
 }
+
+impl<F: Format> std::fmt::Debug for Frame<F> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.delay)
+    }
+}

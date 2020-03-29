@@ -14,6 +14,7 @@ use pix::Raster;
 use crate::{Frame, ChunkEncoder, Format};
 
 /// Frame Encoder for PNG files.
+#[derive(Debug)]
 pub struct FrameEncoder<W: Write, F: Format> {
     encoder: ChunkEncoder<W>,
     _phantom: PhantomData<F>,

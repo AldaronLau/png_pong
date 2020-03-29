@@ -63,7 +63,7 @@ const LODEPNG_CRC32_TABLE: [u32; 256] = [
 ];
 
 /*Return the CRC of the bytes buf[0..len-1].*/
-pub fn lodepng_crc32(data: &[u8]) -> u32 {
+pub(crate)fn lodepng_crc32(data: &[u8]) -> u32 {
     let mut r = 4294967295u32;
     for &d in data {
         r = LODEPNG_CRC32_TABLE[((r ^ d as u32) & 255) as usize] ^ (r >> 8);
@@ -81,7 +81,7 @@ impl Drop for Info {
     }
 }
 
-pub fn lodepng_convert(
+pub(crate)fn lodepng_convert(
     out: &mut [u8],
     inp: &[u8],
     mode_out: &ColorMode,
@@ -122,9 +122,9 @@ pub fn lodepng_convert(
         }
     } else if mode_out.bitdepth() == 8 && mode_out.colortype == ColorType::Rgba
     {
-        get_pixel_colors_rgba8(out, numpixels as usize, true, inp, mode_in);
+        get_pixel_colors_rgba8(out, numpixels, true, inp, mode_in);
     } else if mode_out.bitdepth() == 8 && mode_out.colortype == ColorType::Rgb {
-        get_pixel_colors_rgba8(out, numpixels as usize, false, inp, mode_in);
+        get_pixel_colors_rgba8(out, numpixels, false, inp, mode_in);
     } else {
         for i in 0..numpixels {
             let (r, g, b, a) = get_pixel_color_rgba8(inp, i, mode_in);
@@ -252,7 +252,7 @@ fn unfilter_aliased(
     /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
     let bytewidth = (bpp + 7) / 8;
     let linebytes = (w * bpp + 7) / 8;
-    for y in 0..h as usize {
+    for y in 0..h {
         let outindex = linebytes * y;
         let inindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
         let filter_type = inout[in_off + inindex];
@@ -531,7 +531,7 @@ pub(super) fn adam7_interlace(
                         + (ADAM7_IX[i] as usize + x * ADAM7_DX[i] as usize)
                             * bpp;
                     let mut obp =
-                        ((8 * passstart[i] as usize) + (y * ilinebits + x * bpp)) as usize;
+                        ((8 * passstart[i] as usize) + (y * ilinebits + x * bpp));
                     for _ in 0..bpp {
                         let bit = read_bit_from_reversed_stream(&mut ibp, inp);
                         set_bit_of_reversed_stream(&mut obp, out, bit);

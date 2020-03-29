@@ -41,6 +41,7 @@ mod lodepng;
 pub mod chunk;
 
 pub use crate::lodepng::Error as ParseError;
+pub use crate::lodepng::ColorType;
 
 // Modules
 mod format;

@@ -50,9 +50,9 @@ pub enum ColorType {
 /// format, and is used both for PNG and raw image data in LodePNG.
 #[repr(C)]
 #[derive(Debug)]
-pub struct ColorMode {
+pub(crate) struct ColorMode {
     /// color type, see PNG standard
-    pub colortype: ColorType,
+    pub(crate) colortype: ColorType,
     /// bits per sample, see PNG standard
     pub(crate) bitdepth: u32,
 
@@ -89,47 +89,47 @@ pub(crate) struct DecompressSettings {
 /// Settings for zlib compression. Tweaking these settings tweaks the balance between speed and compression ratio.
 #[repr(C)]
 #[derive(Clone)]
-pub struct CompressSettings {
+pub(crate) struct CompressSettings {
     /// the block type for LZ (0, 1, 2 or 3, see zlib standard). Should be 2 for proper compression.
-    pub btype: u32,
+    pub(crate) btype: u32,
     /// whether or not to use LZ77. Should be 1 for proper compression.
-    pub use_lz77: u32,
+    pub(crate) use_lz77: u32,
     /// must be a power of two <= 32768. higher compresses more but is slower. Typical value: 2048.
-    pub windowsize: u32,
+    pub(crate) windowsize: u32,
     /// mininum lz77 length. 3 is normally best, 6 can be better for some PNGs. Default: 0
-    pub minmatch: u32,
+    pub(crate) minmatch: u32,
     /// stop searching if >= this length found. Set to 258 for best compression. Default: 128
-    pub nicematch: u32,
+    pub(crate) nicematch: u32,
     /// use lazy matching: better compression but a bit slower. Default: true
-    pub lazymatching: u32,
+    pub(crate) lazymatching: u32,
     /// optional custom settings for custom functions
-    pub custom_context: *const c_void,
+    pub(crate) custom_context: *const c_void,
 }
 
 /// The information of a `Time` chunk in PNG
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
-pub struct Time {
-    pub year: u32,
-    pub month: u32,
-    pub day: u32,
-    pub hour: u32,
-    pub minute: u32,
-    pub second: u32,
+pub(crate) struct Time {
+    pub(crate) year: u32,
+    pub(crate) month: u32,
+    pub(crate) day: u32,
+    pub(crate) hour: u32,
+    pub(crate) minute: u32,
+    pub(crate) second: u32,
 }
 
 /// Information about the PNG image, except pixels, width and height
 #[repr(C)]
 #[derive(Debug)]
-pub struct Info {
+pub(crate) struct Info {
     /// compression method of the original file. Always 0.
-    pub compression_method: u32,
+    pub(crate) compression_method: u32,
     /// filter method of the original file
-    pub filter_method: u32,
+    pub(crate) filter_method: u32,
     /// interlace method of the original file
-    pub interlace_method: u32,
+    pub(crate) interlace_method: u32,
     /// color type and bits, palette and transparency of the PNG file
-    pub color: ColorMode,
+    pub(crate) color: ColorMode,
 
     ///  suggested background color chunk (bKGD)
     ///  This color uses the same color mode as the PNG (except alpha channel), which can be 1-bit to 16-bit.
@@ -140,32 +140,32 @@ pub struct Info {
     ///  the palette in background_r, the other two are then ignored.
     ///
     ///  The decoder does not use this background color to edit the color of pixels.
-    pub background_defined: u32,
+    pub(crate) background_defined: u32,
     /// red component of suggested background color
-    pub background_r: u32,
+    pub(crate) background_r: u32,
     /// green component of suggested background color
-    pub background_g: u32,
+    pub(crate) background_g: u32,
     /// blue component of suggested background color
-    pub background_b: u32,
+    pub(crate) background_b: u32,
 
     /// Text chunks.
-    pub text: Vec<TextChunk>,
+    pub(crate) text: Vec<TextChunk>,
     /// IText Chunks
-    pub itext: Vec<ITextChunk>,
+    pub(crate) itext: Vec<ITextChunk>,
 
     /// set to 1 to make the encoder generate a tIME chunk
-    pub time_defined: u32,
+    pub(crate) time_defined: u32,
     /// time chunk (tIME)
-    pub time: Time,
+    pub(crate) time: Time,
 
     /// if 0, there is no pHYs chunk and the values below are undefined, if 1 else there is one
-    pub phys_defined: u32,
+    pub(crate) phys_defined: u32,
     /// pixels per unit in x direction
-    pub phys_x: u32,
+    pub(crate) phys_x: u32,
     /// pixels per unit in y direction
-    pub phys_y: u32,
+    pub(crate) phys_y: u32,
     /// may be 0 (unknown unit) or 1 (metre)
-    pub phys_unit: u32,
+    pub(crate) phys_unit: u32,
 
     /// unknown chunks
     /// There are 3 buffers, one for each position in the PNG where unknown chunks can appear
@@ -174,7 +174,7 @@ pub struct Info {
     /// 0: IHDR-`PLTE`, 1: `PLTE`-IDAT, 2: IDAT-IEND
     /// Do not allocate or traverse this data yourself. Use the chunk traversing functions declared
     /// later, such as lodepng_chunk_next and lodepng_chunk_append, to read/write this struct.
-    pub unknown_chunks_data: [Vec<u8>; 3],
+    pub(crate) unknown_chunks_data: [Vec<u8>; 3],
 }
 
 /// Settings for the decoder. This contains settings for the PNG and the Zlib decoder, but not the `Info` settings from the `Info` structs.
@@ -190,7 +190,7 @@ pub(crate) struct DecoderSettings {
 /// automatically use color type with less bits per pixel if losslessly possible. Default: `AUTO`
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum FilterStrategy {
+pub(crate) enum FilterStrategy {
     /// every filter at zero
     Zero = 0,
     /// Use filter that gives minumum sum, as described in the official PNG filter heuristic.
@@ -205,27 +205,27 @@ pub enum FilterStrategy {
 
 #[repr(C)]
 #[derive(Clone, Debug)]
-pub struct EncoderSettings {
+pub(crate) struct EncoderSettings {
     /// settings for the zlib encoder, such as window size, ...
-    pub zlibsettings: CompressSettings,
+    pub(crate) zlibsettings: CompressSettings,
     /// how to automatically choose output PNG color type, if at all
-    pub auto_convert: u32,
+    pub(crate) auto_convert: u32,
     /// If true, follows the official PNG heuristic: if the PNG uses a palette or lower than
     /// 8 bit depth, set all filters to zero. Otherwise use the filter_strategy. Note that to
     /// completely follow the official PNG heuristic, filter_palette_zero must be true and
     /// filter_strategy must be FilterStrategy::MINSUM
-    pub filter_palette_zero: u32,
+    pub(crate) filter_palette_zero: u32,
     /// Which filter strategy to use when not using zeroes due to filter_palette_zero.
     /// Set filter_palette_zero to 0 to ensure always using your chosen strategy. Default: FilterStrategy::MINSUM
-    pub filter_strategy: FilterStrategy,
+    pub(crate) filter_strategy: FilterStrategy,
 
     /// force creating a `PLTE` chunk if colortype is 2 or 6 (= a suggested palette).
     /// If colortype is 3, `PLTE` is _always_ created
-    pub force_palette: u32,
+    pub(crate) force_palette: u32,
     /// add LodePNG identifier and version as a text chunk, for debugging
-    pub add_id: u32,
+    pub(crate) add_id: u32,
     /// encode text chunks as zTXt chunks instead of tEXt chunks, and use compression in iTXt chunks
-    pub text_compression: u32,
+    pub(crate) text_compression: u32,
 }
 
 /// The settings, state and information for extended encoding and decoding
@@ -245,32 +245,32 @@ pub(crate) struct State {
 /// Gives characteristics about the colors of the image, which helps decide which color model to use for encoding.
 /// Used internally by default if `auto_convert` is enabled. Public because it's useful for custom algorithms.
 #[repr(C)]
-pub struct ColorProfile {
+pub(crate) struct ColorProfile {
     /// not greyscale
-    pub colored: u32,
+    pub(crate) colored: u32,
     /// image is not opaque - use color key instead of full alpha
     ///
     /// key values, always as 16-bit, in 8-bit case the byte is duplicated, e.g.
     /// 65535 means 255
-    pub key: Option<(u16, u16, u16)>,
+    pub(crate) key: Option<(u16, u16, u16)>,
     /// image is not opaque and alpha channel or alpha palette required
-    pub alpha: bool,
+    pub(crate) alpha: bool,
     /// amount of colors, up to 257. Not valid if bits == 16.
-    pub numcolors: u32,
+    pub(crate) numcolors: u32,
     /// Remembers up to the first 256 RGBA colors, in no particular order
-    pub palette: [pix::SRgba8; 256],
+    pub(crate) palette: [pix::SRgba8; 256],
     /// bits per channel (not for palette). 1,2 or 4 for greyscale only. 16 if 16-bit per channel required.
-    pub bits: u32,
+    pub(crate) bits: u32,
 }
 
 impl fmt::Debug for ColorProfile {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("ColorProfile")
     }
 }
 
 impl fmt::Debug for CompressSettings {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("CompressSettings")
     }
 }

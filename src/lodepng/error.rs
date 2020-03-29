@@ -16,7 +16,7 @@ use std::io;
 
 /// A lame error code.
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub struct Error(pub u32);
+pub struct Error(pub u8);
 
 impl Error {
     /// Returns an English description of the numerical error code.
@@ -40,13 +40,13 @@ impl From<Error> for Result<(), Error> {
 }
 
 impl fmt::Debug for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} ({})", self.as_str(), self.0)
     }
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
@@ -57,7 +57,7 @@ impl error::Error for Error {
     }
 }
 
-impl std::convert::From<io::Error> for Error {
+impl From<io::Error> for Error {
     fn from(err: io::Error) -> Error {
         match err.kind() {
             io::ErrorKind::NotFound | io::ErrorKind::UnexpectedEof => Error(78),

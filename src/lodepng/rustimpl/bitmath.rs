@@ -16,8 +16,8 @@ pub(super) fn read_bit_from_reversed_stream(
     bitpointer: &mut usize,
     bitstream: &[u8],
 ) -> u8 {
-    let result = ((bitstream[(*bitpointer) >> 3] >> (7 - ((*bitpointer) & 7)))
-        & 1) as u8;
+    let result = (bitstream[(*bitpointer) >> 3] >> (7 - ((*bitpointer) & 7)))
+        & 1;
     *bitpointer += 1;
     result
 }
