@@ -9,8 +9,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![cfg_attr(feature = "external_doc", feature(external_doc))]
-#![cfg_attr(feature = "external_doc", doc(include = "../README.md"))]
+#![cfg_attr(nightly, feature(external_doc))]
+#![cfg_attr(nightly, doc(include = "../README.md"))]
 #![doc = ""]
 #![doc(
     html_logo_url = "https://libcala.github.io/logo.svg",

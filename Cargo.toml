@@ -54,5 +54,4 @@ opt-level = 2
 
 [features]
 default = ["flate"]
-external_doc = [] # For docs.rs documentation (uses nightly)
 flate = ["miniz_oxide"]
