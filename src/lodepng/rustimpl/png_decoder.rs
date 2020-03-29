@@ -1,7 +1,5 @@
 //! PNG Decoder
 
-use pix::channel::Ch8;
-
 use super::*;
 
 /*read the information from the header and store it in the Info. return value is error*/
@@ -561,12 +559,7 @@ pub(crate) fn get_color_profile(
                 tree.insert((r, g, b, a), profile.numcolors as u16);
                 if profile.numcolors < 256 {
                     profile.palette[profile.numcolors as usize] =
-                        SRgba8::new(
-                            Ch8::new(r),
-                            Ch8::new(g),
-                            Ch8::new(b),
-                            Ch8::new(a),
-                        );
+                        SRgba8::new(r, g, b, a);
                 }
                 profile.numcolors += 1;
                 numcolors_done = profile.numcolors >= maxnumcolors;
@@ -702,12 +695,7 @@ impl ColorProfile {
             alpha: false,
             numcolors: 0,
             bits: 1,
-            palette: [SRgba8::new(
-                Ch8::new(0),
-                Ch8::new(0),
-                Ch8::new(0),
-                Ch8::new(0),
-            ); 256],
+            palette: [SRgba8::new(0, 0, 0, 0); 256],
         }
     }
 }

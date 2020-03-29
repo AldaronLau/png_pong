@@ -1,6 +1,5 @@
 /*extern crate pix;
 extern crate png_pong;
-use pix::Ch8;
 use png_pong::*;
 
 fn encode<T: Copy + pix::Format>(
@@ -28,12 +27,7 @@ fn bgr() {
     assert_eq!(img.as_slice()[0], pix::Rgb8::new(1, 2, 3));
 
     let png = encode(
-        &[pix::Rgba8::with_alpha(
-            Ch8::new(3),
-            Ch8::new(2),
-            Ch8::new(1),
-            Ch8::new(111u8),
-        )],
+        &[pix::Rgba8::new(3, 2, 1, 111)],
         ColorType::BGRX,
         ColorType::RGB,
     )
@@ -41,12 +35,7 @@ fn bgr() {
     let img = decode32(&png).unwrap();
     assert_eq!(
         img.as_slice()[0],
-        pix::Rgba8::with_alpha(
-            Ch8::new(1),
-            Ch8::new(2),
-            Ch8::new(3),
-            Ch8::new(255)
-        )
+        pix::Rgba8::new(1, 2, 3, 255)
     );
 }
 
@@ -95,12 +84,7 @@ fn random() {
 #[test]
 fn bgra() {
     let png = encode(
-        &[pix::Rgba8::with_alpha(
-            Ch8::new(3),
-            Ch8::new(2),
-            Ch8::new(1),
-            Ch8::new(4u8),
-        )],
+        &[pix::Rgba8::with_alpha(3, 2, 1, 4)]
         ColorType::BGRA,
         ColorType::RGBA,
     )
@@ -108,13 +92,8 @@ fn bgra() {
     let img = decode32(&png).unwrap();
     assert_eq!(
         img.as_slice()[0],
-        pix::Rgba8::with_alpha(
-            Ch8::new(1),
-            Ch8::new(2),
-            Ch8::new(3),
-            Ch8::new(4u8)
-        )
-    );
+        pix::Rgba8::with_alpha(1, 2, 3, 4)
+    ;
 }
 
 #[test]

@@ -25,12 +25,7 @@
 //! - Say you want to save a raster as a PNG file.
 //! ```rust,no_run
 //! let raster = pix::RasterBuilder::new().with_pixels(1, 1, &[
-//!     pix::SRgba8::new(
-//!         pix::channel::Ch8::new(0),
-//!         pix::channel::Ch8::new(0),
-//!         pix::channel::Ch8::new(0),
-//!         pix::channel::Ch8::new(0),
-//!     )][..]
+//!     pix::SRgba8::new(0, 0, 0, 0)][..]
 //! );
 //! let mut out_data = Vec::new();
 //! let mut encoder = png_pong::FrameEncoder::<_, pix::SRgba8>::new(

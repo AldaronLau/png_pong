@@ -1,8 +1,6 @@
 /*use crate::huffman;
 use std::ffi::CStr;
 use std::mem;
-
-use pix::Ch8;
 */
 
 use std::fmt;

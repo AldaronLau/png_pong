@@ -1,7 +1,5 @@
 //! Deflate - Huffman
 
-use pix::channel::Ch8;
-
 use crate::chunk::ITextChunk;
 use crate::chunk::TextChunk;
 
@@ -757,12 +755,7 @@ pub(super) fn read_chunk_plte(
 ) -> Result<(), Error> {
     color.palette_clear();
     for c in data.chunks(3).take(data.len() / 3) {
-        color.palette_add(SRgba8::new(
-            Ch8::new(c[0]),
-            Ch8::new(c[1]),
-            Ch8::new(c[2]),
-            Ch8::new(255),
-        ))?;
+        color.palette_add(SRgba8::new(c[0], c[1], c[2], 255))?;
     }
     Ok(())
 }
@@ -781,7 +774,7 @@ pub(super) fn read_chunk_trns(
                 pix::RgbModel::red(pal[i]),
                 pix::RgbModel::green(pal[i]),
                 pix::RgbModel::blue(pal[i]),
-                Ch8::new(d),
+                d.into(),
             );
         }
     } else if color.colortype == ColorType::Grey {

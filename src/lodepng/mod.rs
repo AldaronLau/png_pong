@@ -977,7 +977,6 @@ impl Default for EncoderSettings {
 #[cfg(test)]
 mod test {
     use super::*;
-    use pix::channel::Ch8;
     use std::mem;
 
     #[test]
@@ -1010,36 +1009,16 @@ mod test {
         assert_eq!(state.info_raw().colortype(), ColorType::Palette);
         state
             .info_raw_mut()
-            .palette_add(pix::SRgba8::new(
-                Ch8::new(1),
-                Ch8::new(2),
-                Ch8::new(3),
-                Ch8::new(4),
-            ))
+            .palette_add(pix::SRgba8::new(1, 2, 3, 4))
             .unwrap();
         state
             .info_raw_mut()
-            .palette_add(pix::SRgba8::new(
-                Ch8::new(5),
-                Ch8::new(6),
-                Ch8::new(7),
-                Ch8::new(255),
-            ))
+            .palette_add(pix::SRgba8::new(5, 6, 7, 255))
             .unwrap();
         assert_eq!(
             &[
-                pix::SRgba8::new(
-                    Ch8::new(1u8),
-                    Ch8::new(2),
-                    Ch8::new(3),
-                    Ch8::new(4)
-                ),
-                pix::SRgba8::new(
-                    Ch8::new(5u8),
-                    Ch8::new(6),
-                    Ch8::new(7),
-                    Ch8::new(255)
-                )
+                pix::SRgba8::new(1, 2, 3, 4),
+                pix::SRgba8::new(5, 6, 7, 255),
             ],
             state.info_raw().palette()
         );
