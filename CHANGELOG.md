@@ -4,6 +4,10 @@ All notable changes to PNG Pong will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 
+## 0.2.1 - 2020-03-29
+### Fixed
+- Not all docs showing up on docs.rs
+
 ## 0.2.0 - 2020-03-29
 ### Changed
 - Updated pix to 0.10
