@@ -1,4 +1,4 @@
-# png_pong
+# png-pong
 
 [![Build Status](https://api.travis-ci.org/RedAldaron/png_pong.svg?branch=master)](https://travis-ci.org/RedAldaron/png_pong)
 [![Docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
@@ -35,11 +35,11 @@ There are no optional features.
 ```
 
 ### API
-API documentation can be found on [docs.rs](https://docs.rs/png_pong).
+API documentation can be found on [docs.rs](https://docs.rs/png-pong).
 
 ## Upgrade
 You can use the
-[changelog](https://github.com/RedAldaron/png_pong/blob/master/CHANGELOG.md)
+[changelog](https://github.com/RedAldaron/png-pong/blob/master/CHANGELOG.md)
 to facilitate upgrading this crate as a dependency.
 
 ## License
