@@ -3,22 +3,18 @@ sudo: false
 
 cache: cargo
 
-rust:
-  - beta
-  - nightly
-
 matrix:
     fast_finish: true
     include:
       - os: linux
-        rust: stable
+        rust: nightly
         compiler: gcc
 
       - os: windows
-        rust: stable
+        rust: nightly
 
       - os: osx
-        rust: stable
+        rust: nightly
 
 script:
   - cargo update
