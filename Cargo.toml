@@ -34,7 +34,7 @@ maintenance = { status = "actively-developed" }
 [dependencies.pix]
 version = "0.10"
 
-[depedencies.miniz_oxide]
+[dependencies.miniz_oxide]
 version = "0.3"
 optional = true
 

@@ -12,7 +12,6 @@
 #![cfg_attr(feature = "external_doc", feature(external_doc))]
 #![cfg_attr(feature = "external_doc", doc(include = "../README.md"))]
 #![doc = ""]
-#![cfg_attr(not(feature = "std"), no_std)]
 #![doc(
     html_logo_url = "https://libcala.github.io/logo.svg",
     html_favicon_url = "https://libcala.github.io/icon.svg",
