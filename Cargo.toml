@@ -11,7 +11,7 @@
 
 [package]
 name = "png_pong"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Jeron Aldaron Lau <jeronlau@plopgrizzly.com>"]
 license = "Apache-2.0 OR Zlib"
 
@@ -19,7 +19,7 @@ description = "A pure Rust PNG/APNG encoder & decoder"
 repository = "https://github.com/RedAldaron/png_pong"
 documentation = "https://docs.rs/png_pong"
 homepage = "https://github.com/RedAldaron/png_pong/blob/master/CHANGELOG.md"
-include = ["Cargo.toml", "LICENSE-ZLIB", "LICENSE-APACHE", "src/*"]
+include = ["Cargo.toml", "README.md", "LICENSE-ZLIB", "LICENSE-APACHE", "src/*"]
 categories = ["multimedia::encoding", "multimedia::images"]
 keywords = ["png", "lodepng", "encoder", "decoder", "apng"]
 readme = "README.md"
