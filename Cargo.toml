@@ -15,7 +15,7 @@ version = "0.2.0"
 authors = ["Jeron Aldaron Lau <jeronlau@plopgrizzly.com>"]
 license = "Apache-2.0 OR Zlib"
 
-description = "Read and write PNG/APNG files without system dependencies."
+description = "A pure Rust PNG/APNG encoder & decoder"
 repository = "https://github.com/RedAldaron/png-pong"
 documentation = "https://docs.rs/png-pong"
 homepage = "https://github.com/RedAldaron/png-pong/blob/master/CHANGELOG.md"
