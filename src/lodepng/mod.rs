@@ -29,21 +29,24 @@ use std::io::Write;
 use std::path::Path;
 use std::ptr;
 
+pub(crate) use ffi::ColorMode;
 pub use ffi::ColorType;
 pub(crate) use ffi::CompressSettings;
 pub(crate) use ffi::DecoderSettings;
 pub(crate) use ffi::DecompressSettings;
 pub(crate) use ffi::EncoderSettings;
 pub(crate) use ffi::FilterStrategy;
+pub(crate) use ffi::Info;
 pub(crate) use ffi::State;
 pub(crate) use ffi::Time;
-pub(crate) use ffi::ColorMode;
-pub(crate) use ffi::Info;
 
-use pix::{Rgba8, SRgba8, SRgb8, SRgb16, SRgba16, Mask8, Gray8, SGray8, Graya8, SGraya8, SGray16, SGraya16, Raster, RasterBuilder, ColorModel};
-use crate::chunk::{TextChunk, ITextChunk};
+use crate::chunk::{ITextChunk, TextChunk};
 use crate::error::DecodeError;
 use crate::Format;
+use pix::{
+    ColorModel, Gray8, Graya8, Mask8, Raster, RasterBuilder, Rgba8, SGray16,
+    SGray8, SGraya16, SGraya8, SRgb16, SRgb8, SRgba16, SRgba8,
+};
 
 impl ColorMode {
     pub(crate) fn new() -> Self {
@@ -321,7 +324,10 @@ impl Info {
         )
     }
 
-    pub(crate) fn get<Name: AsRef<[u8]>>(&self, index: Name) -> Option<ChunkRef<'_>> {
+    pub(crate) fn get<Name: AsRef<[u8]>>(
+        &self,
+        index: Name,
+    ) -> Option<ChunkRef<'_>> {
         let index = index.as_ref();
         self.unknown_chunks(ChunkPosition::IHDR)
             .chain(self.unknown_chunks(ChunkPosition::PLTE))
@@ -329,7 +335,10 @@ impl Info {
             .find(|c| c.is_type(index))
     }
 
-    pub(crate) fn unknown_chunks(&self, position: ChunkPosition) -> ChunksIter<'_> {
+    pub(crate) fn unknown_chunks(
+        &self,
+        position: ChunkPosition,
+    ) -> ChunksIter<'_> {
         ChunksIter {
             data: self.unknown_chunks_data[position as usize].as_slice(),
         }
@@ -497,25 +506,34 @@ impl Decoder {
     //  }
     //  ```
     #[inline]
-    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelFormat: Format<Chan = pix::channel::Ch8>>(
+    pub(crate) fn decode<
+        Bytes: AsRef<[u8]>,
+        PixelFormat: Format<Chan = pix::channel::Ch8>,
+    >(
         &mut self,
         input: Bytes,
     ) -> Result<Raster<PixelFormat>, DecodeError> {
         self.state.decode(input)
     }
 
-    pub(crate) fn decode_file<P: AsRef<Path>, PixelFormat: Format<Chan = pix::channel::Ch8>>(
+    pub(crate) fn decode_file<
+        P: AsRef<Path>,
+        PixelFormat: Format<Chan = pix::channel::Ch8>,
+    >(
         &mut self,
         filepath: P,
     ) -> Result<Raster<PixelFormat>, DecodeError> {
         match self.state.decode_file(filepath) {
             Ok(ret) => Ok(ret),
-            Err(error) => Err(error)
+            Err(error) => Err(error),
         }
     }
 
     /// Updates `info_png`. Returns (width, height)
-    pub(crate) fn inspect(&mut self, input: &[u8]) -> Result<(u32, u32), Error> {
+    pub(crate) fn inspect(
+        &mut self,
+        input: &[u8],
+    ) -> Result<(u32, u32), Error> {
         self.state.inspect(input)
     }
 }
@@ -601,7 +619,10 @@ impl State {
     //      _ => panic!("¯\\_(ツ)_/¯")
     //  }
     //  ```
-    pub(crate) fn decode<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::channel::Ch8>>(
+    pub(crate) fn decode<
+        Bytes: AsRef<[u8]>,
+        PixelType: Format<Chan = pix::channel::Ch8>,
+    >(
         &mut self,
         input: Bytes,
     ) -> Result<Raster<PixelType>, DecodeError> {
@@ -611,16 +632,13 @@ impl State {
             Err(error) => return Err(DecodeError::ParseError(error)),
         };
 
-        new_bitmap(
-            v,
-            w,
-            h,
-            self.info_raw.colortype,
-            self.info_raw.bitdepth,
-        )
+        new_bitmap(v, w, h, self.info_raw.colortype, self.info_raw.bitdepth)
     }
 
-    pub(crate) fn decode_file<P: AsRef<Path>, PixelType: Format<Chan = pix::channel::Ch8>>(
+    pub(crate) fn decode_file<
+        P: AsRef<Path>,
+        PixelType: Format<Chan = pix::channel::Ch8>,
+    >(
         &mut self,
         filepath: P,
     ) -> Result<Raster<PixelType>, DecodeError> {
@@ -631,7 +649,10 @@ impl State {
     }
 
     /// Updates `info_png`. Returns (width, height)
-    pub(crate) fn inspect(&mut self, input: &[u8]) -> Result<(u32, u32), Error> {
+    pub(crate) fn inspect(
+        &mut self,
+        input: &[u8],
+    ) -> Result<(u32, u32), Error> {
         let (info, w, h) = rustimpl::lodepng_inspect(&self.decoder, input)?;
         self.info_png = info;
         Ok((w, h))
@@ -740,7 +761,10 @@ fn load_file<P: AsRef<Path>>(filepath: P) -> Result<Vec<u8>, Error> {
 /// * `in`: Memory buffer with the PNG file.
 /// * `colortype`: the desired color type for the raw output image. See `ColorType`.
 /// * `bitdepth`: the desired bit depth for the raw output image. 1, 2, 4, 8 or 16. Typically 8.
-pub(crate) fn decode_memory<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::channel::Ch8>>(
+pub(crate) fn decode_memory<
+    Bytes: AsRef<[u8]>,
+    PixelType: Format<Chan = pix::channel::Ch8>,
+>(
     input: Bytes,
     colortype: ColorType,
     bitdepth: u32,
@@ -748,10 +772,11 @@ pub(crate) fn decode_memory<Bytes: AsRef<[u8]>, PixelType: Format<Chan = pix::ch
     let input = input.as_ref();
 
     assert!(bitdepth > 0 && bitdepth <= 16);
-    let (v, w, h) = match rustimpl::lodepng_decode_memory(input, colortype, bitdepth) {
-        Ok(ret) => ret,
-        Err(error) => return Err(DecodeError::ParseError(error)),
-    };
+    let (v, w, h) =
+        match rustimpl::lodepng_decode_memory(input, colortype, bitdepth) {
+            Ok(ret) => ret,
+            Err(error) => return Err(DecodeError::ParseError(error)),
+        };
     new_bitmap(v, w, h, colortype, bitdepth)
 }
 
@@ -1025,10 +1050,7 @@ mod test {
             .palette_add(pix::SRgba8::new(5, 6, 7, 255))
             .unwrap();
         assert_eq!(
-            &[
-                pix::SRgba8::new(1, 2, 3, 4),
-                pix::SRgba8::new(5, 6, 7, 255),
-            ],
+            &[pix::SRgba8::new(1, 2, 3, 4), pix::SRgba8::new(5, 6, 7, 255),],
             state.info_raw().palette()
         );
         state.info_raw_mut().palette_clear();

@@ -161,8 +161,11 @@ fn pre_process_scanlines(
         adam7_interlace(&mut adam7, inp, width, height, bpp as u32);
         for i in 0..7 {
             if bpp < 8 {
-                let mut padded =
-                    vec![0u8; (padded_passstart[i + 1] - padded_passstart[i]) as usize];
+                let mut padded = vec![
+                    0u8;
+                    (padded_passstart[i + 1] - padded_passstart[i])
+                        as usize
+                ];
                 add_padding_bits(
                     &mut padded,
                     &adam7[passstart[i] as usize..],

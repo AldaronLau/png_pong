@@ -9,9 +9,12 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::{io::{self, Write}, marker::PhantomData};
+use crate::{ChunkEncoder, Format, Frame};
 use pix::Raster;
-use crate::{Frame, ChunkEncoder, Format};
+use std::{
+    io::{self, Write},
+    marker::PhantomData,
+};
 
 /// Frame Encoder for PNG files.
 #[derive(Debug)]

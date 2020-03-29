@@ -49,7 +49,7 @@ pub(super) fn check_lode_color_validity(
     }
 }
 
-pub(crate)fn lodepng_color_mode_equal(a: &ColorMode, b: &ColorMode) -> bool {
+pub(crate) fn lodepng_color_mode_equal(a: &ColorMode, b: &ColorMode) -> bool {
     a.colortype == b.colortype
         && a.bitdepth() == b.bitdepth()
         && a.key() == b.key()

@@ -40,22 +40,22 @@ mod lodepng;
 ///
 pub mod chunk;
 
-pub use crate::lodepng::Error as ParseError;
 pub use crate::lodepng::ColorType;
+pub use crate::lodepng::Error as ParseError;
 
 // Modules
+mod chunk_decoder;
+mod chunk_encoder;
+mod error;
 mod format;
 mod frame;
-mod error;
-mod chunk_encoder;
-mod chunk_decoder;
-mod frame_encoder;
 mod frame_decoder;
+mod frame_encoder;
 
+pub use chunk_decoder::ChunkDecoder;
+pub use chunk_encoder::ChunkEncoder;
+pub use error::{DecodeError, EncodeError};
 pub use format::Format;
 pub use frame::Frame;
-pub use error::{EncodeError, DecodeError};
-pub use chunk_encoder::ChunkEncoder;
-pub use chunk_decoder::ChunkDecoder;
-pub use frame_encoder::FrameEncoder;
 pub use frame_decoder::FrameDecoder;
+pub use frame_encoder::FrameEncoder;

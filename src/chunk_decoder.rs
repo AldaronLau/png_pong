@@ -9,8 +9,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use crate::{chunk::Chunk, lodepng, DecodeError};
 use std::io::Read;
-use crate::{DecodeError, lodepng, chunk::Chunk};
 
 /// Chunk Decoder for PNG files.
 #[derive(Default, Debug)]

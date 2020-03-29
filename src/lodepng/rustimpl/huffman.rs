@@ -1251,10 +1251,9 @@ pub(super) fn adam7_get_pass_values(
             } else {
                 0
             };
-        padded_passstart[i + 1] = padded_passstart[i]
-            + passh[i] * ((passw[i] * bpp + 7) / 8);
-        passstart[i + 1] = passstart[i]
-            + (passh[i] * passw[i] * bpp + 7) / 8;
+        padded_passstart[i + 1] =
+            padded_passstart[i] + passh[i] * ((passw[i] * bpp + 7) / 8);
+        passstart[i + 1] = passstart[i] + (passh[i] * passw[i] * bpp + 7) / 8;
     }
     (passw, passh, filter_passstart, padded_passstart, passstart)
 }
@@ -1283,14 +1282,15 @@ pub(super) fn adam7_deinterlace(
             let bytewidth = bpp / 8;
             for y in 0..passh[i] {
                 for x in 0..passw[i] {
-                    let pixelinstart =
-                        (passstart[i] + (y * passw[i] + x) * bytewidth) as usize;
+                    let pixelinstart = (passstart[i]
+                        + (y * passw[i] + x) * bytewidth)
+                        as usize;
                     let bytewidth = bytewidth as usize;
-                    let pixeloutstart =
-                        ((ADAM7_IY[i] + y * ADAM7_DY[i]) * w
-                            + ADAM7_IX[i]
-                            + x * ADAM7_DX[i]) as usize
-                            * bytewidth;
+                    let pixeloutstart = ((ADAM7_IY[i] + y * ADAM7_DY[i]) * w
+                        + ADAM7_IX[i]
+                        + x * ADAM7_DX[i])
+                        as usize
+                        * bytewidth;
 
                     out[pixeloutstart..(bytewidth + pixeloutstart)]
                         .clone_from_slice(
@@ -1305,13 +1305,12 @@ pub(super) fn adam7_deinterlace(
             let olinebits = bpp * w;
             for y in 0..passh[i] {
                 for x in 0..passw[i] {
-                    let mut ibp =
-                        ((8 * passstart[i]) + (y * ilinebits + x * bpp)) as usize;
-                    let mut obp = ((ADAM7_IY[i]
-                        + y * ADAM7_DY[i])
-                        * olinebits
-                        + (ADAM7_IX[i] + x * ADAM7_DX[i])
-                            * bpp) as usize;
+                    let mut ibp = ((8 * passstart[i])
+                        + (y * ilinebits + x * bpp))
+                        as usize;
+                    let mut obp = ((ADAM7_IY[i] + y * ADAM7_DY[i]) * olinebits
+                        + (ADAM7_IX[i] + x * ADAM7_DX[i]) * bpp)
+                        as usize;
                     for _ in 0..bpp {
                         let bit = read_bit_from_reversed_stream(&mut ibp, inp);
                         /*note that this function assumes the out buffer is completely 0, use set_bit_of_reversed_stream otherwise*/

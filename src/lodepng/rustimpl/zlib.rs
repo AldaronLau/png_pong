@@ -9,7 +9,7 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Zlib     
+//! Zlib
 use miniz_oxide::inflate::decompress_to_vec;
 
 use super::*;

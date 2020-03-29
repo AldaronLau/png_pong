@@ -9,8 +9,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use pix::Raster;
 use crate::Format;
+use pix::Raster;
 
 /// A Frame
 pub struct Frame<F: Format> {

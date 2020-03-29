@@ -9,8 +9,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use crate::{ChunkDecoder, DecodeError, Format, Frame};
 use std::{io::Read, marker::PhantomData};
-use crate::{Frame, ChunkDecoder, Format, DecodeError};
 
 /// Frame Encoder for PNG files.
 #[derive(Debug)]
@@ -58,8 +58,8 @@ where
             Ok(_len) => match self.decoder.state.decode(bytes) {
                 Ok(raster) => Ok(Frame { raster, delay: 0 }),
                 Err(error) => Err(error),
-            }
-            Err(e) => Err(DecodeError::Io(e.kind()))
+            },
+            Err(e) => Err(DecodeError::Io(e.kind())),
         };
 
         Some(raster)

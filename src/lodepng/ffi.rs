@@ -19,7 +19,7 @@ use std::os::raw::*;
 
 use crate::lodepng::rustimpl::*;
 
-use crate::chunk::{TextChunk, ITextChunk};
+use crate::chunk::{ITextChunk, TextChunk};
 use pix::Rgba8;
 
 /// Type for `decode`, `encode`, etc. Same as standard PNG color types.

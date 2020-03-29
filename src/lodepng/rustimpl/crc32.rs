@@ -63,7 +63,7 @@ const LODEPNG_CRC32_TABLE: [u32; 256] = [
 ];
 
 /*Return the CRC of the bytes buf[0..len-1].*/
-pub(crate)fn lodepng_crc32(data: &[u8]) -> u32 {
+pub(crate) fn lodepng_crc32(data: &[u8]) -> u32 {
     let mut r = 4294967295u32;
     for &d in data {
         r = LODEPNG_CRC32_TABLE[((r ^ d as u32) & 255) as usize] ^ (r >> 8);
@@ -81,7 +81,7 @@ impl Drop for Info {
     }
 }
 
-pub(crate)fn lodepng_convert(
+pub(crate) fn lodepng_convert(
     out: &mut [u8],
     inp: &[u8],
     mode_out: &ColorMode,
@@ -156,7 +156,10 @@ pub(super) fn postprocess_scanlines(
         return Err(Error(31));
     }
     if info_png.interlace_method == 0 {
-        if bpp < 8 && w as usize * bpp as usize != ((w as usize * bpp as usize + 7) / 8) * 8 {
+        if bpp < 8
+            && w as usize * bpp as usize
+                != ((w as usize * bpp as usize + 7) / 8) * 8
+        {
             unfilter_aliased(inp, 0, 0, w as usize, h as usize, bpp as usize)?;
             remove_padding_bits(
                 out,
@@ -510,8 +513,8 @@ pub(super) fn adam7_interlace(
                         + ADAM7_IX[i] as usize
                         + x * ADAM7_DX[i] as usize)
                         * bytewidth;
-                    let pixeloutstart =
-                        passstart[i] as usize + (y * passw[i] as usize + x) * bytewidth;
+                    let pixeloutstart = passstart[i] as usize
+                        + (y * passw[i] as usize + x) * bytewidth;
                     out[pixeloutstart..(bytewidth + pixeloutstart)]
                         .clone_from_slice(
                             &inp[pixelinstart..(bytewidth + pixelinstart)],
@@ -530,8 +533,8 @@ pub(super) fn adam7_interlace(
                         * olinebits
                         + (ADAM7_IX[i] as usize + x * ADAM7_DX[i] as usize)
                             * bpp;
-                    let mut obp =
-                        ((8 * passstart[i] as usize) + (y * ilinebits + x * bpp));
+                    let mut obp = ((8 * passstart[i] as usize)
+                        + (y * ilinebits + x * bpp));
                     for _ in 0..bpp {
                         let bit = read_bit_from_reversed_stream(&mut ibp, inp);
                         set_bit_of_reversed_stream(&mut obp, out, bit);

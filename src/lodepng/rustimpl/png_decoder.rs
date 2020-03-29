@@ -190,26 +190,25 @@ pub(super) fn decode_generic(
     } else {
         /*Adam-7 interlaced: predicted size is the sum of the 7 sub-images sizes*/
         let color = &state.info_png.color;
-        let mut predict = color.raw_size_idat((w + 7) >> 3, (h + 7) >> 3)
-            + ((h + 7) >> 3);
+        let mut predict =
+            color.raw_size_idat((w + 7) >> 3, (h + 7) >> 3) + ((h + 7) >> 3);
         if w > 4 {
             predict += color.raw_size_idat((w + 3) >> 3, (h + 7) >> 3)
                 + ((h + 7) >> 3);
         }
-        predict += color.raw_size_idat((w + 3) >> 2, (h + 3) >> 3)
-            + ((h + 3) >> 3);
+        predict +=
+            color.raw_size_idat((w + 3) >> 2, (h + 3) >> 3) + ((h + 3) >> 3);
         if w > 2 {
             predict += color.raw_size_idat((w + 1) >> 2, (h + 3) >> 2)
                 + ((h + 3) >> 2);
         }
-        predict += color.raw_size_idat((w + 1) >> 1, (h + 1) >> 2)
-            + ((h + 1) >> 2);
+        predict +=
+            color.raw_size_idat((w + 1) >> 1, (h + 1) >> 2) + ((h + 1) >> 2);
         if w > 1 {
             predict += color.raw_size_idat((w + 0) >> 1, (h + 1) >> 1)
                 + ((h + 1) >> 1);
         }
-        predict +=
-            color.raw_size_idat(w + 0, (h + 0) >> 1) + ((h + 0) >> 1);
+        predict += color.raw_size_idat(w + 0, (h + 0) >> 1) + ((h + 0) >> 1);
         predict
     };
     let mut scanlines = zlib_decompress(&idat, &state.decoder.zlibsettings)?;
