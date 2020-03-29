@@ -61,26 +61,13 @@ so I'm using [pix](https://crates.io/crates/pix) instead of
 Add the following to your `Cargo.toml`.
 
 ```toml
-[dependencies]
-png_pong = "0.2.0"
+[dependencies.png_pong]
+version = "0.2"
 ```
 
 ### Example
-Say you want to read a PNG file into a raster:
-
-```rust,no_run
-let data = std::fs::read("graphic.png").expect("Failed to open PNG");
-let data = std::io::Cursor::new(data);
-let decoder = png_pong::FrameDecoder::<_, pix::SRgba8>::new(data);
-let png_pong::Frame { raster, delay } = decoder
-    .last()
-    .expect("No frames in PNG")
-    .expect("PNG parsing error");
-```
-
-Say you want to save a raster as a PNG file:
-
-```rust,no_run
+```rust
+// Saving raster as a PNG file
 let raster = pix::RasterBuilder::new().with_pixels(1, 1, &[
     pix::SRgba8::new(0, 0, 0, 0)][..]
 );
@@ -91,6 +78,15 @@ let mut encoder = png_pong::FrameEncoder::<_, pix::SRgba8>::new(
 let frame = png_pong::Frame{ raster, delay: 0 };
 encoder.encode(&frame).expect("Failed to add frame");
 std::fs::write("graphic.png", out_data).expect("Failed to save image");
+
+// Loading PNG file into a Raster
+let data = std::fs::read("graphic.png").expect("Failed to open PNG");
+let data = std::io::Cursor::new(data);
+let decoder = png_pong::FrameDecoder::<_, pix::SRgba8>::new(data);
+let png_pong::Frame { raster, delay } = decoder
+    .last()
+    .expect("No frames in PNG")
+    .expect("PNG parsing error");
 ```
 
 ### API

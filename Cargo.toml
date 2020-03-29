@@ -55,3 +55,4 @@ opt-level = 2
 [features]
 default = ["flate"]
 flate = ["miniz_oxide"]
+docs-rs = []
