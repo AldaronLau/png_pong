@@ -1,7 +1,7 @@
 # PNG Pong
 
 [![Build Status](https://api.travis-ci.org/RedAldaron/png-pong.svg?branch=master)](https://travis-ci.org/RedAldaron/png-pong)
-[![Docs](https://docs.rs/png-pong/badge.svg)](https://docs.rs/png-pong)
+[![Docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
 [![crates.io](https://img.shields.io/crates/v/png-pong.svg)](https://crates.io/crates/png-pong)
 
 > A pure Rust PNG/APNG encoder & decoder
