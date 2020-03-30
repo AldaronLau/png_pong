@@ -83,7 +83,6 @@ pub(crate) struct ColorMode {
 #[derive(Clone, Debug)]
 pub(crate) struct DecompressSettings {
     pub(crate) check_adler32: bool,
-    pub(crate) custom_context: *const c_void,
 }
 
 /// Settings for zlib compression. Tweaking these settings tweaks the balance between speed and compression ratio.
@@ -102,8 +101,6 @@ pub(crate) struct CompressSettings {
     pub(crate) nicematch: u32,
     /// use lazy matching: better compression but a bit slower. Default: true
     pub(crate) lazymatching: u32,
-    /// optional custom settings for custom functions
-    pub(crate) custom_context: *const c_void,
 }
 
 /// The information of a `Time` chunk in PNG

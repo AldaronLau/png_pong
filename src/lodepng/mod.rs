@@ -27,7 +27,6 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
-use std::ptr;
 
 pub(crate) use ffi::ColorMode;
 pub use ffi::ColorType;
@@ -952,7 +951,6 @@ impl Default for CompressSettings {
             minmatch: 3,
             nicematch: 128,
             lazymatching: 1,
-            custom_context: ptr::null_mut(),
         }
     }
 }
@@ -967,7 +965,6 @@ impl Default for DecompressSettings {
     fn default() -> Self {
         Self {
             check_adler32: false,
-            custom_context: ptr::null_mut(),
         }
     }
 }
