@@ -156,7 +156,7 @@ fn pre_process_scanlines(
             adam7_get_pass_values(width, height, bpp as u32);
         let outsize = filter_passstart[7];
         /*image size plus an extra byte per scanline + possible padding bits*/
-        let mut out = vec![0u8; (outsize as usize)];
+        let mut out = vec![0u8; outsize as usize];
         let mut adam7 = vec![0u8; passstart[7] as usize + 1];
         adam7_interlace(&mut adam7, inp, width, height, bpp as u32);
         for i in 0..7 {
