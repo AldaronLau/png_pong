@@ -43,8 +43,8 @@ use crate::chunk::{ITextChunk, TextChunk};
 use crate::error::DecodeError;
 use crate::Format;
 use pix::{
-    ColorModel, Gray8, Graya8, Mask8, Raster, RasterBuilder, Rgba8, SGray16,
-    SGray8, SGraya16, SGraya8, SRgb16, SRgb8, SRgba16, SRgba8,
+    Gray8, Graya8, Matte8, Raster, Rgba8, SGray16,
+    SGray8, SGraya16, SGraya8, SRgb16, SRgb8, SRgba16, SRgba8, el::Pixel
 };
 
 impl ColorMode {
@@ -135,7 +135,7 @@ impl ColorMode {
     /// Loops through the palette to check this.
     pub(crate) fn has_palette_alpha(&self) -> bool {
         self.palette().iter().any(|p| {
-            let byte: u8 = pix::RgbModel::alpha(*p).into();
+            let byte: u8 = p.alpha().into();
 
             byte < 255
         })
@@ -432,7 +432,7 @@ impl Encoder {
     }
 
     #[inline]
-    pub(crate) fn encode<PixelType: Copy + pix::Pixel>(
+    pub(crate) fn encode<PixelType: Copy + Pixel>(
         &mut self,
         raster: &Raster<PixelType>,
     ) -> Result<Vec<u8>, Error> {
@@ -440,7 +440,7 @@ impl Encoder {
     }
 
     #[inline]
-    pub(crate) fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
+    pub(crate) fn encode_file<PixelType: Copy + Pixel, P: AsRef<Path>>(
         &mut self,
         filepath: P,
         raster: &Raster<PixelType>,
@@ -507,7 +507,7 @@ impl Decoder {
     #[inline]
     pub(crate) fn decode<
         Bytes: AsRef<[u8]>,
-        PixelFormat: Format<Chan = pix::channel::Ch8>,
+        PixelFormat: Format<Chan = pix::chan::Ch8>,
     >(
         &mut self,
         input: Bytes,
@@ -517,7 +517,7 @@ impl Decoder {
 
     pub(crate) fn decode_file<
         P: AsRef<Path>,
-        PixelFormat: Format<Chan = pix::channel::Ch8>,
+        PixelFormat: Format<Chan = pix::chan::Ch8>,
     >(
         &mut self,
         filepath: P,
@@ -620,7 +620,7 @@ impl State {
     //  ```
     pub(crate) fn decode<
         Bytes: AsRef<[u8]>,
-        PixelType: Format<Chan = pix::channel::Ch8>,
+        PixelType: Format<Chan = pix::chan::Ch8>,
     >(
         &mut self,
         input: Bytes,
@@ -636,7 +636,7 @@ impl State {
 
     pub(crate) fn decode_file<
         P: AsRef<Path>,
-        PixelType: Format<Chan = pix::channel::Ch8>,
+        PixelType: Format<Chan = pix::chan::Ch8>,
     >(
         &mut self,
         filepath: P,
@@ -657,7 +657,7 @@ impl State {
         Ok((w, h))
     }
 
-    pub(crate) fn encode<PixelType: Copy + pix::Pixel>(
+    pub(crate) fn encode<PixelType: Copy + Pixel>(
         &mut self,
         raster: &Raster<PixelType>,
     ) -> Result<Vec<u8>, Error> {
@@ -669,7 +669,7 @@ impl State {
         )?)
     }
 
-    pub(crate) fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
+    pub(crate) fn encode_file<PixelType: Copy + Pixel, P: AsRef<Path>>(
         &mut self,
         filepath: P,
         raster: &Raster<PixelType>,
@@ -697,7 +697,7 @@ impl Default for State {
 /// Images with <8bpp are represented as a bunch of bytes, with multiple pixels per byte.
 pub(crate) enum Image {
     /// Bytes of the image. See bpp how many pixels per element there are
-    RawData(Raster<Mask8>),
+    RawData(Raster<Matte8>),
     Grey(Raster<SGray8>),
     Grey16(Raster<SGray16>),
     GreyAlpha(Raster<SGraya8>),
@@ -722,7 +722,7 @@ pub(crate) struct ChunkRef<'a> {
     data: &'a [u8],
 }
 
-fn new_bitmap<PixelType: Format<Chan = pix::channel::Ch8>>(
+fn new_bitmap<PixelType: Format<Chan = pix::chan::Ch8>>(
     out: Vec<u8>,
     width: u32,
     height: u32,
@@ -734,7 +734,7 @@ fn new_bitmap<PixelType: Format<Chan = pix::channel::Ch8>>(
     } else if bitdepth != PixelType::BIT_DEPTH {
         Err(DecodeError::BitDepth)
     } else {
-        Ok(RasterBuilder::new().with_u8_buffer(width, height, out))
+        Ok(Raster::with_u8_buffer(width, height, out))
     }
 }
 
@@ -762,7 +762,7 @@ fn load_file<P: AsRef<Path>>(filepath: P) -> Result<Vec<u8>, Error> {
 /// * `bitdepth`: the desired bit depth for the raw output image. 1, 2, 4, 8 or 16. Typically 8.
 pub(crate) fn decode_memory<
     Bytes: AsRef<[u8]>,
-    PixelType: Format<Chan = pix::channel::Ch8>,
+    PixelType: Format<Chan = pix::chan::Ch8>,
 >(
     input: Bytes,
     colortype: ColorType,
@@ -790,7 +790,7 @@ pub(crate) fn decode_memory<
 /// * `h`: height of the raw pixel data in pixels.
 /// * `colortype`: the color type of the raw input image. See `ColorType`.
 /// * `bitdepth`: the bit depth of the raw input image. 1, 2, 4, 8 or 16. Typically 8.
-pub(crate) fn encode_memory<PixelType: Copy + pix::Pixel>(
+pub(crate) fn encode_memory<PixelType: Copy + Pixel>(
     raster: &Raster<PixelType>,
     colortype: ColorType,
     bitdepth: u32,
@@ -805,14 +805,14 @@ pub(crate) fn encode_memory<PixelType: Copy + pix::Pixel>(
 }
 
 /// Same as `encode_memory`, but always encodes from 32-bit RGBA raw image
-pub(crate) fn encode32<PixelType: Copy + pix::Pixel>(
+pub(crate) fn encode32<PixelType: Copy + Pixel>(
     raster: &Raster<PixelType>,
 ) -> Result<Vec<u8>, Error> {
     encode_memory(raster, ColorType::Rgba, 8)
 }
 
 /// Same as `encode_memory`, but always encodes from 24-bit RGB raw image
-pub(crate) fn encode24<PixelType: Copy + pix::Pixel>(
+pub(crate) fn encode24<PixelType: Copy + Pixel>(
     raster: &Raster<PixelType>,
 ) -> Result<Vec<u8>, Error> {
     encode_memory(raster, ColorType::Rgb, 8)
@@ -822,7 +822,7 @@ pub(crate) fn encode24<PixelType: Copy + pix::Pixel>(
 /// Same as the other encode functions, but instead takes a file path as output.
 ///
 /// NOTE: This overwrites existing files without warning!
-pub(crate) fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
+pub(crate) fn encode_file<PixelType: Copy + Pixel, P: AsRef<Path>>(
     filepath: P,
     raster: &Raster<PixelType>,
     colortype: ColorType,
@@ -833,7 +833,7 @@ pub(crate) fn encode_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
 }
 
 /// Same as `encode_file`, but always encodes from 32-bit RGBA raw image
-pub(crate) fn encode32_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
+pub(crate) fn encode32_file<PixelType: Copy + Pixel, P: AsRef<Path>>(
     filepath: P,
     raster: &Raster<PixelType>,
 ) -> Result<(), Error> {
@@ -841,7 +841,7 @@ pub(crate) fn encode32_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
 }
 
 /// Same as `encode_file`, but always encodes from 24-bit RGB raw image
-pub(crate) fn encode24_file<PixelType: Copy + pix::Pixel, P: AsRef<Path>>(
+pub(crate) fn encode24_file<PixelType: Copy + Pixel, P: AsRef<Path>>(
     filepath: P,
     raster: &Raster<PixelType>,
 ) -> Result<(), Error> {
@@ -1093,7 +1093,7 @@ mod test {
         }
 
         let raster: Raster<SRgba8> =
-            RasterBuilder::new().with_u8_buffer(1, 1, &[0u8, 0, 0, 0][..]);
+            Raster::with_u8_buffer(1, 1, &[0u8, 0, 0, 0][..]);
         let img = state.encode(&raster).unwrap();
         let mut dec = State::new();
         dec.decode::<_, SRgba8>(img).unwrap();

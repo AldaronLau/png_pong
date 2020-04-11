@@ -371,10 +371,10 @@ pub(super) fn get_pixel_color_rgba8(
             } else {
                 let p = pal[index];
                 (
-                    pix::RgbModel::red(p).into(),
-                    pix::RgbModel::green(p).into(),
-                    pix::RgbModel::blue(p).into(),
-                    pix::RgbModel::alpha(p).into(),
+                    pix::clr::Rgb::red(p).into(),
+                    pix::clr::Rgb::green(p).into(),
+                    pix::clr::Rgb::blue(p).into(),
+                    p.alpha().into(),
                 )
             }
         }
@@ -580,11 +580,11 @@ pub(super) fn get_pixel_colors_rgba8(
                     }
                 } else {
                     let p = pal[index];
-                    buffer[0] = pix::RgbModel::red(p).into();
-                    buffer[1] = pix::RgbModel::green(p).into();
-                    buffer[2] = pix::RgbModel::blue(p).into();
+                    buffer[0] = pix::clr::Rgb::red(p).into();
+                    buffer[1] = pix::clr::Rgb::green(p).into();
+                    buffer[2] = pix::clr::Rgb::blue(p).into();
                     if has_alpha {
-                        buffer[3] = pix::RgbModel::alpha(p).into();
+                        buffer[3] = p.alpha().into();
                     }
                 };
             }
@@ -782,9 +782,9 @@ pub(super) fn read_chunk_trns(
         }
         for (i, &d) in data.iter().enumerate() {
             pal[i] = SRgba8::new(
-                pix::RgbModel::red(pal[i]),
-                pix::RgbModel::green(pal[i]),
-                pix::RgbModel::blue(pal[i]),
+                pix::clr::Rgb::red(pal[i]),
+                pix::clr::Rgb::green(pal[i]),
+                pix::clr::Rgb::blue(pal[i]),
                 d.into(),
             );
         }
@@ -1116,7 +1116,7 @@ pub(super) fn add_chunk_trns(
         /*the tail of palette values that all have 255 as alpha, does not have to be encoded*/
         let mut i = palette.len();
         while i != 0 {
-            let byte: u8 = pix::RgbModel::alpha(palette[i - 1]).into();
+            let byte: u8 = palette[i - 1].alpha().into();
             if byte == 255 {
                 amount -= 1;
             } else {
@@ -1125,7 +1125,7 @@ pub(super) fn add_chunk_trns(
             i -= 1;
         }
         for p in &palette[0..amount] {
-            trns.push(pix::RgbModel::alpha(*p).into());
+            trns.push(p.alpha().into());
         }
     } else if info.colortype == ColorType::Grey {
         if let Some((r, _, _)) = info.key() {
@@ -1151,9 +1151,9 @@ pub(super) fn add_chunk_plte(
 ) -> Result<(), Error> {
     let mut plte = Vec::new();
     for p in info.palette() {
-        plte.push(pix::RgbModel::red(*p).into());
-        plte.push(pix::RgbModel::green(*p).into());
-        plte.push(pix::RgbModel::blue(*p).into());
+        plte.push(pix::clr::Rgb::red(*p).into());
+        plte.push(pix::clr::Rgb::green(*p).into());
+        plte.push(pix::clr::Rgb::blue(*p).into());
     }
     add_chunk(out, b"PLTE", &plte)
 }

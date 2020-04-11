@@ -12,7 +12,7 @@
 use crate::lodepng::ColorType;
 
 /// PNG compatible subset of pix `Format`s.
-pub trait Format: pix::Pixel {
+pub trait Format: pix::el::Pixel {
     /// Format to save as.
     const PNG_COLOR: ColorType;
     /// Bit Depth to save as.
