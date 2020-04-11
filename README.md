@@ -2,7 +2,7 @@
 
 #### A pure Rust PNG/APNG encoder & decoder
 
-[![Build Status](https://api.travis-ci.org/RedAldaron/png_pong.svg?branch=master)](https://travis-ci.org/RedAldaron/png_pong)
+[![Build Status](https://api.travis-ci.org/AldaronLau/png_pong.svg?branch=master)](https://travis-ci.org/AldaronLau/png_pong)
 [![Docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
 [![crates.io](https://img.shields.io/crates/v/png_pong.svg)](https://crates.io/crates/png_pong)
 
@@ -68,7 +68,7 @@ version = "0.2"
 ### Example
 ```rust
 // Saving raster as a PNG file
-let raster = pix::RasterBuilder::new().with_pixels(1, 1, &[
+let raster = pix::Raster::with_pixels(1, 1, &[
     pix::SRgba8::new(0, 0, 0, 0)][..]
 );
 let mut out_data = Vec::new();
@@ -99,16 +99,16 @@ This pulls in the miniz\_oxide dependency.
 
 ## Upgrade
 You can use the
-[changelog](https://github.com/RedAldaron/png_pong/blob/master/CHANGELOG.md)
+[changelog](https://github.com/AldaronLau/png_pong/blob/master/CHANGELOG.md)
 to facilitate upgrading this crate as a dependency.
 
 ## License
 Licensed under either of
  - Apache License, Version 2.0,
-   ([LICENSE-APACHE](https://github.com/RedAldaron/png_pong/blob/master/LICENSE-APACHE)
+   ([LICENSE-APACHE](https://github.com/AldaronLau/png_pong/blob/master/LICENSE-APACHE)
    or https://www.apache.org/licenses/LICENSE-2.0)
  - Zlib License,
-   ([LICENSE-ZLIB](https://github.com/RedAldaron/png_pong/blob/master/LICENSE-ZLIB)
+   ([LICENSE-ZLIB](https://github.com/AldaronLau/png_pong/blob/master/LICENSE-ZLIB)
    or https://opensource.org/licenses/Zlib)
 
 at your option.
@@ -119,6 +119,6 @@ for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
 Before contributing, check out the
-[contribution guidelines](https://github.com/RedAldaron/png_pong/blob/master/CONTRIBUTING.md),
+[contribution guidelines](https://github.com/AldaronLau/png_pong/blob/master/CONTRIBUTING.md),
 and, as always, make sure to always follow the
-[code of conduct](https://github.com/RedAldaron/png_pong/blob/master/CODE_OF_CONDUCT.md).
+[code of conduct](https://github.com/AldaronLau/png_pong/blob/master/CODE_OF_CONDUCT.md).
