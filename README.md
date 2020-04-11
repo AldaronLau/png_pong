@@ -62,7 +62,7 @@ Add the following to your `Cargo.toml`.
 
 ```toml
 [dependencies.png_pong]
-version = "0.2"
+version = "0.3"
 ```
 
 ### Example
