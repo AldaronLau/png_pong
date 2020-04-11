@@ -43,8 +43,8 @@ use crate::chunk::{ITextChunk, TextChunk};
 use crate::error::DecodeError;
 use crate::Format;
 use pix::{
-    Gray8, Graya8, Matte8, Raster, Rgba8, SGray16,
-    SGray8, SGraya16, SGraya8, SRgb16, SRgb8, SRgba16, SRgba8, el::Pixel
+    el::Pixel, Gray8, Graya8, Matte8, Raster, Rgba8, SGray16, SGray8, SGraya16,
+    SGraya8, SRgb16, SRgb8, SRgba16, SRgba8,
 };
 
 impl ColorMode {
