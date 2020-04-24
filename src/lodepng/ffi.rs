@@ -20,7 +20,7 @@ use std::os::raw::*;
 use crate::lodepng::rustimpl::*;
 
 use crate::chunk::{ITextChunk, TextChunk};
-use pix::Rgba8;
+use pix::rgb::{Rgba8, SRgba8};
 
 /// Type for `decode`, `encode`, etc. Same as standard PNG color types.
 #[repr(C)]
@@ -66,7 +66,7 @@ pub(crate) struct ColorMode {
     /// fills the palette colors in the pixels of the raw RGBA output.
     ///
     /// The palette is only supported for color type 3.
-    pub(crate) palette: Vec<pix::SRgba8>,
+    pub(crate) palette: Vec<SRgba8>,
 
     /// transparent color key (`tRNS`)
     ///
@@ -255,7 +255,7 @@ pub(crate) struct ColorProfile {
     /// amount of colors, up to 257. Not valid if bits == 16.
     pub(crate) numcolors: u32,
     /// Remembers up to the first 256 RGBA colors, in no particular order
-    pub(crate) palette: [pix::SRgba8; 256],
+    pub(crate) palette: [SRgba8; 256],
     /// bits per channel (not for palette). 1,2 or 4 for greyscale only. 16 if 16-bit per channel required.
     pub(crate) bits: u32,
 }

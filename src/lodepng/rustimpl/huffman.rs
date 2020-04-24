@@ -11,6 +11,8 @@
 
 //! Deflate - Huffman
 
+use pix::rgb::Rgb;
+
 use crate::chunk::ITextChunk;
 use crate::chunk::TextChunk;
 
@@ -371,9 +373,9 @@ pub(super) fn get_pixel_color_rgba8(
             } else {
                 let p = pal[index];
                 (
-                    pix::clr::Rgb::red(p).into(),
-                    pix::clr::Rgb::green(p).into(),
-                    pix::clr::Rgb::blue(p).into(),
+                    Rgb::red(p).into(),
+                    Rgb::green(p).into(),
+                    Rgb::blue(p).into(),
                     p.alpha().into(),
                 )
             }
@@ -580,9 +582,9 @@ pub(super) fn get_pixel_colors_rgba8(
                     }
                 } else {
                     let p = pal[index];
-                    buffer[0] = pix::clr::Rgb::red(p).into();
-                    buffer[1] = pix::clr::Rgb::green(p).into();
-                    buffer[2] = pix::clr::Rgb::blue(p).into();
+                    buffer[0] = Rgb::red(p).into();
+                    buffer[1] = Rgb::green(p).into();
+                    buffer[2] = Rgb::blue(p).into();
                     if has_alpha {
                         buffer[3] = p.alpha().into();
                     }
@@ -782,9 +784,9 @@ pub(super) fn read_chunk_trns(
         }
         for (i, &d) in data.iter().enumerate() {
             pal[i] = SRgba8::new(
-                pix::clr::Rgb::red(pal[i]),
-                pix::clr::Rgb::green(pal[i]),
-                pix::clr::Rgb::blue(pal[i]),
+                Rgb::red(pal[i]),
+                Rgb::green(pal[i]),
+                Rgb::blue(pal[i]),
                 d.into(),
             );
         }
@@ -1151,9 +1153,9 @@ pub(super) fn add_chunk_plte(
 ) -> Result<(), Error> {
     let mut plte = Vec::new();
     for p in info.palette() {
-        plte.push(pix::clr::Rgb::red(*p).into());
-        plte.push(pix::clr::Rgb::green(*p).into());
-        plte.push(pix::clr::Rgb::blue(*p).into());
+        plte.push(Rgb::red(*p).into());
+        plte.push(Rgb::green(*p).into());
+        plte.push(Rgb::blue(*p).into());
     }
     add_chunk(out, b"PLTE", &plte)
 }

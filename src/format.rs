@@ -11,6 +11,9 @@
 
 use crate::lodepng::ColorType;
 
+use pix::gray::{SGray16, SGray32, SGray8, SGraya16, SGraya32, SGraya8};
+use pix::rgb::{SRgb16, SRgb32, SRgb8, SRgba16, SRgba32, SRgba8};
+
 /// PNG compatible subset of pix `Format`s.
 pub trait Format: pix::el::Pixel {
     /// Format to save as.
@@ -19,62 +22,62 @@ pub trait Format: pix::el::Pixel {
     const BIT_DEPTH: u32;
 }
 
-impl Format for pix::SGray8 {
+impl Format for SGray8 {
     const PNG_COLOR: ColorType = ColorType::Grey;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::SGray16 {
+impl Format for SGray16 {
     const PNG_COLOR: ColorType = ColorType::Grey;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::SGray32 {
+impl Format for SGray32 {
     const PNG_COLOR: ColorType = ColorType::Grey;
     const BIT_DEPTH: u32 = 32;
 }
 
-impl Format for pix::SGraya8 {
+impl Format for SGraya8 {
     const PNG_COLOR: ColorType = ColorType::GreyAlpha;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::SGraya16 {
+impl Format for SGraya16 {
     const PNG_COLOR: ColorType = ColorType::GreyAlpha;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::SGraya32 {
+impl Format for SGraya32 {
     const PNG_COLOR: ColorType = ColorType::GreyAlpha;
     const BIT_DEPTH: u32 = 32;
 }
 
-impl Format for pix::SRgb8 {
+impl Format for SRgb8 {
     const PNG_COLOR: ColorType = ColorType::Rgb;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::SRgb16 {
+impl Format for SRgb16 {
     const PNG_COLOR: ColorType = ColorType::Rgb;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::SRgb32 {
+impl Format for SRgb32 {
     const PNG_COLOR: ColorType = ColorType::Rgb;
     const BIT_DEPTH: u32 = 32;
 }
 
-impl Format for pix::SRgba8 {
+impl Format for SRgba8 {
     const PNG_COLOR: ColorType = ColorType::Rgba;
     const BIT_DEPTH: u32 = 8;
 }
 
-impl Format for pix::SRgba16 {
+impl Format for SRgba16 {
     const PNG_COLOR: ColorType = ColorType::Rgba;
     const BIT_DEPTH: u32 = 16;
 }
 
-impl Format for pix::SRgba32 {
+impl Format for SRgba32 {
     const PNG_COLOR: ColorType = ColorType::Rgba;
     const BIT_DEPTH: u32 = 32;
 }

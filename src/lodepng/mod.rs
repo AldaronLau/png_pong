@@ -43,8 +43,11 @@ use crate::chunk::{ITextChunk, TextChunk};
 use crate::error::DecodeError;
 use crate::Format;
 use pix::{
-    el::Pixel, Gray8, Graya8, Matte8, Raster, Rgba8, SGray16, SGray8, SGraya16,
-    SGraya8, SRgb16, SRgb8, SRgba16, SRgba8,
+    el::Pixel,
+    gray::{Gray8, Graya8, SGray16, SGray8, SGraya16, SGraya8},
+    matte::Matte8,
+    rgb::{Rgba8, SRgb16, SRgb8, SRgba16, SRgba8},
+    Raster,
 };
 
 impl ColorMode {
@@ -1040,14 +1043,14 @@ mod test {
         assert_eq!(state.info_raw().colortype(), ColorType::Palette);
         state
             .info_raw_mut()
-            .palette_add(pix::SRgba8::new(1, 2, 3, 4))
+            .palette_add(SRgba8::new(1, 2, 3, 4))
             .unwrap();
         state
             .info_raw_mut()
-            .palette_add(pix::SRgba8::new(5, 6, 7, 255))
+            .palette_add(SRgba8::new(5, 6, 7, 255))
             .unwrap();
         assert_eq!(
-            &[pix::SRgba8::new(1, 2, 3, 4), pix::SRgba8::new(5, 6, 7, 255),],
+            &[SRgba8::new(1, 2, 3, 4), SRgba8::new(5, 6, 7, 255),],
             state.info_raw().palette()
         );
         state.info_raw_mut().palette_clear();
