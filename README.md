@@ -62,17 +62,17 @@ Add the following to your `Cargo.toml`.
 
 ```toml
 [dependencies.png_pong]
-version = "0.3"
+version = "0.4"
 ```
 
 ### Example
 ```rust
 // Saving raster as a PNG file
 let raster = pix::Raster::with_pixels(1, 1, &[
-    pix::SRgba8::new(0, 0, 0, 0)][..]
+    pix::rgb::SRgba8::new(0, 0, 0, 0)][..]
 );
 let mut out_data = Vec::new();
-let mut encoder = png_pong::FrameEncoder::<_, pix::SRgba8>::new(
+let mut encoder = png_pong::FrameEncoder::<_, pix::rgb::SRgba8>::new(
     &mut out_data
 );
 let frame = png_pong::Frame{ raster, delay: 0 };
@@ -82,7 +82,7 @@ std::fs::write("graphic.png", out_data).expect("Failed to save image");
 // Loading PNG file into a Raster
 let data = std::fs::read("graphic.png").expect("Failed to open PNG");
 let data = std::io::Cursor::new(data);
-let decoder = png_pong::FrameDecoder::<_, pix::SRgba8>::new(data);
+let decoder = png_pong::FrameDecoder::<_, pix::rgb::SRgba8>::new(data);
 let png_pong::Frame { raster, delay } = decoder
     .last()
     .expect("No frames in PNG")
