@@ -11,6 +11,12 @@
 
 //! Deflate - Huffman
 
+#![allow(clippy::type_complexity)]
+#![allow(clippy::identity_op)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::clippy::unreadable_literal)]
+#![allow(clippy::cognitive_complexity)]
+
 use pix::rgb::Rgb;
 
 use crate::chunk::ITextChunk;
@@ -867,9 +873,12 @@ pub(super) fn read_chunk_text(
     if keyword.is_empty() || keyword.len() > 79 {
         return Err(Error(89));
     }
+
+    info.push_text(keyword, str);
+
     /*even though it's not allowed by the standard, no error is thrown if
     there's no null termination char, if the text is empty*/
-    Ok(info.push_text(keyword, str))
+    Ok(())
 }
 
 /*compressed text chunk (zTXt)*/
@@ -991,12 +1000,12 @@ pub(super) fn add_chunk_idat(
     zlibsettings: &CompressSettings,
 ) -> Result<(), Error> {
     let zlib = zlib_compress(data, zlibsettings)?;
-    add_chunk(out, b"IDAT", &zlib)?;
+    add_chunk(out, *b"IDAT", &zlib)?;
     Ok(())
 }
 
 pub(super) fn add_chunk_iend(out: &mut Vec<u8>) -> Result<(), Error> {
-    add_chunk(out, b"IEND", &[])
+    add_chunk(out, *b"IEND", &[])
 }
 
 pub(super) fn add_chunk_text(
@@ -1010,7 +1019,7 @@ pub(super) fn add_chunk_text(
     let mut text = Vec::from(keyword.as_bytes());
     text.push(0u8);
     text.extend_from_slice(textstring.as_bytes());
-    add_chunk(out, b"tEXt", &text)
+    add_chunk(out, *b"tEXt", &text)
 }
 
 pub(super) fn add_chunk_ztxt(
@@ -1027,7 +1036,7 @@ pub(super) fn add_chunk_ztxt(
     let textstring = textstring.as_bytes();
     let v = zlib_compress(textstring, zlibsettings)?;
     data.extend_from_slice(&v);
-    add_chunk(out, b"zTXt", &data)?;
+    add_chunk(out, *b"zTXt", &data)?;
     Ok(())
 }
 
@@ -1060,7 +1069,7 @@ pub(super) fn add_chunk_itxt(
     } else {
         data.extend_from_slice(textstring.as_bytes());
     }
-    add_chunk(out, b"iTXt", &data)
+    add_chunk(out, *b"iTXt", &data)
 }
 
 pub(super) fn add_chunk_bkgd(
@@ -1085,7 +1094,7 @@ pub(super) fn add_chunk_bkgd(
     } else if info.color.colortype == ColorType::Palette {
         bkgd.push((info.background_r & 255) as u8);
     }
-    add_chunk(out, b"bKGD", &bkgd)
+    add_chunk(out, *b"bKGD", &bkgd)
 }
 
 pub(super) fn add_chunk_ihdr(
@@ -1104,7 +1113,7 @@ pub(super) fn add_chunk_ihdr(
     header.push(0u8);
     header.push(0u8);
     header.push(interlace_method);
-    add_chunk(out, b"IHDR", &header)
+    add_chunk(out, *b"IHDR", &header)
 }
 
 pub(super) fn add_chunk_trns(
@@ -1144,7 +1153,7 @@ pub(super) fn add_chunk_trns(
             trns.push((b & 255) as u8);
         };
     }
-    add_chunk(out, b"tRNS", &trns)
+    add_chunk(out, *b"tRNS", &trns)
 }
 
 pub(super) fn add_chunk_plte(
@@ -1157,7 +1166,7 @@ pub(super) fn add_chunk_plte(
         plte.push(Rgb::green(*p).into());
         plte.push(Rgb::blue(*p).into());
     }
-    add_chunk(out, b"PLTE", &plte)
+    add_chunk(out, *b"PLTE", &plte)
 }
 
 pub(super) fn add_chunk_time(
@@ -1173,7 +1182,7 @@ pub(super) fn add_chunk_time(
         time.minute as u8,
         time.second as u8,
     ];
-    add_chunk(out, b"tIME", &data)
+    add_chunk(out, *b"tIME", &data)
 }
 
 pub(super) fn add_chunk_phys(
@@ -1184,13 +1193,13 @@ pub(super) fn add_chunk_phys(
     add32bit_int(&mut data, info.phys_x);
     add32bit_int(&mut data, info.phys_y);
     data.push(info.phys_unit as u8);
-    add_chunk(out, b"pHYs", &data)
+    add_chunk(out, *b"pHYs", &data)
 }
 
 /*chunk_name must be string of 4 characters*/
 pub(crate) fn add_chunk(
     out: &mut Vec<u8>,
-    type_: &[u8; 4],
+    type_: [u8; 4],
     data: &[u8],
 ) -> Result<(), Error> {
     let length = data.len();

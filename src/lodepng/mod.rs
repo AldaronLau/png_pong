@@ -204,9 +204,9 @@ impl Default for ColorMode {
 
 impl ColorType {
     /// Create color mode with given type and bitdepth
-    pub(crate) fn to_color_mode(&self, bitdepth: u32) -> ColorMode {
+    pub(crate) fn to_color_mode(self, bitdepth: u32) -> ColorMode {
         ColorMode {
-            colortype: *self,
+            colortype: self,
             bitdepth,
             palette: Vec::new(),
             key: None,
@@ -214,8 +214,8 @@ impl ColorType {
     }
 
     /// channels * bytes per channel = bytes per pixel
-    pub(crate) fn channels(&self) -> u8 {
-        match *self {
+    pub(crate) fn channels(self) -> u8 {
+        match self {
             ColorType::Grey | ColorType::Palette => 1,
             ColorType::GreyAlpha => 2,
             ColorType::Bgr | ColorType::Rgb => 3,
@@ -321,7 +321,7 @@ impl Info {
 
         rustimpl::add_chunk(
             &mut self.unknown_chunks_data[position as usize],
-            &type_,
+            type_,
             data,
         )
     }

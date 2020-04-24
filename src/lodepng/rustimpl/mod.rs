@@ -34,7 +34,6 @@ pub(crate) use self::{
 use super::*;
 use ffi::ColorProfile;
 use ffi::State;
-use ChunkPosition;
 
 use std::collections::HashMap;
 
@@ -80,12 +79,11 @@ fn get_palette_translucency(palette: &[SRgba8]) -> PaletteTranslucency {
             i = 0;
             /*restart from beginning, to detect earlier opaque colors with key's value*/
             continue;
-        } else if byte != 255 {
-            return PaletteTranslucency::Semi;
-        } else if key == PaletteTranslucency::Key
-            && r == Rgb::red(palette[i]).into()
-            && g == Rgb::green(palette[i]).into()
-            && b == Rgb::blue(palette[i]).into()
+        } else if byte != 255
+            || (key == PaletteTranslucency::Key
+                && r == Rgb::red(palette[i]).into()
+                && g == Rgb::green(palette[i]).into()
+                && b == Rgb::blue(palette[i]).into())
         {
             /*when key, no opaque RGB may have key's RGB*/
             return PaletteTranslucency::Semi;
@@ -519,7 +517,7 @@ fn filter_scanline(
                 }
             }
         }
-        _ => return,
+        _ => {}
     };
 }
 

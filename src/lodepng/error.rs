@@ -9,7 +9,6 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std;
 use std::error;
 use std::fmt;
 use std::io;
@@ -20,7 +19,7 @@ pub struct Error(pub u8);
 
 impl Error {
     /// Returns an English description of the numerical error code.
-    pub fn as_str(&self) -> &'static str {
+    pub fn as_str(self) -> &'static str {
         self.description_en()
     }
 
@@ -71,7 +70,7 @@ This returns the description of a numerical error code in English. This is also
 the documentation of all the error codes.
 */
 impl Error {
-    fn description_en(&self) -> &'static str {
+    fn description_en(self) -> &'static str {
         match self.0 {
             0 => "no error, everything went ok",
             1 => "nothing done yet",

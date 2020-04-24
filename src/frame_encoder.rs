@@ -46,7 +46,7 @@ impl<W: Write, F: Format> FrameEncoder<W, F> {
 
         match self.encoder.bytes.write(&bytes) {
             Ok(_size) => Ok(()),
-            Err(e) => return Err(e),
+            Err(e) => Err(e),
         }
     }
 
@@ -64,7 +64,7 @@ impl<W: Write, F: Format> FrameEncoder<W, F> {
 
         match self.encoder.bytes.write(&bytes) {
             Ok(_size) => Ok(()),
-            Err(e) => return Err(e),
+            Err(e) => Err(e),
         }
     }
 }

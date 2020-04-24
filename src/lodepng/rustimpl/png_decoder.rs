@@ -11,6 +11,10 @@
 
 //! PNG Decoder
 
+#![allow(clippy::identity_op)]
+#![allow(clippy::cognitive_complexity)]
+#![allow(clippy::clippy::unreadable_literal)]
+
 use super::*;
 
 /*read the information from the header and store it in the Info. return value is error*/
@@ -437,12 +441,12 @@ pub(crate) fn lodepng_encode(
 It's ok to set some parameters of profile to done already.*/
 pub(crate) fn get_color_profile(
     inp: &[u8],
-    w: u32,
-    h: u32,
+    width: u32,
+    height: u32,
     mode: &ColorMode,
 ) -> Result<ColorProfile, Error> {
     let mut profile = ColorProfile::new();
-    let numpixels: usize = w as usize * h as usize;
+    let numpixels: usize = width as usize * height as usize;
     let mut colored_done = mode.is_greyscale_type();
     let mut alpha_done = !mode.can_have_alpha();
     let mut numcolors_done = false;
@@ -489,11 +493,9 @@ pub(crate) fn get_color_profile(
                 {
                     let matchkey = r == *key_r && g == *key_g && b == *key_b;
 
-                    if a != 65535 && (a != 0 || !matchkey) {
-                        profile.alpha = true;
-                        profile.key = None;
-                        alpha_done = true;
-                    } else if a == 65535 && matchkey {
+                    if (a != 65535 && (a != 0 || !matchkey))
+                        || (a == 65535 && matchkey)
+                    {
                         profile.alpha = true;
                         profile.key = None;
                         alpha_done = true;

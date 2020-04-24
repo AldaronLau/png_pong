@@ -11,6 +11,8 @@
 
 //! CRC32
 
+#![allow(clippy::unreadable_literal)]
+
 use pix::rgb::Rgb;
 
 use std::convert::TryInto;
@@ -88,12 +90,12 @@ pub(crate) fn lodepng_convert(
     inp: &[u8],
     mode_out: &ColorMode,
     mode_in: &ColorMode,
-    w: u32,
-    h: u32,
+    width: u32,
+    height: u32,
 ) -> Result<(), Error> {
-    let numpixels = w as usize * h as usize;
+    let numpixels = width as usize * height as usize;
     if lodepng_color_mode_equal(mode_out, mode_in) {
-        let numbytes = mode_in.raw_size(w, h);
+        let numbytes = mode_in.raw_size(width, height);
         out[..numbytes].clone_from_slice(&inp[..numbytes]);
         return Ok(());
     }
@@ -213,8 +215,8 @@ in and out are allowed to be the same memory address (but aren't the same size s
 fn unfilter(
     out: &mut [u8],
     inp: &[u8],
-    w: u32,
-    h: u32,
+    width: u32,
+    height: u32,
     bpp: u32,
 ) -> Result<(), Error> {
     use std::convert::TryInto;
@@ -223,13 +225,13 @@ fn unfilter(
 
     /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
     let bytewidth = (bpp as usize + 7) / 8;
-    let linebytes = (w as usize * bpp as usize + 7) / 8;
+    let linebytes = (width as usize * bpp as usize + 7) / 8;
     let in_linebytes = 1 + linebytes; /*the extra filterbyte added to each row*/
 
     for (out_line, in_line) in out
         .chunks_mut(linebytes)
         .zip(inp.chunks(in_linebytes))
-        .take(h as usize)
+        .take(height as usize)
     {
         let filter_type = in_line[0];
         unfilter_scanline(
