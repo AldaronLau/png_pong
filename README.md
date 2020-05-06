@@ -11,7 +11,7 @@ This crate allows easy reading and writing of PNG files without any
 system dependencies.
 
 ### Why another PNG crate?
-These are the 3 Rust PNG encoder/decoder crates I know of:
+These are the 4 Rust PNG encoder/decoder crates I know of:
 - [png](https://crates.io/crates/png) - The one everyone uses, is very
   limited in which PNGs it can open.
 - [lodepng](https://crates.io/crates/lodepng) - Lots of features, code
@@ -19,6 +19,7 @@ These are the 3 Rust PNG encoder/decoder crates I know of:
   slow implementation of deflate/inflate algorithm.
 - [imagefmt](https://crates.io/crates/imagefmt) - Abandoned, just as
   limited as png, but with a lot less lines of code.
+- [imagine](https://crates.io/crates/imagine) - PNG decoding only.
 
 Originally I made the [aci_png](https://crates.io/crates/aci_png) based
 on imagefmt, and intended to add more features.  That task seemed
