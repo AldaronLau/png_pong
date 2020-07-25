@@ -70,11 +70,9 @@ mod adam7;
 mod bitstream;
 mod checksum;
 mod consts;
-mod filter;
 mod raster;
 mod step;
 mod zlib;
 
-pub use filter::FilterStrategy;
 pub use raster::PngRaster;
 pub use step::Step;

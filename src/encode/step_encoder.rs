@@ -12,9 +12,8 @@ use crate::{
     bitstream::{BitstreamReader, BitstreamWriter},
     chunk::{ColorType, ImageHeader},
     chunk::{ImageData, ImageEnd, Palette as PaletteChunk, Transparency},
-    encode::ChunkEncoder,
-    encode::Error as EncoderError,
-    filter, FilterStrategy, PngRaster, Step,
+    encode::{FilterStrategy, ChunkEncoder, Error as EncoderError, filter},
+    PngRaster, Step,
 };
 use pix::rgb::SRgb8;
 use std::io::{self, Write};

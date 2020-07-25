@@ -12,7 +12,7 @@ use crate::{
     bitstream::{BitstreamReader, BitstreamWriter},
     chunk::ImageHeader,
     decode::Error as DecoderError,
-    filter,
+    encode::filter,
 };
 
 /*out must be buffer big enough to contain full image, and in must contain the full decompressed data from
