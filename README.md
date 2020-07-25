@@ -1,4 +1,4 @@
-# ![PNG Pong](https://media.githubusercontent.com/media/AldaronLau/png_pong/master/res/icon.png)
+# ![PNG Pong](https://raw.githubusercontent.com/AldaronLau/png_pong/master/res/icon.png)
 
 #### A pure Rust PNG/APNG encoder & decoder
 
