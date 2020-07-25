@@ -1,0 +1,73 @@
+[package]
+name = "comparison"
+version = "0.1.0"
+authors = ["Jeron Aldaron Lau <jeronlau@plopgrizzly.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+png_pong = { path = "../" }
+png = "=0.16.7"
+imagine = "=0.0.5"
+lodepng = "=3.0.0"
+imagefmt = "=4.0.0"
+aci_png = "=0.8.0-pre0"
+libpng-sys = "=1.1.8"
+pix = "=0.13.1"
+afi = "=0.8.0-pre0"
+
+[dev-dependencies.criterion]
+version = "0.3"
+
+[[bench]]
+name = "encode"
+harness = false
+
+[[bench]]
+name = "decode"
+harness = false
+
+[[bench]]
+name = "decode_libpng"
+harness = false
+
+[[bench]]
+name = "encode_libpng"
+harness = false
+
+[[bench]]
+name = "decode_png"
+harness = false
+
+[[bench]]
+name = "encode_png"
+harness = false
+
+[[bench]]
+name = "decode_lodepng"
+harness = false
+
+[[bench]]
+name = "encode_lodepng"
+harness = false
+
+[[bench]]
+name = "decode_imagefmt"
+harness = false
+
+[[bench]]
+name = "encode_imagefmt"
+harness = false
+
+[[bench]]
+name = "decode_aci"
+harness = false
+
+[[bench]]
+name = "encode_aci"
+harness = false
+
+[[bench]]
+name = "decode_imagine"
+harness = false
