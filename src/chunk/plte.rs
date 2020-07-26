@@ -7,8 +7,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use super::{DecoderError, EncoderError};
-use crate::{checksum::CrcDecoder, consts};
+use super::{Chunk, DecoderError, EncoderError};
+use crate::{consts, decoder::Parser};
 use pix::rgb::{Rgb, SRgb8};
 use std::io::{Read, Write};
 
@@ -21,17 +21,18 @@ pub struct Palette {
 }
 
 impl Palette {
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-    ) -> Result<(Self, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::PALETTE);
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
+        parse.set_palette();
         let mut palette = Vec::new();
-        while let Some(red) = chunk.maybe_u8()? {
-            let green = chunk.u8()?;
-            let blue = chunk.u8()?;
+        for _ in 0..(parse.len() / 3) {
+            let red = parse.u8()?;
+            let green = parse.u8()?;
+            let blue = parse.u8()?;
             palette.push(SRgb8::new(red, green, blue));
         }
-        Ok((Palette { palette }, chunk.end()?))
+        Ok(Chunk::Palette(Palette { palette }))
     }
 
     pub(crate) fn write<W: Write>(

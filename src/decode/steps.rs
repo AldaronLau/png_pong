@@ -17,8 +17,7 @@ use crate::{
         Physical, Time, Transparency,
     },
     consts,
-    decode::ChunkDecoder,
-    decode::Error as DecoderError,
+    decode::{Chunks, Error as DecoderError},
     zlib, PngRaster, Step,
 };
 
@@ -33,12 +32,12 @@ struct TextEntry {
 
 /// Iterator over `Step`s for PNG files.
 #[derive(Debug)]
-pub struct StepDecoder<R: Read> {
-    decoder: Peekable<ChunkDecoder<R>>,
+pub struct Steps<R: Read> {
+    decoder: Peekable<Chunks<R>>,
     // FIXME: This is a workaround for not supporting APNG yet.
     has_decoded: bool,
-    //
-    header: ImageHeader,
+    // None if haven't decoded a frame yet.
+    header: Option<ImageHeader>,
     // Is the file an APNG animation?
     is_animation: bool,
     // Is IDAT part of the animation?
@@ -55,137 +54,150 @@ pub struct StepDecoder<R: Read> {
     physical: Option<Physical>,
     //
     time: Option<Time>,
+    // True if after palette chunk found
+    reject_pal: bool,
 }
 
-impl<R: Read> StepDecoder<R> {
+impl<R: Read> Steps<R> {
     /// Create a new decoder.
-    pub fn new(r: R) -> Result<Self, DecoderError> {
-        let mut decoder = ChunkDecoder::new(r)?.peekable();
-        // First chunk must be IHDR
-        let header = match decoder.next().ok_or(DecoderError::Empty)?? {
-            Chunk::ImageHeader(header) => header,
-            _chunk => return Err(DecoderError::ChunkOrder),
-        };
-        let mut palette = None;
-        let mut background = None;
-        let mut physical = None;
-        let mut reject_pal = false;
-        let mut text = HashMap::new();
-        let mut time = None;
-        let mut transparency = None;
-        // Go through chunks before IDAT
-        while {
-            match decoder.peek() {
-                Some(Ok(chunk)) => !chunk.is_idat(),
-                Some(Err(DecoderError::UnknownChunkType(_))) => true,
-                Some(Err(e)) => return Err(e.clone()),
-                None => return Err(DecoderError::NoImageData),
-            }
-        } {
-            use Chunk::*;
-            // Won't panic
-            let chunk = if let Ok(chunk) = decoder.next().unwrap() {
-                chunk
-            } else {
-                continue; // Skip unknown chunks
-            };
-            match chunk {
-                Palette(chunk) => {
-                    if reject_pal {
-                        return Err(DecoderError::ChunkOrder);
-                    }
-                    if palette.is_some() {
-                        return Err(DecoderError::Multiple(consts::PALETTE));
-                    }
-                    palette = Some(chunk)
-                }
-                Background(chunk) => {
-                    reject_pal = true;
-                    if background.is_some() {
-                        return Err(DecoderError::Multiple(consts::BACKGROUND));
-                    }
-                    background = Some(chunk);
-                }
-                InternationalText(chunk) => {
-                    text.insert(
-                        chunk.key,
-                        TextEntry {
-                            text: chunk.val,
-                            langtag: Some(chunk.langtag),
-                            transkey: Some(chunk.transkey),
-                        },
-                    );
-                }
-                CompressedText(chunk) => {
-                    text.insert(
-                        chunk.key,
-                        TextEntry {
-                            text: chunk.val,
-                            langtag: None,
-                            transkey: None,
-                        },
-                    );
-                }
-                Text(chunk) => {
-                    text.insert(
-                        chunk.key,
-                        TextEntry {
-                            text: chunk.val,
-                            langtag: None,
-                            transkey: None,
-                        },
-                    );
-                }
-                Physical(chunk) => {
-                    if physical.is_some() {
-                        return Err(DecoderError::Multiple(consts::PHYSICAL));
-                    }
-                    physical = Some(chunk);
-                }
-                Time(chunk) => {
-                    if time.is_some() {
-                        return Err(DecoderError::Multiple(consts::TIME));
-                    }
-                    time = Some(chunk);
-                }
-                Transparency(chunk) => {
-                    reject_pal = true;
-                    if transparency.is_some() {
-                        return Err(DecoderError::Multiple(
-                            consts::TRANSPARENCY,
-                        ));
-                    }
-                    transparency = Some(chunk);
-                }
-                ImageHeader(_) => return Err(DecoderError::ChunkOrder),
-                ImageEnd(_) => return Err(DecoderError::NoImageData),
-                ImageData(_) => unreachable!(),
-            }
-        }
+    pub(crate) fn new(chunks: Chunks<R>) -> Self {
+        let decoder = chunks.peekable();
 
-        Ok(Self {
+        Self {
             decoder,
             has_decoded: false,
-            header,
+            header: None,
             idat_anim: false,
             is_animation: false,
-            palette,
-            transparency,
-            background,
-            physical,
-            text,
-            time,
-        })
+            palette: None,
+            transparency: None,
+            background: None,
+            physical: None,
+            text: HashMap::new(),
+            time: None,
+            reject_pal: false,
+        }
     }
 }
 
-impl<R> Iterator for StepDecoder<R>
+impl<R> Iterator for Steps<R>
 where
     R: Read,
 {
     type Item = Result<Step, DecoderError>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // First frame
+        if self.header.is_none() {
+            // First chunk must be IHDR
+            self.header = match self.decoder.next().ok_or(DecoderError::Empty) {
+                Ok(Ok(Chunk::ImageHeader(header))) => Some(header),
+                Ok(Ok(_chunk)) => return Some(Err(DecoderError::ChunkOrder)),
+                Ok(Err(e)) => return Some(Err(e)),
+                Err(e) => return Some(Err(e)),
+            };
+
+            // Go through chunks before IDAT
+            while {
+                match self.decoder.peek() {
+                    Some(Ok(chunk)) => !chunk.is_idat(),
+                    Some(Err(DecoderError::UnknownChunkType(_))) => true,
+                    Some(Err(e)) => return Some(Err(e.clone())),
+                    None => return Some(Err(DecoderError::NoImageData)),
+                }
+            } {
+                use Chunk::*;
+                // Won't panic
+                let chunk = if let Ok(chunk) = self.decoder.next().unwrap() {
+                    chunk
+                } else {
+                    continue; // Skip unknown chunks
+                };
+                match chunk {
+                    Palette(chunk) => {
+                        if self.reject_pal {
+                            return Some(Err(DecoderError::ChunkOrder));
+                        }
+                        if self.palette.is_some() {
+                            return Some(Err(DecoderError::Multiple(
+                                consts::PALETTE,
+                            )));
+                        }
+                        self.palette = Some(chunk)
+                    }
+                    Background(chunk) => {
+                        self.reject_pal = true;
+                        if self.background.is_some() {
+                            return Some(Err(DecoderError::Multiple(
+                                consts::BACKGROUND,
+                            )));
+                        }
+                        self.background = Some(chunk);
+                    }
+                    InternationalText(chunk) => {
+                        self.text.insert(
+                            chunk.key,
+                            TextEntry {
+                                text: chunk.val,
+                                langtag: Some(chunk.langtag),
+                                transkey: Some(chunk.transkey),
+                            },
+                        );
+                    }
+                    CompressedText(chunk) => {
+                        self.text.insert(
+                            chunk.key,
+                            TextEntry {
+                                text: chunk.val,
+                                langtag: None,
+                                transkey: None,
+                            },
+                        );
+                    }
+                    Text(chunk) => {
+                        self.text.insert(
+                            chunk.key,
+                            TextEntry {
+                                text: chunk.val,
+                                langtag: None,
+                                transkey: None,
+                            },
+                        );
+                    }
+                    Physical(chunk) => {
+                        if self.physical.is_some() {
+                            return Some(Err(DecoderError::Multiple(
+                                consts::PHYSICAL,
+                            )));
+                        }
+                        self.physical = Some(chunk);
+                    }
+                    Time(chunk) => {
+                        if self.time.is_some() {
+                            return Some(Err(DecoderError::Multiple(
+                                consts::TIME,
+                            )));
+                        }
+                        self.time = Some(chunk);
+                    }
+                    Transparency(chunk) => {
+                        self.reject_pal = true;
+                        if self.transparency.is_some() {
+                            return Some(Err(DecoderError::Multiple(
+                                consts::TRANSPARENCY,
+                            )));
+                        }
+                        self.transparency = Some(chunk);
+                    }
+                    ImageHeader(_) => {
+                        return Some(Err(DecoderError::ChunkOrder))
+                    }
+                    ImageEnd(_) => return Some(Err(DecoderError::NoImageData)),
+                    ImageData(_) => unreachable!(),
+                }
+            }
+        }
+
         // Check for ImageEnd
         if let Some(Ok(chunk)) = self.decoder.peek() {
             if chunk.is_iend() {
@@ -220,7 +232,7 @@ where
 
         let raster = match decode(
             idat.as_slice(),
-            &self.header,
+            self.header.as_ref().unwrap(),
             self.palette.as_ref(),
             self.transparency.as_ref(),
         ) {

@@ -32,7 +32,7 @@
 //! // Loading PNG file into a Raster
 //! let data = std::fs::read("graphic.png").expect("Failed to open PNG");
 //! let data = std::io::Cursor::new(data);
-//! let decoder = png_pong::decode::StepDecoder::new(data).expect("Not PNG");
+//! let decoder = png_pong::Decoder::new(data).expect("Not PNG").into_steps();
 //! let png_pong::Step { raster, delay } = decoder
 //!     .last()
 //!     .expect("No frames in PNG")
@@ -65,14 +65,18 @@ pub mod chunk;
 pub mod decode;
 pub mod encode;
 
-// Modules
+pub(crate) mod decoder;
+
 mod adam7;
 mod bitstream;
 mod checksum;
 mod consts;
+mod encoder;
 mod raster;
 mod step;
 mod zlib;
 
+pub use decoder::Decoder;
+pub use encoder::Encoder;
 pub use raster::PngRaster;
 pub use step::Step;

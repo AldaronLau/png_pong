@@ -9,8 +9,8 @@
 
 use std::io::{Read, Write};
 
-use super::{DecoderError, EncoderError};
-use crate::{checksum::CrcDecoder, consts};
+use super::{Chunk, DecoderError, EncoderError};
+use crate::{consts, decoder::Parser};
 
 /// Suggested background color chunk (bKGD)
 #[derive(Copy, Clone, Debug)]
@@ -24,18 +24,17 @@ pub enum Background {
 }
 
 impl Background {
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-        chunk_length: u32,
-    ) -> Result<(Self, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::BACKGROUND);
-        match chunk_length {
-            1 => Ok((Background::Palette(chunk.u8()?), chunk.end()?)),
-            2 => Ok((Background::Gray(chunk.u16()?), chunk.end()?)),
-            6 => Ok((
-                Background::Rgb(chunk.u16()?, chunk.u16()?, chunk.u16()?),
-                chunk.end()?,
-            )),
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
+        match parse.len() {
+            1 => Ok(Chunk::Background(Background::Palette(parse.u8()?))),
+            2 => Ok(Chunk::Background(Background::Gray(parse.u16()?))),
+            6 => Ok(Chunk::Background(Background::Rgb(
+                parse.u16()?,
+                parse.u16()?,
+                parse.u16()?,
+            ))),
             _ => Err(DecoderError::ChunkLength(consts::BACKGROUND)),
         }
     }

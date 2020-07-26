@@ -9,8 +9,8 @@
 
 use std::io::{Read, Write};
 
-use super::{DecoderError, DecoderResult, EncoderError, EncoderResult};
-use crate::{checksum, consts, zlib};
+use super::{Chunk, DecoderError, DecoderResult, EncoderError, EncoderResult};
+use crate::{consts, decoder::Parser, zlib};
 
 /// Compressed Text Chunk Data (zTXt)
 #[derive(Clone, Debug)]
@@ -44,20 +44,20 @@ impl CompressedText {
         Ok(())
     }
 
-    pub(crate) fn read<R: Read>(reader: &mut R) -> DecoderResult<(Self, u32)> {
-        let mut chunk = checksum::CrcDecoder::new(reader, consts::ZTEXT);
-
-        let key = chunk.utf8z()?;
-        if chunk.u8()? != 0 {
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> DecoderResult<Chunk> {
+        let key = parse.str()?;
+        if parse.u8()? != 0 {
             return Err(DecoderError::CompressionMethod);
         }
-        let ztxt = chunk.vec_eof()?;
+        let ztxt = parse.vec(parse.len() - (key.len() + 2))?;
         let decoded = zlib::decompress(&ztxt)?;
         if key.is_empty() || key.len() > 79 {
             return Err(DecoderError::TextSize(key.len()));
         }
         let val = String::from_utf8_lossy(&decoded).to_string();
 
-        Ok((CompressedText { key, val }, chunk.end()?))
+        Ok(Chunk::CompressedText(CompressedText { key, val }))
     }
 }

@@ -11,10 +11,10 @@
 
 mod chunk_encoder;
 mod error;
-mod step_encoder;
-pub(super) mod filter; // Share with unfilter
+pub(super) mod filter;
+mod step_encoder; // Share with unfilter
 
 pub use chunk_encoder::ChunkEncoder;
 pub use error::{Error, Result};
-pub use step_encoder::StepEncoder;
 pub use filter::FilterStrategy;
+pub use step_encoder::StepEncoder;

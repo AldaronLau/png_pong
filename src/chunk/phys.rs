@@ -7,8 +7,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use super::{DecoderError, EncoderError};
-use crate::{checksum::CrcDecoder, consts};
+use super::{Chunk, DecoderError, EncoderError};
+use crate::{consts, decoder::Parser};
 use std::io::{Read, Write};
 
 /// Physical dimensions chunk (pHYs)
@@ -36,27 +36,22 @@ impl Physical {
         super::encode_chunk(writer, consts::PHYSICAL, &data)
     }
 
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-    ) -> Result<(Self, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::PHYSICAL);
-
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
         // 9 bytes
-        let ppu_x = chunk.u32()?;
-        let ppu_y = chunk.u32()?;
-        let is_meter = match chunk.u8()? {
+        let ppu_x = parse.u32()?;
+        let ppu_y = parse.u32()?;
+        let is_meter = match parse.u8()? {
             0 => false,
             1 => true,
             _ => return Err(DecoderError::PhysUnits),
         };
 
-        Ok((
-            Physical {
-                ppu_x,
-                ppu_y,
-                is_meter,
-            },
-            chunk.end()?,
-        ))
+        Ok(Chunk::Physical(Physical {
+            ppu_x,
+            ppu_y,
+            is_meter,
+        }))
     }
 }

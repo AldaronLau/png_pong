@@ -9,8 +9,8 @@
 
 use std::io::{Read, Write};
 
-use super::{DecoderError, DecoderResult, EncoderResult};
-use crate::{checksum, consts};
+use super::{Chunk, DecoderError, DecoderResult, EncoderResult};
+use crate::{consts, decoder::Parser};
 
 /// Alpha Palette Chunk Data (tRNS)
 #[derive(Debug, Clone, PartialEq)]
@@ -40,35 +40,26 @@ impl Transparency {
         }
     }
 
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-        palette_len: usize,
-        chunk_length: u32,
-    ) -> DecoderResult<(Self, u32)> {
-        let mut chunk = checksum::CrcDecoder::new(reader, consts::TRANSPARENCY);
-
-        if palette_len == 0 {
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> DecoderResult<Chunk> {
+        if parse.has_palette() {
+            // Palette
+            let apal = parse.raw()?;
+            Ok(Chunk::Transparency(Transparency::Palette(apal)))
+        } else {
             // Gray or RGB
-            match chunk_length {
-                2 => Ok((Transparency::GrayKey(chunk.u16()?), chunk.end()?)),
-                6 => Ok((
-                    Transparency::RgbKey(
-                        chunk.u16()?,
-                        chunk.u16()?,
-                        chunk.u16()?,
-                    ),
-                    chunk.end()?,
-                )),
+            match parse.len() {
+                2 => {
+                    Ok(Chunk::Transparency(Transparency::GrayKey(parse.u16()?)))
+                }
+                6 => Ok(Chunk::Transparency(Transparency::RgbKey(
+                    parse.u16()?,
+                    parse.u16()?,
+                    parse.u16()?,
+                ))),
                 _ => Err(DecoderError::ChunkLength(consts::TRANSPARENCY)),
             }
-        } else {
-            // Palette
-            let apal = chunk.vec_eof()?;
-            if apal.len() > palette_len {
-                // Alpha palette can't be larger than the palette
-                return Err(DecoderError::AlphaPaletteLen);
-            }
-            Ok((Transparency::Palette(apal), chunk.end()?))
         }
     }
 

@@ -9,10 +9,10 @@
 
 //! PNG file decoding
 
-mod chunk_decoder;
+mod chunks;
 mod error;
-mod step_decoder;
+mod steps;
 
-pub use chunk_decoder::ChunkDecoder;
+pub use chunks::Chunks;
 pub use error::{Error, Result};
-pub use step_decoder::StepDecoder;
+pub use steps::Steps;

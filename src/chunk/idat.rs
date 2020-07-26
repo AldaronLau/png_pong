@@ -10,7 +10,8 @@
 use std::io::{Read, Write};
 
 use crate::{
-    checksum::CrcDecoder, consts, decode::Result as DecoderResult,
+    chunk::Chunk, consts,
+    decode::Result as DecoderResult, decoder::Parser,
     encode::Error as EncoderError, zlib,
 };
 
@@ -22,10 +23,11 @@ pub struct ImageData {
 }
 
 impl ImageData {
-    pub(crate) fn read<R: Read>(reader: &mut R) -> DecoderResult<(Self, u32)> {
-        let mut chunk = CrcDecoder::new(reader, consts::IMAGE_DATA);
-        let data = chunk.vec_eof()?;
-        Ok((ImageData { data }, chunk.end()?))
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> DecoderResult<Chunk> {
+        let data = parse.raw()?;
+        Ok(Chunk::ImageData(ImageData { data }))
     }
 
     pub(crate) fn write<W: Write>(

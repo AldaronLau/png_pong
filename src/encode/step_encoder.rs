@@ -12,7 +12,7 @@ use crate::{
     bitstream::{BitstreamReader, BitstreamWriter},
     chunk::{ColorType, ImageHeader},
     chunk::{ImageData, ImageEnd, Palette as PaletteChunk, Transparency},
-    encode::{FilterStrategy, ChunkEncoder, Error as EncoderError, filter},
+    encode::{filter, ChunkEncoder, Error as EncoderError, FilterStrategy},
     PngRaster, Step,
 };
 use pix::rgb::SRgb8;

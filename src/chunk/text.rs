@@ -7,8 +7,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use super::{DecoderError, EncoderError};
-use crate::{checksum::CrcDecoder, consts};
+use super::{Chunk, DecoderError, EncoderError};
+use crate::{consts, decoder::Parser};
 use std::io::{Read, Write};
 
 /// Non-International Text Chunk Data (tEXt and zTXt)
@@ -24,17 +24,16 @@ pub struct Text {
 }
 
 impl Text {
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-    ) -> Result<(Self, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::TEXT);
-        let key = chunk.utf8z()?;
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
+        let key = parse.str()?;
         if key.is_empty() || key.len() > 79 {
             return Err(DecoderError::TextSize(key.len()));
         }
-        let val = chunk.utf8z()?;
+        let val = parse.string(parse.len() - (key.len() + 1))?;
 
-        Ok((Text { key, val }, chunk.end()?))
+        Ok(Chunk::Text(Text { key, val }))
     }
 
     pub(crate) fn write<W: Write>(

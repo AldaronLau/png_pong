@@ -71,7 +71,7 @@
 //!   - **Multiple** `GifApplicationExt` "gIFx" (*Extension*)
 //! - **Required** `ImageEnd` "IEND"
 
-use std::io::{Read, Write};
+use std::io::{Write};
 
 use crate::{
     checksum, decode::Error as DecoderError, decode::Result as DecoderResult,
@@ -148,24 +148,6 @@ impl Chunk {
             _ => false,
         }
     }
-}
-
-/// Try to fill a buffer with the contents from a reader.
-pub(crate) fn read<R: Read>(
-    reader: &mut R,
-    buffer: &mut [u8],
-) -> DecoderResult<usize> {
-    buffer
-        .iter_mut()
-        .zip(reader.bytes())
-        .fold(Ok(0), |count, (o, i)| match i {
-            Ok(x) => {
-                *o = x;
-                count.map(|x| x + 1)
-            }
-            Err(e) => Err(e),
-        })
-        .map_err(DecoderError::from)
 }
 
 /// Write u32 to writer in big endian.

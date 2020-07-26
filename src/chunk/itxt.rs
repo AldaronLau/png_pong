@@ -7,12 +7,12 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::io::{Read, Write};
-
+use super::Chunk;
 use crate::{
-    checksum::CrcDecoder, consts, decode::Error as DecoderError,
-    encode::Error as EncoderError, zlib,
+    consts, decode::Error as DecoderError,
+    decoder::Parser, encode::Error as EncoderError, zlib,
 };
+use std::io::{Read, Write};
 
 /// International Text Chunk Data (iTXt)
 #[derive(Clone, Debug)]
@@ -34,38 +34,35 @@ pub struct InternationalText {
 
 impl InternationalText {
     /*international text chunk (iTXt)*/
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-    ) -> Result<(Self, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::ITEXT);
-
-        let key = chunk.utf8z()?;
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
+        let key = parse.str()?;
         if key.is_empty() || key.len() > 79 {
             return Err(DecoderError::TextSize(key.len()));
         }
-        let compressed = chunk.u8()? != 0;
-        if chunk.u8()? != 0 {
+        let compressed = parse.u8()? != 0;
+        if parse.u8()? != 0 {
             return Err(DecoderError::CompressionMethod);
         }
-        let langtag = chunk.utf8z()?;
-        let transkey = chunk.utf8z()?;
-        let data = chunk.vec_eof()?;
+        let langtag = parse.str()?;
+        let transkey = parse.str()?;
+        let data = parse.vec(
+            parse.len() - (key.len() + langtag.len() + transkey.len() + 5),
+        )?;
 
         let val = if compressed {
             String::from_utf8_lossy(&zlib::decompress(&data)?).to_string()
         } else {
             String::from_utf8_lossy(&data).to_string()
         };
-        Ok((
-            InternationalText {
-                key,
-                langtag,
-                transkey,
-                val,
-                compressed,
-            },
-            chunk.end()?,
-        ))
+        Ok(Chunk::InternationalText(InternationalText {
+            key,
+            langtag,
+            transkey,
+            val,
+            compressed,
+        }))
     }
 
     pub(crate) fn write<W: Write>(
@@ -96,6 +93,6 @@ impl InternationalText {
                 .map_err(EncoderError::Io)?;
         }
 
-        super::encode_chunk(writer, *b"iTXt", &data)
+        super::encode_chunk(writer, consts::ITEXT, &data)
     }
 }

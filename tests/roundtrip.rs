@@ -5,7 +5,7 @@ use pix::{
     rgb::{SRgb8, SRgba8},
     Raster,
 };
-use png_pong::{decode::StepDecoder, encode::StepEncoder, PngRaster};
+use png_pong::{encode::StepEncoder, Decoder, PngRaster};
 use std::io::Cursor;
 
 fn roundtrip_core<F: Pixel<Chan = Ch8>>(raster_a: PngRaster) -> Raster<F> {
@@ -15,7 +15,9 @@ fn roundtrip_core<F: Pixel<Chan = Ch8>>(raster_a: PngRaster) -> Raster<F> {
     encoder.still(&raster_a).unwrap();
 
     // Decode as SRgba8
-    let mut decoder = StepDecoder::new(Cursor::new(file)).expect("Not PNG");
+    let mut decoder = Decoder::new(Cursor::new(file))
+        .expect("Not PNG")
+        .into_steps();
     let raster_b: Raster<F> = decoder.next().unwrap().unwrap().raster.into();
 
     //
@@ -30,7 +32,9 @@ fn roundtrip_core<F: Pixel<Chan = Ch8>>(raster_a: PngRaster) -> Raster<F> {
 fn roundtrip<F: Pixel<Chan = Ch8>>(filename: &str) -> Raster<F> {
     // Decode as SRgba8
     let file = std::fs::read(filename).unwrap();
-    let mut decoder = StepDecoder::new(Cursor::new(file)).expect("Not PNG");
+    let mut decoder = Decoder::new(Cursor::new(file))
+        .expect("Not PNG")
+        .into_steps();
     let raster_a = decoder.next().unwrap().unwrap().raster;
 
     roundtrip_core(raster_a)

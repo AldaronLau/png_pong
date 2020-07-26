@@ -7,8 +7,8 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use super::{checksum::CrcDecoder, DecoderError, EncoderError};
-use crate::consts;
+use super::{Chunk, DecoderError, EncoderError};
+use crate::{consts, decoder::Parser};
 use std::io::{Read, Write};
 
 /// Time chunk (tIME)
@@ -40,31 +40,24 @@ impl Time {
         super::encode_chunk(writer, consts::TIME, &data)
     }
 
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-    ) -> Result<(Time, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::TIME);
-
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
         // 7 Bytes
-        let year = chunk.u16()?;
-        let month = chunk.u8()?;
-        let day = chunk.u8()?;
-        let hour = chunk.u8()?;
-        let minute = chunk.u8()?;
-        let second = chunk.u8()?;
-        //
-        let crc = chunk.end()?;
+        let year = parse.u16()?;
+        let month = parse.u8()?;
+        let day = parse.u8()?;
+        let hour = parse.u8()?;
+        let minute = parse.u8()?;
+        let second = parse.u8()?;
 
-        Ok((
-            Time {
-                year,
-                month,
-                day,
-                hour,
-                minute,
-                second,
-            },
-            crc,
-        ))
+        Ok(Chunk::Time(Time {
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+        }))
     }
 }

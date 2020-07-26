@@ -7,24 +7,23 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use super::{checksum::CrcDecoder, DecoderResult, EncoderError};
-use crate::consts;
-use std::io::{Read, Write};
+use super::{Chunk, DecoderResult, EncoderError};
+use crate::{consts};
+use std::io::{Write};
 
 /// Image End Chunk Data (IEND)
 #[derive(Copy, Clone, Debug)]
 pub struct ImageEnd;
 
 impl ImageEnd {
-    pub(crate) fn read<R: Read>(reader: &mut R) -> DecoderResult<(Self, u32)> {
-        let chunk = CrcDecoder::new(reader, consts::IMAGE_END);
-        Ok((ImageEnd, chunk.end()?))
+    pub(crate) fn parse() -> DecoderResult<Chunk> {
+        Ok(Chunk::ImageEnd(ImageEnd))
     }
 
     pub(crate) fn write<W: Write>(
         &self,
         writer: &mut W,
     ) -> Result<(), EncoderError> {
-        super::encode_chunk(writer, *b"IEND", &[])
+        super::encode_chunk(writer, consts::IMAGE_END, &[])
     }
 }

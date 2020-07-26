@@ -10,8 +10,8 @@
 use std::io::{Read, Write};
 
 use crate::{
-    checksum::CrcDecoder, consts, decode::Error as DecoderError,
-    encode::Error as EncoderError,
+    chunk::Chunk, consts, decode::Error as DecoderError,
+    decoder::Parser, encode::Error as EncoderError,
 };
 
 /// Standard PNG color types.
@@ -116,22 +116,20 @@ impl ImageHeader {
         super::encode_chunk(writer, consts::IMAGE_HEADER, &header)
     }
 
-    pub(crate) fn read<R: Read>(
-        reader: &mut R,
-    ) -> Result<(Self, u32), DecoderError> {
-        let mut chunk = CrcDecoder::new(reader, consts::IMAGE_HEADER);
-
+    pub(crate) fn parse<R: Read>(
+        parse: &mut Parser<R>,
+    ) -> Result<Chunk, DecoderError> {
         // Read file
-        let width = chunk.u32()?;
-        let height = chunk.u32()?;
+        let width = parse.u32()?;
+        let height = parse.u32()?;
         if width == 0 || height == 0 {
             return Err(DecoderError::ImageDimensions);
         }
-        let bit_depth = chunk.u8()?;
+        let bit_depth = parse.u8()?;
         if bit_depth == 0 || bit_depth > 16 {
             return Err(DecoderError::BitDepth(bit_depth));
         }
-        let color_type = match chunk.u8()? {
+        let color_type = match parse.u8()? {
             0 => ColorType::Grey,
             2 => ColorType::Rgb,
             3 => ColorType::Palette,
@@ -140,30 +138,27 @@ impl ImageHeader {
             c => return Err(DecoderError::ColorType(c)),
         };
         color_type.check_png_color_validity(bit_depth)?;
-        if chunk.u8()? != 0 {
+        if parse.u8()? != 0 {
             /*error: only compression method 0 is allowed in the specification*/
             return Err(DecoderError::CompressionMethod);
         }
-        if chunk.u8()? != 0 {
+        if parse.u8()? != 0 {
             /*error: only filter method 0 is allowed in the specification*/
             return Err(DecoderError::FilterMethod);
         }
-        let interlace = match chunk.u8()? {
+        let interlace = match parse.u8()? {
             0 => false,
             1 => true,
             _ => return Err(DecoderError::InterlaceMethod),
         };
-        // Success
-        Ok((
-            ImageHeader {
-                width,
-                height,
-                color_type,
-                bit_depth,
-                interlace,
-            },
-            chunk.end()?,
-        ))
+
+        Ok(Chunk::ImageHeader(Self {
+            width,
+            height,
+            color_type,
+            bit_depth,
+            interlace,
+        }))
     }
 
     /// get the total amount of bits per pixel, based on colortype and bitdepth
