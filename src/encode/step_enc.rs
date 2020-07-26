@@ -12,11 +12,12 @@ use crate::{
     bitstream::{BitstreamReader, BitstreamWriter},
     chunk::{ColorType, ImageHeader},
     chunk::{ImageData, ImageEnd, Palette as PaletteChunk, Transparency},
-    encode::{filter, ChunkEnc, Error as EncoderError, Result, FilterStrategy},
-    PngRaster, Step, encoder::Enc,
+    encode::{filter, ChunkEnc, Error as EncoderError, FilterStrategy, Result},
+    encoder::Enc,
+    PngRaster, Step,
 };
 use pix::rgb::SRgb8;
-use std::io::{self, Write};
+use std::io::Write;
 
 /// Frame Encoder for PNG files.
 #[derive(Debug)]
@@ -28,9 +29,7 @@ pub struct StepEnc<W: Write> {
 
 impl<W: Write> StepEnc<W> {
     /// Create a new encoder.
-    pub(crate) fn new(
-        encoder: ChunkEnc<W>,
-    ) -> Self {
+    pub(crate) fn new(encoder: ChunkEnc<W>) -> Self {
         Self {
             encoder,
             coldepth: None,
@@ -137,7 +136,12 @@ pub(super) fn encode<W: Write>(
         .check_png_color_validity(header.bit_depth)
         .unwrap();
 
-    let data = pre_process_scanlines(image, header, enc.filter_strategy(), enc.level())?;
+    let data = pre_process_scanlines(
+        image,
+        header,
+        enc.filter_strategy(),
+        enc.level(),
+    )?;
 
     header.write(enc)?;
 

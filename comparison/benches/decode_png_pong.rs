@@ -3,10 +3,11 @@ extern crate criterion;
 
 fn png_pong(c: &mut criterion::Criterion, file: &str) {
     let data = std::fs::read(file).expect("Failed to open PNG");
-    c.bench_function(file, |b| {
+    c.bench_function(&format!("PNG Pong Decoder: {}", file), |b| {
         b.iter(|| {
             let data = std::io::Cursor::new(data.as_slice());
-            let decoder = png_pong::StepDecoder::new(data);
+            let decoder =
+                png_pong::Decoder::new(data).expect("Not PNG").into_steps();
             let png_pong::Step { raster, delay: _ } = decoder
                 .last()
                 .expect("No frames in PNG")

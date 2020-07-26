@@ -5,7 +5,8 @@ fn imagine(c: &mut criterion::Criterion, file: &str) {
     let data = std::fs::read(file).expect("Failed to open PNG");
     c.bench_function(file, |b| {
         b.iter(|| {
-            let image = imagine::png::parse_png_rgba8(&data).expect("Failed to decode with imagine");
+            let image = imagine::png::parse_png_rgba8(&data)
+                .expect("Failed to decode with imagine");
             let _ = image;
         })
     });

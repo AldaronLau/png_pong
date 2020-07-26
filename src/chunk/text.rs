@@ -44,7 +44,7 @@ impl Text {
         if self.key.as_bytes().is_empty() || self.val.as_bytes().len() > 79 {
             return Err(EncoderError::TextSize(self.val.as_bytes().len()));
         }
-        
+
         // 1 Null-terminated string, 1 string
         enc.prepare(self.key.len() + self.val.len() + 1, consts::TEXT)?;
         enc.str(&self.key)?;

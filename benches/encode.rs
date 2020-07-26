@@ -4,7 +4,7 @@ extern crate criterion;
 fn encode(c: &mut criterion::Criterion) {
     let data = std::fs::read("./tests/png/4.png").expect("Failed to open PNG");
     let data = std::io::Cursor::new(data);
-    let decoder = png_pong::decode::StepDecoder::new(data).expect("Not PNG");
+    let decoder = png_pong::Decoder::new(data).expect("Not PNG").into_steps();
     let step = decoder
         .last()
         .expect("No frames in PNG")
@@ -13,7 +13,7 @@ fn encode(c: &mut criterion::Criterion) {
         b.iter(|| {
             let mut out_data = Vec::new();
             let mut encoder =
-                png_pong::encode::StepEncoder::new(&mut out_data, None, 6);
+                png_pong::Encoder::new(&mut out_data).into_step_enc();
             encoder.encode(&step).expect("Failed to add frame");
         })
     });

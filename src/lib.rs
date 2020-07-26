@@ -69,7 +69,6 @@ pub(crate) mod decoder;
 
 mod adam7;
 mod bitstream;
-mod checksum;
 mod consts;
 mod encoder;
 mod raster;

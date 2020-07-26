@@ -2,10 +2,9 @@
 extern crate criterion;
 
 fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
-    let data =
-        std::fs::read(file).expect("Failed to open PNG");
+    let data = std::fs::read(file).expect("Failed to open PNG");
     let data = std::io::Cursor::new(data);
-    let decoder = png_pong::StepDecoder::new(data);
+    let decoder = png_pong::Decoder::new(data).expect("Not PNG").into_steps();
     let step = decoder
         .last()
         .expect("No frames in PNG")
@@ -30,9 +29,17 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                     message: [0; 64],
                 };
                 // 3. Call png_image_write...
-                let mut memory: *mut std::ffi::c_void = std::ptr::null_mut();
+                let memory: *mut std::ffi::c_void = std::ptr::null_mut();
                 let mut memory_bytes = 0;
-                let _r = libpng_sys::ffi::png_image_write_to_memory(&mut png_image, memory, &mut memory_bytes, 0, raster.as_u8_slice().as_ptr().cast(), raster.width() as i32, std::ptr::null());
+                let _r = libpng_sys::ffi::png_image_write_to_memory(
+                    &mut png_image,
+                    memory,
+                    &mut memory_bytes,
+                    0,
+                    raster.as_u8_slice().as_ptr().cast(),
+                    raster.width() as i32,
+                    std::ptr::null(),
+                );
             })
         });
     } else {
@@ -57,7 +64,15 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                 // 3. Call png_image_write...
                 let mut memory = Vec::with_capacity(100_000_000);
                 let mut memory_bytes = 100_000_000;
-                let _r = libpng_sys::ffi::png_image_write_to_memory(&mut png_image, memory.as_mut_ptr(), &mut memory_bytes, 0, raster.as_u8_slice().as_ptr().cast(), raster.width() as i32, std::ptr::null());
+                let _r = libpng_sys::ffi::png_image_write_to_memory(
+                    &mut png_image,
+                    memory.as_mut_ptr(),
+                    &mut memory_bytes,
+                    0,
+                    raster.as_u8_slice().as_ptr().cast(),
+                    raster.width() as i32,
+                    std::ptr::null(),
+                );
                 memory.set_len(memory_bytes);
             })
         });

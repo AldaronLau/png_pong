@@ -7,8 +7,11 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::{io::Write, convert::TryInto};
-use crate::{consts, encode::{Error, Result, StepEnc, ChunkEnc, FilterStrategy}};
+use crate::{
+    consts,
+    encode::{ChunkEnc, Error, FilterStrategy, Result, StepEnc},
+};
+use std::{convert::TryInto, io::Write};
 
 /// Chunk encoder.
 #[derive(Debug)]
@@ -22,9 +25,12 @@ pub(crate) struct Enc<W: Write> {
 impl<W: Write> Enc<W> {
     /// Prepare a chunk for writing (reset checksum).
     pub(crate) fn prepare(&mut self, len: usize, name: [u8; 4]) -> Result<()> {
-        dbg!(String::from_utf8_lossy(&name));
+        assert!(len <= consts::MAX_CHUNK_SIZE);
         let len: u32 = len.try_into().unwrap();
-        self.encode.writer.write_all(&len.to_be_bytes()).map_err(Error::from)?;
+        self.encode
+            .writer
+            .write_all(&len.to_be_bytes())
+            .map_err(Error::from)?;
         self.chksum = consts::CRC32_INIT;
         for c in name.iter().cloned() {
             self.u8(c)?;
@@ -34,12 +40,15 @@ impl<W: Write> Enc<W> {
 
     /// Write a u8
     pub(crate) fn u8(&mut self, value: u8) -> Result<()> {
-        self.encode.writer.write_all(&[value]).map_err(Error::from)?;
+        self.encode
+            .writer
+            .write_all(&[value])
+            .map_err(Error::from)?;
         let index: usize = (self.chksum as u8 ^ value).into();
         self.chksum = consts::CRC32_LOOKUP[index] ^ (self.chksum >> 8);
         Ok(())
     }
-    
+
     /// Write a u16
     pub(crate) fn u16(&mut self, value: u16) -> Result<()> {
         let bytes = value.to_be_bytes();
@@ -48,7 +57,7 @@ impl<W: Write> Enc<W> {
         }
         Ok(())
     }
-    
+
     /// Write a u32
     pub(crate) fn u32(&mut self, value: u32) -> Result<()> {
         let bytes = value.to_be_bytes();
@@ -65,13 +74,13 @@ impl<W: Write> Enc<W> {
         }
         Ok(())
     }
-    
+
     /// Write a null-terminated string
     pub(crate) fn str(&mut self, value: &str) -> Result<()> {
         self.string(value)?;
         self.u8(0)
     }
-    
+
     /// Write raw data
     pub(crate) fn raw(&mut self, raw: &[u8]) -> Result<()> {
         for byte in raw.iter().cloned() {
@@ -83,7 +92,10 @@ impl<W: Write> Enc<W> {
     /// Calculate and write Chunk CRC, ending the chunk.
     pub(crate) fn write_crc(&mut self) -> Result<()> {
         let crc = self.chksum ^ consts::CRC32_INIT;
-        self.encode.writer.write_all(&crc.to_be_bytes()).map_err(Error::from)
+        self.encode
+            .writer
+            .write_all(&crc.to_be_bytes())
+            .map_err(Error::from)
     }
 
     /// Get the chosen filter strategy    
@@ -131,10 +143,10 @@ impl<W: Write> Encoder<W> {
             interlace: false,
         }
     }
-    
+
     /// Set a specific filter strategy.  If this is never called, than png_pong
     /// attempts to choose the best (compromise speed / compression) filter
-    /// strategy. 
+    /// strategy.
     pub fn filter_strategy(mut self, strategy: FilterStrategy) -> Self {
         self.filter_strategy = Some(strategy);
         self
@@ -146,7 +158,7 @@ impl<W: Write> Encoder<W> {
         self.level = level;
         self
     }
-    
+
     /// Encode interlaced (default non-interlaced)
     pub fn interlace(mut self) -> Self {
         self.interlace = true;
@@ -162,7 +174,7 @@ impl<W: Write> Encoder<W> {
     pub fn into_step_enc(self) -> StepEnc<W> {
         StepEnc::new(self.into_chunk_enc())
     }
-    
+
     fn into_enc(self) -> Enc<W> {
         Enc {
             encode: self,

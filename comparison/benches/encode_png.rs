@@ -2,10 +2,9 @@
 extern crate criterion;
 
 fn png(c: &mut criterion::Criterion, file: &str, alpha: bool) {
-    let data =
-        std::fs::read(file).expect("Failed to open PNG");
+    let data = std::fs::read(file).expect("Failed to open PNG");
     let data = std::io::Cursor::new(data);
-    let decoder = png_pong::StepDecoder::new(data);
+    let decoder = png_pong::Decoder::new(data).expect("Not PNG").into_steps();
     let step = decoder
         .last()
         .expect("No frames in PNG")
@@ -18,7 +17,11 @@ fn png(c: &mut criterion::Criterion, file: &str, alpha: bool) {
         c.bench_function(file, |b| {
             b.iter(|| {
                 let mut out_data = Vec::new();
-                let mut encoder = png::Encoder::new(&mut out_data, raster.width(), raster.height());
+                let mut encoder = png::Encoder::new(
+                    &mut out_data,
+                    raster.width(),
+                    raster.height(),
+                );
                 encoder.set_color(png::ColorType::RGBA);
                 encoder.set_depth(png::BitDepth::Eight);
                 let mut writer = encoder.write_header().unwrap();
@@ -33,7 +36,11 @@ fn png(c: &mut criterion::Criterion, file: &str, alpha: bool) {
         c.bench_function(file, |b| {
             b.iter(|| {
                 let mut out_data = Vec::new();
-                let mut encoder = png::Encoder::new(&mut out_data, raster.width(), raster.height());
+                let mut encoder = png::Encoder::new(
+                    &mut out_data,
+                    raster.width(),
+                    raster.height(),
+                );
                 encoder.set_color(png::ColorType::RGB);
                 encoder.set_depth(png::BitDepth::Eight);
                 let mut writer = encoder.write_header().unwrap();

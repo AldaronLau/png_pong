@@ -5,7 +5,7 @@ use pix::{
     rgb::{SRgb8, SRgba8},
     Raster,
 };
-use png_pong::{Encoder, Decoder, PngRaster};
+use png_pong::{Decoder, Encoder, PngRaster};
 use std::io::Cursor;
 
 fn roundtrip_core<F: Pixel<Chan = Ch8>>(raster_a: PngRaster) -> Raster<F> {

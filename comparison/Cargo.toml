@@ -21,11 +21,11 @@ afi = "=0.8.0-pre0"
 version = "0.3"
 
 [[bench]]
-name = "encode"
+name = "encode_png_pong"
 harness = false
 
 [[bench]]
-name = "decode"
+name = "decode_png_pong"
 harness = false
 
 [[bench]]

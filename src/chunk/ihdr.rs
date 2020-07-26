@@ -10,8 +10,8 @@
 use std::io::{Read, Write};
 
 use crate::{
-    chunk::Chunk, consts, decode::Error as DecoderError,
-    decoder::Parser, encode::Error as EncoderError, encoder::Enc
+    chunk::Chunk, consts, decode::Error as DecoderError, decoder::Parser,
+    encode::Error as EncoderError, encoder::Enc,
 };
 
 /// Standard PNG color types.

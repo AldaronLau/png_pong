@@ -2,15 +2,14 @@
 extern crate criterion;
 
 fn lodepng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
-    let data =
-        std::fs::read(file).expect("Failed to open PNG");
+    let data = std::fs::read(file).expect("Failed to open PNG");
     let data = std::io::Cursor::new(data);
-    let decoder = png_pong::StepDecoder::new(data);
+    let decoder = png_pong::Decoder::new(data).expect("Not PNG").into_steps();
     let step = decoder
         .last()
         .expect("No frames in PNG")
         .expect("PNG parsing error");
-      
+
     if alpha {
         let raster = match step.raster {
             png_pong::PngRaster::Rgba8(ok) => ok,
@@ -18,7 +17,14 @@ fn lodepng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
         };
         c.bench_function(file, |b| {
             b.iter(|| {
-                let mut out_data = lodepng::encode_memory(raster.as_u8_slice(), raster.width() as usize, raster.height() as usize, lodepng::ColorType::RGBA, 8).expect("Failed to encode with lodepng");
+                let out_data = lodepng::encode_memory(
+                    raster.as_u8_slice(),
+                    raster.width() as usize,
+                    raster.height() as usize,
+                    lodepng::ColorType::RGBA,
+                    8,
+                )
+                .expect("Failed to encode with lodepng");
                 let _ = out_data;
             })
         });
@@ -29,7 +35,14 @@ fn lodepng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
         };
         c.bench_function(file, |b| {
             b.iter(|| {
-                let mut out_data = lodepng::encode_memory(raster.as_u8_slice(), raster.width() as usize, raster.height() as usize, lodepng::ColorType::RGB, 8).expect("Failed to encode with lodepng");
+                let out_data = lodepng::encode_memory(
+                    raster.as_u8_slice(),
+                    raster.width() as usize,
+                    raster.height() as usize,
+                    lodepng::ColorType::RGB,
+                    8,
+                )
+                .expect("Failed to encode with lodepng");
                 let _ = out_data;
             })
         });

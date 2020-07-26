@@ -6,7 +6,8 @@ fn imagefmt(c: &mut criterion::Criterion, file: &str) {
     c.bench_function(file, |b| {
         b.iter(|| {
             let mut data = std::io::Cursor::new(data.as_slice());
-            let image = imagefmt::read_from(&mut data, imagefmt::ColFmt::Auto).expect("Failed to decode");
+            let image = imagefmt::read_from(&mut data, imagefmt::ColFmt::Auto)
+                .expect("Failed to decode");
             let _ = image;
         })
     });

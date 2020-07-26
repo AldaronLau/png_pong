@@ -6,14 +6,16 @@ fn aci(c: &mut criterion::Criterion, file: &str, alpha: bool) {
     if alpha {
         c.bench_function(file, |b| {
             b.iter(|| {
-                let video = aci_png::decode(&data, afi::ColorChannels::Srgba).expect("Failed to load PNG");
+                let video = aci_png::decode(&data, afi::ColorChannels::Srgba)
+                    .expect("Failed to load PNG");
                 let _ = video;
             })
         });
     } else {
         c.bench_function(file, |b| {
             b.iter(|| {
-                let video = aci_png::decode(&data, afi::ColorChannels::Srgb).expect("Failed to load PNG");
+                let video = aci_png::decode(&data, afi::ColorChannels::Srgb)
+                    .expect("Failed to load PNG");
                 let _ = video;
             })
         });

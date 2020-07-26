@@ -43,7 +43,11 @@ impl<R: Read> Parser<R> {
         // Start checksum over
         self.chksum = consts::CRC32_INIT;
         // Return chunk name
-        Ok(Some([self.u8()?, self.u8()?, self.u8()?, self.u8()?]))
+        let name = [self.u8()?, self.u8()?, self.u8()?, self.u8()?];
+        if self.length > consts::MAX_CHUNK_SIZE as u32 {
+            return Err(Error::ChunkLength(name));
+        }
+        Ok(Some(name))
     }
 
     /// Call this when palette chunk is found, whether or not it shows up
@@ -87,7 +91,10 @@ impl<R: Read> Parser<R> {
     /// Get a u8 out of the reader.
     pub(crate) fn u8(&mut self) -> Result<u8> {
         let mut byte = [0; 1];
-        self.decode.reader.read_exact(&mut byte).map_err(Error::from)?;
+        self.decode
+            .reader
+            .read_exact(&mut byte)
+            .map_err(Error::from)?;
         let index: usize = (self.chksum as u8 ^ byte[0]).into();
         self.chksum = consts::CRC32_LOOKUP[index] ^ (self.chksum >> 8);
         Ok(byte[0])

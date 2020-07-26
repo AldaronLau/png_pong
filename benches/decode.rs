@@ -7,7 +7,7 @@ fn decode(c: &mut criterion::Criterion) {
         b.iter(|| {
             let data = std::io::Cursor::new(data.as_slice());
             let decoder =
-                png_pong::decode::StepDecoder::new(data).expect("Not PNG");
+                png_pong::Decoder::new(data).expect("Not PNG").into_steps();
             let png_pong::Step { raster, delay: _ } = decoder
                 .last()
                 .expect("No frames in PNG")

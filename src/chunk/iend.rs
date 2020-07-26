@@ -9,7 +9,7 @@
 
 use super::{Chunk, DecoderResult, EncoderError};
 use crate::{consts, encoder::Enc};
-use std::io::{Write};
+use std::io::Write;
 
 /// Image End Chunk Data (IEND)
 #[derive(Copy, Clone, Debug)]

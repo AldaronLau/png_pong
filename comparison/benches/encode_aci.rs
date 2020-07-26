@@ -4,10 +4,9 @@ extern crate criterion;
 use afi::EncoderV;
 
 fn aci(c: &mut criterion::Criterion, file: &str, alpha: bool) {
-    let data =
-        std::fs::read(file).expect("Failed to open PNG");
+    let data = std::fs::read(file).expect("Failed to open PNG");
     let data = std::io::Cursor::new(data);
-    let decoder = png_pong::StepDecoder::new(data);
+    let decoder = png_pong::Decoder::new(data).expect("Not PNG").into_steps();
     let step = decoder
         .last()
         .expect("No frames in PNG")
@@ -19,7 +18,11 @@ fn aci(c: &mut criterion::Criterion, file: &str, alpha: bool) {
         };
         c.bench_function(file, |b| {
             b.iter(|| {
-                let mut encoder = aci_png::PngEncoder::new(&afi::Video::new(afi::ColorChannels::Srgba, (raster.width() as u16, raster.height() as u16), 1));
+                let mut encoder = aci_png::PngEncoder::new(&afi::Video::new(
+                    afi::ColorChannels::Srgba,
+                    (raster.width() as u16, raster.height() as u16),
+                    1,
+                ));
                 encoder.run(&afi::VFrame(raster.as_u8_slice().to_vec()));
                 let out_data = encoder.end();
                 let _ = out_data;

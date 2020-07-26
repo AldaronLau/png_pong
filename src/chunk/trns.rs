@@ -63,7 +63,10 @@ impl Transparency {
         }
     }
 
-    pub(crate) fn write<W: Write>(&self, enc: &mut Enc<W>) -> EncoderResult<()> {
+    pub(crate) fn write<W: Write>(
+        &self,
+        enc: &mut Enc<W>,
+    ) -> EncoderResult<()> {
         use Transparency::*;
         match self {
             Palette(plte) => {
@@ -81,7 +84,7 @@ impl Transparency {
             GrayKey(key) => {
                 enc.prepare(2, consts::TRANSPARENCY)?;
                 enc.u16(*key)?
-            },
+            }
         }
         enc.write_crc()
     }

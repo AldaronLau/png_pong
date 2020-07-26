@@ -23,7 +23,7 @@ pub(super) const TIME: [u8; 4] = *b"tIME";
 pub(super) const ZTEXT: [u8; 4] = *b"zTXt";
 pub(super) const TEXT: [u8; 4] = *b"tEXt";
 
-pub(super) const MAX_CHUNK_SIZE: u32 = 1 << 31; // 2³¹
+pub(super) const MAX_CHUNK_SIZE: usize = 1 << 31; // 2³¹
 
 // Initial value for CRC32 Checksum
 pub(super) const CRC32_INIT: u32 = 4_294_967_295;

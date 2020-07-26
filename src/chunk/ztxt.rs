@@ -33,7 +33,7 @@ impl CompressedText {
         if self.key.as_bytes().is_empty() || self.key.as_bytes().len() > 79 {
             return Err(EncoderError::TextSize(self.key.len()));
         }
-        
+
         // Compress text
         let mut zdata = Vec::new();
         zlib::compress(&mut zdata, self.val.as_bytes(), enc.level());

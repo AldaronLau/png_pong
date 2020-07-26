@@ -9,8 +9,8 @@
 
 use super::Chunk;
 use crate::{
-    consts, decode::Error as DecoderError,
-    decoder::Parser, encode::Error as EncoderError, zlib, encoder::Enc,
+    consts, decode::Error as DecoderError, decoder::Parser,
+    encode::Error as EncoderError, encoder::Enc, zlib,
 };
 use std::io::{Read, Write};
 
@@ -83,9 +83,12 @@ impl InternationalText {
         } else {
             None
         };
-        
+
         // Encode
-        enc.prepare(self.key.len() + self.langtag.len() + self.transkey.len() + 5, consts::ITEXT)?;
+        enc.prepare(
+            self.key.len() + self.langtag.len() + self.transkey.len() + 5,
+            consts::ITEXT,
+        )?;
         enc.str(&self.key)?;
         enc.u8(self.compressed as u8)?;
         enc.u8(0)?;

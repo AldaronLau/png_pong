@@ -7,14 +7,18 @@ fn lodepng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
     if alpha {
         c.bench_function(file, |b| {
             b.iter(|| {
-                let image = lodepng::decode_memory(data, lodepng::ColorType::RGBA, 8).expect("Failed to decode with lodepng");
+                let image =
+                    lodepng::decode_memory(data, lodepng::ColorType::RGBA, 8)
+                        .expect("Failed to decode with lodepng");
                 let _ = image;
             })
         });
     } else {
         c.bench_function(file, |b| {
             b.iter(|| {
-                let image = lodepng::decode_memory(data, lodepng::ColorType::RGB, 8).expect("Failed to decode with lodepng");
+                let image =
+                    lodepng::decode_memory(data, lodepng::ColorType::RGB, 8)
+                        .expect("Failed to decode with lodepng");
                 let _ = image;
             })
         });

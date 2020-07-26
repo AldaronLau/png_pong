@@ -10,9 +10,8 @@
 use std::io::{Read, Write};
 
 use crate::{
-    chunk::Chunk, consts,
-    decode::Result as DecoderResult, decoder::Parser,
-    encode::Error as EncoderError, zlib, encoder::Enc,
+    chunk::Chunk, consts, decode::Result as DecoderResult, decoder::Parser,
+    encode::Error as EncoderError, encoder::Enc, zlib,
 };
 
 /// Image Data Chunk Data (IDAT)
@@ -37,7 +36,7 @@ impl ImageData {
         // FIXME: Should already be compressed.
         let mut zlib = Vec::new();
         zlib::compress(&mut zlib, self.data.as_slice(), enc.level());
-        
+
         //
         enc.prepare(zlib.len(), consts::IMAGE_DATA)?;
         enc.raw(&zlib)?;

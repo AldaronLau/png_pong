@@ -19,26 +19,56 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                 message: [0; 64],
             };
             // 2. Begin read
-            let r = libpng_sys::ffi::png_image_begin_read_from_memory(&mut png_image, data.as_ptr().cast(), data.len());
+            let _r = libpng_sys::ffi::png_image_begin_read_from_memory(
+                &mut png_image,
+                data.as_ptr().cast(),
+                data.len(),
+            );
             if alpha {
                 // 3. Set required sample format
                 png_image.format = libpng_sys::ffi::PNG_FORMAT_RGBA as u32;
                 // 4. Allocate buffer for image
-                let mut raster = pix::Raster::<pix::rgb::SRgba8>::with_clear(png_image.width, png_image.height);
+                let mut raster = pix::Raster::<pix::rgb::SRgba8>::with_clear(
+                    png_image.width,
+                    png_image.height,
+                );
                 // 5. Call png_image_finish_read
                 let row_stride = png_image.width as i32;
-                let bg = libpng_sys::ffi::png_color { red: 0, green: 0, blue: 0 };
-                let _r = libpng_sys::ffi::png_image_finish_read(&mut png_image, &bg, raster.as_u8_slice_mut().as_mut_ptr().cast(), row_stride, std::ptr::null_mut());
+                let bg = libpng_sys::ffi::png_color {
+                    red: 0,
+                    green: 0,
+                    blue: 0,
+                };
+                let _r = libpng_sys::ffi::png_image_finish_read(
+                    &mut png_image,
+                    &bg,
+                    raster.as_u8_slice_mut().as_mut_ptr().cast(),
+                    row_stride,
+                    std::ptr::null_mut(),
+                );
                 let _ = raster;
             } else {
                 // 3. Set required sample format
                 png_image.format = libpng_sys::ffi::PNG_FORMAT_RGB as u32;
                 // 4. Allocate buffer for image
-                let mut raster = pix::Raster::<pix::rgb::SRgb8>::with_clear(png_image.width, png_image.height);
+                let mut raster = pix::Raster::<pix::rgb::SRgb8>::with_clear(
+                    png_image.width,
+                    png_image.height,
+                );
                 // 5. Call png_image_finish_read
                 let row_stride = png_image.width as i32;
-                let bg = libpng_sys::ffi::png_color { red: 0, green: 0, blue: 0 };
-                let _r = libpng_sys::ffi::png_image_finish_read(&mut png_image, &bg, raster.as_u8_slice_mut().as_mut_ptr().cast(), row_stride, std::ptr::null_mut());
+                let bg = libpng_sys::ffi::png_color {
+                    red: 0,
+                    green: 0,
+                    blue: 0,
+                };
+                let _r = libpng_sys::ffi::png_image_finish_read(
+                    &mut png_image,
+                    &bg,
+                    raster.as_u8_slice_mut().as_mut_ptr().cast(),
+                    row_stride,
+                    std::ptr::null_mut(),
+                );
                 let _ = raster;
             }
         })

@@ -9,9 +9,8 @@
 
 use crate::{
     chunk::{
-        Background, Chunk, CompressedText, ImageData, ImageEnd,
-        ImageHeader, InternationalText, Palette, Physical, Text, Time,
-        Transparency,
+        Background, Chunk, CompressedText, ImageData, ImageEnd, ImageHeader,
+        InternationalText, Palette, Physical, Text, Time, Transparency,
     },
     consts,
     decode::{Error, Result},
@@ -40,7 +39,6 @@ impl<R: Read> Chunks<R> {
         } else {
             return Ok(None);
         };
-        println!("GOT TNAME {:?}", String::from_utf8_lossy(&name));
         // Choose correct parser for the chunk based on it's name.
         use consts::*;
         let chunk = match name {
