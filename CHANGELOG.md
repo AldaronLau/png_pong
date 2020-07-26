@@ -4,6 +4,42 @@ All notable changes to PNG Pong will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 
+## 0.6.0 - 2020-07-26
+### Added
+- `chunk::ColorType` and `PngRaster` for reading PNGs without conversion
+- Lots of chunks to the Chunk API
+  - `CompressedText`
+  - `ImageData`
+  - `ImageEnd`
+  - `ImageHeader`
+  - `Palette`
+  - `Physical`
+  - `Time`
+  - `Background`
+  - `Transparency`
+- `encode::Result`
+- `decode::Result`
+- `Decoder` - A builder for decoder types
+- `Encoder` - A builder for encoder types
+
+### Changed
+- Renamed `EncodeError` -> `encode::Error`
+- Renamed `DecodeError` -> `decode::Error`
+- Renamed `chunk::TextChunk` -> `chunk::Text`
+- Renamed `chunk::ITextChunk` -> `InternationalText`
+- Renamed `Frame` -> `Step`
+- Renamed `ChunkDecoder` -> `decode::Chunks`
+- Renamed `ChunkEncoder` -> `encode::ChunkEnc`
+- Renamed `FrameDecoder` -> `decode::Steps`
+- Renamed `FrameEncoder` -> `encode::StepEnc`
+
+### Removed
+- `Format` trait
+- `ParseError`, the very lame integer error.
+
+### Fixed
+- Chunk APIs not working
+
 ## 0.5.0 - 2020-05-05
 ### Changed
 - Update to pix 0.13

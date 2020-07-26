@@ -7,14 +7,14 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! A library for decoding and encoding GIF images and animations.
+//! A library for decoding and encoding PNG images and APNG animations.
 //!
 //! ## Getting Started
 //! Add the following to your `Cargo.toml`.
 //!
 //! ```toml
 //! [dependencies.png_pong]
-//! version = "0.5"
+//! version = "0.6"
 //! ```
 //!
 //! ### Example
