@@ -10,7 +10,7 @@
 use super::Chunk;
 use crate::{
     consts, decode::Error as DecoderError,
-    decoder::Parser, encode::Error as EncoderError, zlib,
+    decoder::Parser, encode::Error as EncoderError, zlib, encoder::Enc,
 };
 use std::io::{Read, Write};
 
@@ -67,32 +67,35 @@ impl InternationalText {
 
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
-        level: u8,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
+        // Checks
         let k_len = self.key.len();
         if k_len < 1 || k_len > 79 {
             return Err(EncoderError::TextSize(k_len));
         }
-        let mut data = Vec::new();
-        data.write_all(self.key.as_bytes())
-            .map_err(EncoderError::Io)?;
-        super::encode_u8(&mut data, 0)?;
-        super::encode_u8(&mut data, self.compressed as u8)?;
-        super::encode_u8(&mut data, 0)?;
-        data.write_all(self.langtag.as_bytes())
-            .map_err(EncoderError::Io)?;
-        super::encode_u8(&mut data, 0)?;
-        data.write_all(self.transkey.as_bytes())
-            .map_err(EncoderError::Io)?;
-        super::encode_u8(&mut data, 0)?;
-        if self.compressed {
-            zlib::compress(&mut data, self.val.as_bytes(), level);
-        } else {
-            data.write_all(self.val.as_bytes())
-                .map_err(EncoderError::Io)?;
-        }
 
-        super::encode_chunk(writer, consts::ITEXT, &data)
+        // Maybe compress
+        let zdata = if self.compressed {
+            let mut data = Vec::new();
+            zlib::compress(&mut data, self.val.as_bytes(), enc.level());
+            Some(data)
+        } else {
+            None
+        };
+        
+        // Encode
+        enc.prepare(self.key.len() + self.langtag.len() + self.transkey.len() + 5, consts::ITEXT)?;
+        enc.str(&self.key)?;
+        enc.u8(self.compressed as u8)?;
+        enc.u8(0)?;
+        enc.str(&self.langtag)?;
+        enc.str(&self.transkey)?;
+        if let Some(zdata) = zdata {
+            enc.raw(&zdata)?;
+        } else {
+            enc.raw(self.val.as_bytes())?;
+        }
+        enc.write_crc()
     }
 }

@@ -32,10 +32,7 @@ impl<R: Read> Parser<R> {
     /// Prepare a chunk for reading, returning it's name.
     pub(crate) fn prepare(&mut self) -> Result<Option<[u8; 4]>> {
         let first = match self.u8() {
-            Ok(first) => {
-                dbg!(first);
-                first
-            }
+            Ok(first) => first,
             Err(Error::Io(e)) if e.kind() == ErrorKind::UnexpectedEof => {
                 return Ok(None)
             }
@@ -193,8 +190,7 @@ pub struct Decoder<R: Read> {
 }
 
 impl<R: Read> Decoder<R> {
-    /// Create a new PNG decoder.  Returns `Err(InvalidSignature)` if it's not a
-    /// PNG file.
+    /// Create a new PNG decoder.  Returns `Err` if it's not a PNG file.
     pub fn new(mut reader: R) -> Result<Self> {
         // Read first 8 bytes (PNG Signature)
         let mut buf = [0u8; 8];

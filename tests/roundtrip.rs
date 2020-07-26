@@ -5,13 +5,13 @@ use pix::{
     rgb::{SRgb8, SRgba8},
     Raster,
 };
-use png_pong::{encode::StepEncoder, Decoder, PngRaster};
+use png_pong::{Encoder, Decoder, PngRaster};
 use std::io::Cursor;
 
 fn roundtrip_core<F: Pixel<Chan = Ch8>>(raster_a: PngRaster) -> Raster<F> {
     // Encode as SRgba8
     let mut file = Vec::<u8>::new();
-    let mut encoder = StepEncoder::new(&mut file, None, 6);
+    let mut encoder = Encoder::new(&mut file).into_step_enc();
     encoder.still(&raster_a).unwrap();
 
     // Decode as SRgba8

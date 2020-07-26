@@ -12,142 +12,119 @@ use crate::{
     bitstream::{BitstreamReader, BitstreamWriter},
     chunk::{ColorType, ImageHeader},
     chunk::{ImageData, ImageEnd, Palette as PaletteChunk, Transparency},
-    encode::{filter, ChunkEncoder, Error as EncoderError, FilterStrategy},
-    PngRaster, Step,
+    encode::{filter, ChunkEnc, Error as EncoderError, Result, FilterStrategy},
+    PngRaster, Step, encoder::Enc,
 };
 use pix::rgb::SRgb8;
 use std::io::{self, Write};
 
 /// Frame Encoder for PNG files.
 #[derive(Debug)]
-pub struct StepEncoder<W: Write> {
-    encoder: ChunkEncoder<W>,
+pub struct StepEnc<W: Write> {
+    encoder: ChunkEnc<W>,
     coldepth: Option<(ColorType, u32)>,
-    filter_strategy: Option<FilterStrategy>,
-    interlace: bool,
     header: Option<ImageHeader>,
 }
 
-impl<W: Write> StepEncoder<W> {
+impl<W: Write> StepEnc<W> {
     /// Create a new encoder.
-    pub fn new(
-        w: W,
-        filter_strategy: Option<FilterStrategy>,
-        level: u8,
+    pub(crate) fn new(
+        encoder: ChunkEnc<W>,
     ) -> Self {
         Self {
-            encoder: ChunkEncoder::new(w, level),
+            encoder,
             coldepth: None,
-            filter_strategy,
-            interlace: false, // FIXME: add parameter via builder
             header: None,
         }
     }
 
     /// Encode a still.
-    pub fn still(&mut self, raster: &PngRaster) -> io::Result<()> {
+    pub fn still(&mut self, raster: &PngRaster) -> Result<()> {
         use PngRaster::*;
-        let fs = self.filter_strategy;
-        let image_header = raster.header(self.interlace);
+        let image_header = raster.header(self.encoder.enc.interlace());
 
-        let bytes = match raster {
+        match raster {
             Rgb8(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Rgba8(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Rgb16(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Rgba16(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Gray8(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Gray16(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Graya8(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Graya16(r) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 &[],
                 &[],
-                self.encoder.level,
             ),
             Palette(r, pal_rgb, pal_a) => encode(
+                &mut self.encoder.enc,
                 r.as_u8_slice(),
                 &image_header,
-                fs,
                 pal_rgb.colors(),
                 pal_a.as_slice(),
-                self.encoder.level,
             ),
-        };
-        let bytes = match bytes {
-            Ok(o) => o,
-            Err(e) => panic!("Encoding failure bug: {:?}!", e),
-        };
-        match self.encoder.bytes.write(&bytes) {
-            Ok(_size) => Ok(()),
-            Err(e) => Err(e),
         }
     }
 
     /// Encode one [`Step`](struct.Step.html) of an animation.
-    pub fn encode(&mut self, frame: &Step) -> io::Result<()> {
+    pub fn encode(&mut self, frame: &Step) -> Result<()> {
         self.still(&frame.raster)
     }
 }
 
-pub(super) fn encode(
+pub(super) fn encode<W: Write>(
+    enc: &mut Enc<W>,
     image: &[u8],
     header: &ImageHeader,
-    filter_strategy: Option<FilterStrategy>,
     palette: &[SRgb8],
     transparency: &[u8],
-    level: u8,
-) -> Result<Vec<u8>, EncoderError> {
+) -> Result<()> {
+    enc.raw(&crate::consts::PNG_SIGNATURE)?;
+
     let transparency = Transparency::Palette(transparency.to_vec());
 
     if header.color_type == ColorType::Palette
@@ -160,21 +137,19 @@ pub(super) fn encode(
         .check_png_color_validity(header.bit_depth)
         .unwrap();
 
-    let data = pre_process_scanlines(image, header, filter_strategy, level)?;
+    let data = pre_process_scanlines(image, header, enc.filter_strategy(), enc.level())?;
 
-    let mut outv = crate::consts::PNG_SIGNATURE.to_vec();
-
-    header.write(&mut outv)?;
+    header.write(enc)?;
 
     if header.color_type == ColorType::Palette {
         let palette = PaletteChunk {
             palette: palette.to_vec(),
         };
 
-        palette.write(&mut outv)?;
+        palette.write(enc)?;
     }
     if header.color_type == ColorType::Palette && transparency.len() != 0 {
-        transparency.write(&mut outv)?;
+        transparency.write(enc)?;
     }
     // FIXME: Transparency KEY
     /*if color_type == ColorType::Grey
@@ -199,7 +174,7 @@ pub(super) fn encode(
     /*if let Some(_chunks) = info.unknown_chunks_data(ChunkPosition::PLTE) {
         // add_unknown_chunks(&mut outv, _chunks);
     }*/
-    ImageData::with_data(data).write(&mut outv, level)?;
+    ImageData::with_data(data).write(enc)?;
     /*if let Some(ref time) = info.time {
         time.write(&mut outv)?;
     }*/
@@ -237,8 +212,7 @@ pub(super) fn encode(
     /*if let Some(_chunks) = info.unknown_chunks_data(ChunkPosition::IDAT) {
         // add_unknown_chunks(&mut outv, _chunks);
     }*/
-    ImageEnd.write(&mut outv)?;
-    Ok(outv)
+    ImageEnd.write(enc)
 }
 
 /// The opposite of the remove_padding_bits function
@@ -277,7 +251,7 @@ fn pre_process_scanlines(
     header: &ImageHeader,
     filter_strategy: Option<FilterStrategy>,
     level: u8,
-) -> Result<Vec<u8>, EncoderError> {
+) -> Result<Vec<u8>> {
     let width = header.width;
     let height = header.height;
     let bit_depth = header.bit_depth;

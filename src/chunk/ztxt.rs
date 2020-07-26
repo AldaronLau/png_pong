@@ -10,7 +10,7 @@
 use std::io::{Read, Write};
 
 use super::{Chunk, DecoderError, DecoderResult, EncoderError, EncoderResult};
-use crate::{consts, decoder::Parser, zlib};
+use crate::{consts, decoder::Parser, encoder::Enc, zlib};
 
 /// Compressed Text Chunk Data (zTXt)
 #[derive(Clone, Debug)]
@@ -27,21 +27,23 @@ pub struct CompressedText {
 impl CompressedText {
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
-        level: u8,
+        enc: &mut Enc<W>,
     ) -> EncoderResult<()> {
+        // Checks
         if self.key.as_bytes().is_empty() || self.key.as_bytes().len() > 79 {
             return Err(EncoderError::TextSize(self.key.len()));
         }
-        let mut data = Vec::new();
-        data.write_all(self.key.as_bytes())
-            .map_err(EncoderError::Io)?;
-        super::encode_u8(writer, 0)?; // Null termination
-        super::encode_u8(writer, 0)?; // Compression Method
-        zlib::compress(&mut data, self.val.as_bytes(), level);
+        
+        // Compress text
+        let mut zdata = Vec::new();
+        zlib::compress(&mut zdata, self.val.as_bytes(), enc.level());
 
-        super::encode_chunk(writer, consts::ZTEXT, &data)?;
-        Ok(())
+        // Encode Chunk
+        enc.prepare(self.key.len() + 2 + zdata.len(), consts::ZTEXT)?;
+        enc.str(&self.key)?;
+        enc.u8(0)?; // Compression Method
+        enc.raw(&zdata)?;
+        enc.write_crc()
     }
 
     pub(crate) fn parse<R: Read>(

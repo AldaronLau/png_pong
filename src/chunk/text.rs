@@ -8,7 +8,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use super::{Chunk, DecoderError, EncoderError};
-use crate::{consts, decoder::Parser};
+use crate::{consts, decoder::Parser, encoder::Enc};
 use std::io::{Read, Write};
 
 /// Non-International Text Chunk Data (tEXt and zTXt)
@@ -38,18 +38,17 @@ impl Text {
 
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
+        // Checks
         if self.key.as_bytes().is_empty() || self.val.as_bytes().len() > 79 {
             return Err(EncoderError::TextSize(self.val.as_bytes().len()));
         }
-        let mut text = Vec::new();
-        text.write_all(self.key.as_bytes())
-            .map_err(EncoderError::Io)?;
-        super::encode_u8(&mut text, 0)?;
-        text.write_all(self.val.as_bytes())
-            .map_err(EncoderError::Io)?;
-
-        super::encode_chunk(writer, consts::TEXT, &text)
+        
+        // 1 Null-terminated string, 1 string
+        enc.prepare(self.key.len() + self.val.len() + 1, consts::TEXT)?;
+        enc.str(&self.key)?;
+        enc.string(&self.val)?;
+        enc.write_crc()
     }
 }

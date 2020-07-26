@@ -8,7 +8,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use super::{Chunk, DecoderResult, EncoderError};
-use crate::{consts};
+use crate::{consts, encoder::Enc};
 use std::io::{Write};
 
 /// Image End Chunk Data (IEND)
@@ -22,8 +22,9 @@ impl ImageEnd {
 
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        super::encode_chunk(writer, consts::IMAGE_END, &[])
+        enc.prepare(0, consts::IMAGE_END)?;
+        enc.write_crc()
     }
 }

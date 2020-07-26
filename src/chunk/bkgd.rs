@@ -10,7 +10,7 @@
 use std::io::{Read, Write};
 
 use super::{Chunk, DecoderError, EncoderError};
-use crate::{consts, decoder::Parser};
+use crate::{consts, decoder::Parser, encoder::Enc};
 
 /// Suggested background color chunk (bKGD)
 #[derive(Copy, Clone, Debug)]
@@ -41,19 +41,25 @@ impl Background {
 
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        let mut bkgd = Vec::new();
         use Background::*;
         match *self {
-            Palette(v) => super::encode_u8(&mut bkgd, v)?,
-            Gray(v) => super::encode_u16(&mut bkgd, v)?,
+            Palette(v) => {
+                enc.prepare(1, consts::BACKGROUND)?;
+                enc.u8(v)?;
+            }
+            Gray(v) => {
+                enc.prepare(2, consts::BACKGROUND)?;
+                enc.u16(v)?
+            }
             Rgb(r, g, b) => {
-                super::encode_u16(&mut bkgd, r)?;
-                super::encode_u16(&mut bkgd, g)?;
-                super::encode_u16(&mut bkgd, b)?;
+                enc.prepare(6, consts::BACKGROUND)?;
+                enc.u16(r)?;
+                enc.u16(g)?;
+                enc.u16(b)?;
             }
         }
-        super::encode_chunk(writer, consts::BACKGROUND, &bkgd)
+        enc.write_crc()
     }
 }

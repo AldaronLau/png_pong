@@ -11,7 +11,7 @@ use std::io::{Read, Write};
 
 use crate::{
     chunk::Chunk, consts, decode::Error as DecoderError,
-    decoder::Parser, encode::Error as EncoderError,
+    decoder::Parser, encode::Error as EncoderError, encoder::Enc
 };
 
 /// Standard PNG color types.
@@ -102,18 +102,17 @@ pub struct ImageHeader {
 impl ImageHeader {
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        let mut header = Vec::new();
-        super::encode_u32(&mut header, self.width)?;
-        super::encode_u32(&mut header, self.height)?;
-        super::encode_u8(&mut header, self.bit_depth)?;
-        super::encode_u8(&mut header, self.color_type as u8)?;
-        super::encode_u8(&mut header, 0u8)?;
-        super::encode_u8(&mut header, 0u8)?;
-        super::encode_u8(&mut header, self.interlace as u8)?;
-
-        super::encode_chunk(writer, consts::IMAGE_HEADER, &header)
+        enc.prepare(13, consts::IMAGE_HEADER)?;
+        enc.u32(self.width)?;
+        enc.u32(self.height)?;
+        enc.u8(self.bit_depth)?;
+        enc.u8(self.color_type as u8)?;
+        enc.u8(0)?;
+        enc.u8(0)?;
+        enc.u8(self.interlace as u8)?;
+        enc.write_crc()
     }
 
     pub(crate) fn parse<R: Read>(

@@ -8,7 +8,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use super::{Chunk, DecoderError, EncoderError};
-use crate::{consts, decoder::Parser};
+use crate::{consts, decoder::Parser, encoder::Enc};
 use std::io::{Read, Write};
 
 /// Time chunk (tIME)
@@ -26,38 +26,30 @@ pub struct Time {
 impl Time {
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        let mut data = Vec::new();
         // 7 Bytes
-        super::encode_u16(&mut data, self.year)?;
-        super::encode_u8(&mut data, self.month)?;
-        super::encode_u8(&mut data, self.day)?;
-        super::encode_u8(&mut data, self.hour)?;
-        super::encode_u8(&mut data, self.minute)?;
-        super::encode_u8(&mut data, self.second)?;
-
-        super::encode_chunk(writer, consts::TIME, &data)
+        enc.prepare(7, consts::TIME)?;
+        enc.u16(self.year)?;
+        enc.u8(self.month)?;
+        enc.u8(self.day)?;
+        enc.u8(self.hour)?;
+        enc.u8(self.minute)?;
+        enc.u8(self.second)?;
+        enc.write_crc()
     }
 
     pub(crate) fn parse<R: Read>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {
         // 7 Bytes
-        let year = parse.u16()?;
-        let month = parse.u8()?;
-        let day = parse.u8()?;
-        let hour = parse.u8()?;
-        let minute = parse.u8()?;
-        let second = parse.u8()?;
-
         Ok(Chunk::Time(Time {
-            year,
-            month,
-            day,
-            hour,
-            minute,
-            second,
+            year: parse.u16()?,
+            month: parse.u8()?,
+            day: parse.u8()?,
+            hour: parse.u8()?,
+            minute: parse.u8()?,
+            second: parse.u8()?,
         }))
     }
 }

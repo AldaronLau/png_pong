@@ -154,19 +154,19 @@ impl Chunk {
 fn encode_u32<W: Write>(writer: &mut W, int: u32) -> EncoderResult<()> {
     writer
         .write_all(&int.to_be_bytes())
-        .map_err(EncoderError::Io)
+        .map_err(EncoderError::from)
 }
 
 /// Write u16 to writer in big endian.
 fn encode_u16<W: Write>(writer: &mut W, int: u16) -> EncoderResult<()> {
     writer
         .write_all(&int.to_be_bytes())
-        .map_err(EncoderError::Io)
+        .map_err(EncoderError::from)
 }
 
 /// Write u8 to writer in big endian.
 fn encode_u8<W: Write>(writer: &mut W, int: u8) -> EncoderResult<()> {
-    writer.write_all(&[int]).map_err(EncoderError::Io)
+    writer.write_all(&[int]).map_err(EncoderError::from)
 }
 
 fn encode_chunk<W: Write>(
@@ -186,7 +186,7 @@ fn encode_chunk<W: Write>(
     // 2: chunk name (4 letters)
     encode_u32(&mut out, u32::from_be_bytes(name))?;
     // 3: the data
-    out.write_all(data).map_err(EncoderError::Io)?;
+    out.write_all(data).map_err(EncoderError::from)?;
     // 4: CRC (of the chunkname characters and the data)
     let mut crc = checksum::Crc32::new();
     for byte in out[4..length + 8].iter().cloned() {
@@ -194,5 +194,5 @@ fn encode_chunk<W: Write>(
     }
     encode_u32(&mut out, crc.into_u32())?;
 
-    writer.write_all(out.as_slice()).map_err(EncoderError::Io)
+    writer.write_all(out.as_slice()).map_err(EncoderError::from)
 }

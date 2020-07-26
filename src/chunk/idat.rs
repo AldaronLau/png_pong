@@ -12,7 +12,7 @@ use std::io::{Read, Write};
 use crate::{
     chunk::Chunk, consts,
     decode::Result as DecoderResult, decoder::Parser,
-    encode::Error as EncoderError, zlib,
+    encode::Error as EncoderError, zlib, encoder::Enc,
 };
 
 /// Image Data Chunk Data (IDAT)
@@ -32,14 +32,16 @@ impl ImageData {
 
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
-        level: u8,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        let mut zlib = Vec::new();
         // FIXME: Should already be compressed.
-        zlib::compress(&mut zlib, self.data.as_slice(), level);
-        super::encode_chunk(writer, consts::IMAGE_DATA, &zlib)?;
-        Ok(())
+        let mut zlib = Vec::new();
+        zlib::compress(&mut zlib, self.data.as_slice(), enc.level());
+        
+        //
+        enc.prepare(zlib.len(), consts::IMAGE_DATA)?;
+        enc.raw(&zlib)?;
+        enc.write_crc()
     }
 
     /// Construct from raw uncompressed image data.

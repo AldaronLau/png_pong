@@ -10,12 +10,18 @@
 /// PNG Pong Encoder Result Type
 pub type Result<T> = std::result::Result<T, Error>;
 
+impl From<std::io::Error> for Error {
+    fn from(err: std::io::Error) -> Error {
+        Error::Io(std::sync::Arc::new(err))
+    }
+}
+
 /// Encoding Errors.
 #[derive(Debug)]
 #[allow(variant_size_differences)]
 pub enum Error {
     /// A wrapped I/O error.
-    Io(std::io::Error),
+    Io(std::sync::Arc<std::io::Error>),
     /// Chunks arranged in invalid sequence. (FIXME: Replace with ChunkOrder)
     InvalidChunkSequence,
     /// Chunk is too large to save in a PNG file (length must fit in 32 bits)

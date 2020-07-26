@@ -8,7 +8,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use super::{Chunk, DecoderError, EncoderError};
-use crate::{consts, decoder::Parser};
+use crate::{consts, decoder::Parser, encoder::Enc};
 use std::io::{Read, Write};
 
 /// Physical dimensions chunk (pHYs)
@@ -25,15 +25,13 @@ pub struct Physical {
 impl Physical {
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        // 9 bytes
-        let mut data = Vec::new();
-        super::encode_u32(&mut data, self.ppu_x)?;
-        super::encode_u32(&mut data, self.ppu_y)?;
-        super::encode_u8(&mut data, if self.is_meter { 1 } else { 0 })?;
-
-        super::encode_chunk(writer, consts::PHYSICAL, &data)
+        enc.prepare(9, consts::PHYSICAL)?;
+        enc.u32(self.ppu_x)?;
+        enc.u32(self.ppu_y)?;
+        enc.u8(if self.is_meter { 1 } else { 0 })?;
+        enc.write_crc()
     }
 
     pub(crate) fn parse<R: Read>(

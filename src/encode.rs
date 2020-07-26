@@ -9,12 +9,12 @@
 
 //! PNG file encoding
 
-mod chunk_encoder;
+mod chunk_enc;
 mod error;
 pub(super) mod filter;
-mod step_encoder; // Share with unfilter
+mod step_enc; // Share with unfilter
 
-pub use chunk_encoder::ChunkEncoder;
+pub use chunk_enc::ChunkEnc;
 pub use error::{Error, Result};
 pub use filter::FilterStrategy;
-pub use step_encoder::StepEncoder;
+pub use step_enc::StepEnc;

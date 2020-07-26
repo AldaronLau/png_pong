@@ -10,7 +10,7 @@
 use std::io::{Read, Write};
 
 use super::{Chunk, DecoderError, DecoderResult, EncoderResult};
-use crate::{consts, decoder::Parser};
+use crate::{consts, decoder::Parser, encoder::Enc};
 
 /// Alpha Palette Chunk Data (tRNS)
 #[derive(Debug, Clone, PartialEq)]
@@ -63,22 +63,26 @@ impl Transparency {
         }
     }
 
-    pub(crate) fn write<W: Write>(&self, writer: &mut W) -> EncoderResult<()> {
+    pub(crate) fn write<W: Write>(&self, enc: &mut Enc<W>) -> EncoderResult<()> {
         use Transparency::*;
-        let mut trns = Vec::new();
         match self {
             Palette(plte) => {
+                enc.prepare(plte.len(), consts::TRANSPARENCY)?;
                 for alpha in plte.iter().cloned() {
-                    super::encode_u8(&mut trns, alpha)?;
+                    enc.u8(alpha)?;
                 }
             }
             RgbKey(red, green, blue) => {
-                super::encode_u16(&mut trns, *red)?;
-                super::encode_u16(&mut trns, *green)?;
-                super::encode_u16(&mut trns, *blue)?;
+                enc.prepare(6, consts::TRANSPARENCY)?;
+                enc.u16(*red)?;
+                enc.u16(*green)?;
+                enc.u16(*blue)?;
             }
-            GrayKey(key) => super::encode_u16(&mut trns, *key)?,
+            GrayKey(key) => {
+                enc.prepare(2, consts::TRANSPARENCY)?;
+                enc.u16(*key)?
+            },
         }
-        super::encode_chunk(writer, consts::TRANSPARENCY, &trns)
+        enc.write_crc()
     }
 }

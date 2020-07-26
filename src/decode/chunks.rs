@@ -40,7 +40,7 @@ impl<R: Read> Chunks<R> {
         } else {
             return Ok(None);
         };
-        println!("GOT TNAME {:?}", name);
+        println!("GOT TNAME {:?}", String::from_utf8_lossy(&name));
         // Choose correct parser for the chunk based on it's name.
         use consts::*;
         let chunk = match name {

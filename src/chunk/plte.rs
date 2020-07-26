@@ -8,7 +8,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use super::{Chunk, DecoderError, EncoderError};
-use crate::{consts, decoder::Parser};
+use crate::{consts, decoder::Parser, encoder::Enc};
 use pix::rgb::{Rgb, SRgb8};
 use std::io::{Read, Write};
 
@@ -37,15 +37,14 @@ impl Palette {
 
     pub(crate) fn write<W: Write>(
         &self,
-        writer: &mut W,
+        enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
-        let mut plte = Vec::new();
+        enc.prepare(self.palette.len() * 3, consts::PALETTE)?;
         for p in self.palette.iter().cloned() {
-            super::encode_u8(&mut plte, Rgb::red(p).into())?;
-            super::encode_u8(&mut plte, Rgb::green(p).into())?;
-            super::encode_u8(&mut plte, Rgb::blue(p).into())?;
+            enc.u8(Rgb::red(p).into())?;
+            enc.u8(Rgb::green(p).into())?;
+            enc.u8(Rgb::blue(p).into())?;
         }
-
-        super::encode_chunk(writer, consts::PALETTE, &plte)
+        enc.write_crc()
     }
 }

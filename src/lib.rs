@@ -24,7 +24,7 @@
 //!     pix::rgb::SRgba8::new(0, 0, 0, 0)][..]
 //! ));
 //! let mut out_data = Vec::new();
-//! let mut encoder = png_pong::encode::StepEncoder::new(&mut out_data, None, 10);
+//! let mut encoder = png_pong::Encoder::new(&mut out_data).into_step_enc();
 //! let step = png_pong::Step{ raster, delay: 0 };
 //! encoder.encode(&step).expect("Failed to add frame");
 //! std::fs::write("graphic.png", out_data).expect("Failed to save image");
