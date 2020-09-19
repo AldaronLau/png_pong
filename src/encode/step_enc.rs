@@ -16,8 +16,95 @@ use crate::{
     encoder::Enc,
     PngRaster, Step,
 };
-use pix::rgb::SRgb8;
-use std::io::Write;
+use pix::{el::Pixel, Raster, rgb::{SRgb8, SRgb16, SRgba8, SRgba16}, gray::{SGray8, SGray16, SGraya8, SGraya16}};
+use std::{any::TypeId, io::Write};
+
+pub trait AsRaster {
+    fn get_header(&self, interlace: bool) -> ImageHeader;
+    fn get_u8_slice(&self) -> &[u8];
+    fn get_palette_colors(&self) -> &[SRgb8];
+    fn get_palette_alphas(&self) -> &[u8];
+}
+
+impl AsRaster for PngRaster {
+    fn get_header(&self, interlace: bool) -> ImageHeader {
+        self.header(interlace)
+    }
+    
+    fn get_u8_slice(&self) -> &[u8] {
+        use PngRaster::*;
+        match self {
+            Rgb8(r) => r.as_u8_slice(),
+            Rgba8(r) => r.as_u8_slice(),
+            Rgb16(r) => r.as_u8_slice(),
+            Rgba16(r) => r.as_u8_slice(),
+            Gray8(r) => r.as_u8_slice(),
+            Gray16(r) => r.as_u8_slice(),
+            Graya8(r) => r.as_u8_slice(),
+            Graya16(r) => r.as_u8_slice(),
+            Palette(r, _palc, _pala) => r.as_u8_slice(),
+        }
+    }
+    
+    fn get_palette_colors(&self) -> &[SRgb8] {
+        use PngRaster::*;
+        match self {
+            Palette(_r, palc, _pala) => palc.colors(),
+            _ => &[],
+        }
+    }
+
+    fn get_palette_alphas(&self) -> &[u8] {
+        use PngRaster::*;
+        match self {
+            Palette(_r, _palc, pala) => pala.as_slice(),
+            _ => &[],
+        }
+    }
+}
+
+impl<P: Pixel> AsRaster for Raster<P> {
+    fn get_header(&self, interlace: bool) -> ImageHeader {
+        let (color_type, bit_depth) = if TypeId::of::<SGray8>() == TypeId::of::<P>() {
+            (ColorType::Grey, 8)
+        } else if TypeId::of::<SGray16>() == TypeId::of::<P>() {
+            (ColorType::Grey, 16)
+        } else if TypeId::of::<SGraya8>() == TypeId::of::<P>() {
+            (ColorType::GreyAlpha, 8)
+        } else if TypeId::of::<SGraya16>() == TypeId::of::<P>() {
+            (ColorType::GreyAlpha, 16)
+        } else if TypeId::of::<SRgb8>() == TypeId::of::<P>() {
+            (ColorType::Rgb, 8)
+        } else if TypeId::of::<SRgb16>() == TypeId::of::<P>() {
+            (ColorType::Rgb, 16)
+        } else if TypeId::of::<SRgba8>() == TypeId::of::<P>() {
+            (ColorType::Rgba, 8)
+        } else if TypeId::of::<SRgba16>() == TypeId::of::<P>() {
+            (ColorType::Rgba, 16)
+        } else {
+            panic!("Invalid Color Type + Bit Depth Combination For PNG");
+        };
+        ImageHeader {
+            width: self.width(),
+            height: self.height(),
+            color_type,
+            bit_depth,
+            interlace,
+        }
+    }
+
+    fn get_u8_slice(&self) -> &[u8] {
+        self.as_u8_slice()
+    }
+
+    fn get_palette_colors(&self) -> &[SRgb8] {
+        &[]
+    }
+
+    fn get_palette_alphas(&self) -> &[u8] {
+        &[]
+    }
+}
 
 /// Frame Encoder for PNG files.
 #[derive(Debug)]
@@ -37,76 +124,17 @@ impl<W: Write> StepEnc<W> {
         }
     }
 
-    /// Encode a still.
-    pub fn still(&mut self, raster: &PngRaster) -> Result<()> {
-        use PngRaster::*;
-        let image_header = raster.header(self.encoder.enc.interlace());
+    /// Encode a still (takes either a `png_pong::PngRaster` or `pix::Raster`).
+    pub fn still<R: AsRaster>(&mut self, raster: &R) -> Result<()> {
+        let image_header = raster.get_header(self.encoder.enc.interlace());
 
-        match raster {
-            Rgb8(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Rgba8(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Rgb16(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Rgba16(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Gray8(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Gray16(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Graya8(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Graya16(r) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                &[],
-                &[],
-            ),
-            Palette(r, pal_rgb, pal_a) => encode(
-                &mut self.encoder.enc,
-                r.as_u8_slice(),
-                &image_header,
-                pal_rgb.colors(),
-                pal_a.as_slice(),
-            ),
-        }
+        encode(
+            &mut self.encoder.enc,
+            raster.get_u8_slice(),
+            &image_header,
+            raster.get_palette_colors(),
+            raster.get_palette_alphas(),
+        )
     }
 
     /// Encode one [`Step`](struct.Step.html) of an animation.
