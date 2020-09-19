@@ -4,6 +4,13 @@ All notable changes to PNG Pong will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 
+## 0.7.0 - 2020-09-19
+### Added
+ - Sealed trait: `AsRaster`
+
+### Changed
+ - `StepEnc.still()` now takes either a reference to a PngRaster or a Raster
+
 ## 0.6.0 - 2020-07-26
 ### Added
 - `chunk::ColorType` and `PngRaster` for reading PNGs without conversion
