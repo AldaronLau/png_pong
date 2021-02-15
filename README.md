@@ -2,8 +2,8 @@
 
 #### A pure Rust PNG/APNG encoder & decoder
 
-[![Build Status](https://api.travis-ci.org/AldaronLau/png_pong.svg?branch=master)](https://travis-ci.org/AldaronLau/png_pong)
-[![Docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
+[![tests](https://github.com/AldaronLau/png_pong/workflows/tests/badge.svg)](https://github.com/AldaronLau/png_pong/actions?query=workflow%3Atests)
+[![docs](https://docs.rs/png_pong/badge.svg)](https://docs.rs/png_pong)
 [![crates.io](https://img.shields.io/crates/v/png_pong.svg)](https://crates.io/crates/png_pong)
 
 This is a pure Rust PNG image decoder and encoder taking inspiration from
