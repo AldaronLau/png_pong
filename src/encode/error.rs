@@ -34,3 +34,27 @@ pub enum Error {
     /// the out-of-order chunk.
     ChunkOrder([u8; 4]),
 }
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use Error::*;
+        match self {
+            Io(io) => write!(f, "I/O Error: {}", io),
+            InvalidChunkSequence => write!(f, "Invalid chunk sequence"),
+            ChunkTooBig => write!(f, "Chunk too big"),
+            TextSize(size) => write!(
+                f,
+                "Text size {} is not between 1 and 79 characters",
+                size
+            ),
+            BadPalette => write!(f, "Invalid palette"),
+            ChunkOrder(bytes) => write!(
+                f,
+                "Chunk {} out of order",
+                String::from_utf8_lossy(bytes)
+            ),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
