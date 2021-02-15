@@ -86,6 +86,7 @@ mod plte;
 mod text;
 mod time;
 mod trns;
+mod unknown;
 mod ztxt;
 
 // Required
@@ -101,6 +102,7 @@ pub use phys::Physical;
 pub use text::Text;
 pub use time::Time;
 pub use trns::Transparency;
+pub use unknown::Unknown;
 pub use ztxt::CompressedText;
 
 /// A chunk within a PNG file.
@@ -130,6 +132,8 @@ pub enum Chunk {
     Transparency(Transparency),
     /// Optional: Z text chunk.
     CompressedText(CompressedText),
+    /// Unknown chunk
+    Unknown(Unknown),
 }
 
 impl Chunk {

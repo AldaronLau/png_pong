@@ -41,6 +41,7 @@ impl<W: Write> ChunkEnc<W> {
             Time(time) => time.write(&mut self.enc),
             Transparency(transparency) => transparency.write(&mut self.enc),
             CompressedText(ztext) => ztext.write(&mut self.enc),
+            Unknown(unknown) => unknown.write(&mut self.enc),
         }
     }
 }

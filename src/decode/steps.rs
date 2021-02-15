@@ -194,6 +194,7 @@ where
                     }
                     ImageEnd(_) => return Some(Err(DecoderError::NoImageData)),
                     ImageData(_) => unreachable!(),
+                    Unknown(_) => continue, // Skip unknown chunks
                 }
             }
         }
@@ -296,6 +297,11 @@ where
                 Transparency(_) => return Some(Err(DecoderError::ChunkOrder)),
                 ImageData(_) => unreachable!(),
                 ImageEnd(_) => unreachable!(),
+                Unknown(unknown) => {
+                    return Some(Err(DecoderError::UnknownChunkType(
+                        unknown.name,
+                    )))
+                }
             }
         }
 
