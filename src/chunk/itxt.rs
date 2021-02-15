@@ -71,7 +71,7 @@ impl InternationalText {
     ) -> Result<(), EncoderError> {
         // Checks
         let k_len = self.key.len();
-        if k_len < 1 || k_len > 79 {
+        if !(1..=79).contains(&k_len) {
             return Err(EncoderError::TextSize(k_len));
         }
 

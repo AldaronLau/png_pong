@@ -16,7 +16,12 @@ use crate::{
     encoder::Enc,
     PngRaster, Step,
 };
-use pix::{el::Pixel, Raster, rgb::{SRgb8, SRgb16, SRgba8, SRgba16}, gray::{SGray8, SGray16, SGraya8, SGraya16}};
+use pix::{
+    el::Pixel,
+    gray::{SGray16, SGray8, SGraya16, SGraya8},
+    rgb::{SRgb16, SRgb8, SRgba16, SRgba8},
+    Raster,
+};
 use std::{any::TypeId, io::Write};
 
 pub trait AsRaster {
@@ -30,7 +35,7 @@ impl AsRaster for PngRaster {
     fn get_header(&self, interlace: bool) -> ImageHeader {
         self.header(interlace)
     }
-    
+
     fn get_u8_slice(&self) -> &[u8] {
         use PngRaster::*;
         match self {
@@ -45,7 +50,7 @@ impl AsRaster for PngRaster {
             Palette(r, _palc, _pala) => r.as_u8_slice(),
         }
     }
-    
+
     fn get_palette_colors(&self) -> &[SRgb8] {
         use PngRaster::*;
         match self {
@@ -65,25 +70,26 @@ impl AsRaster for PngRaster {
 
 impl<P: Pixel> AsRaster for Raster<P> {
     fn get_header(&self, interlace: bool) -> ImageHeader {
-        let (color_type, bit_depth) = if TypeId::of::<SGray8>() == TypeId::of::<P>() {
-            (ColorType::Grey, 8)
-        } else if TypeId::of::<SGray16>() == TypeId::of::<P>() {
-            (ColorType::Grey, 16)
-        } else if TypeId::of::<SGraya8>() == TypeId::of::<P>() {
-            (ColorType::GreyAlpha, 8)
-        } else if TypeId::of::<SGraya16>() == TypeId::of::<P>() {
-            (ColorType::GreyAlpha, 16)
-        } else if TypeId::of::<SRgb8>() == TypeId::of::<P>() {
-            (ColorType::Rgb, 8)
-        } else if TypeId::of::<SRgb16>() == TypeId::of::<P>() {
-            (ColorType::Rgb, 16)
-        } else if TypeId::of::<SRgba8>() == TypeId::of::<P>() {
-            (ColorType::Rgba, 8)
-        } else if TypeId::of::<SRgba16>() == TypeId::of::<P>() {
-            (ColorType::Rgba, 16)
-        } else {
-            panic!("Invalid Color Type + Bit Depth Combination For PNG");
-        };
+        let (color_type, bit_depth) =
+            if TypeId::of::<SGray8>() == TypeId::of::<P>() {
+                (ColorType::Grey, 8)
+            } else if TypeId::of::<SGray16>() == TypeId::of::<P>() {
+                (ColorType::Grey, 16)
+            } else if TypeId::of::<SGraya8>() == TypeId::of::<P>() {
+                (ColorType::GreyAlpha, 8)
+            } else if TypeId::of::<SGraya16>() == TypeId::of::<P>() {
+                (ColorType::GreyAlpha, 16)
+            } else if TypeId::of::<SRgb8>() == TypeId::of::<P>() {
+                (ColorType::Rgb, 8)
+            } else if TypeId::of::<SRgb16>() == TypeId::of::<P>() {
+                (ColorType::Rgb, 16)
+            } else if TypeId::of::<SRgba8>() == TypeId::of::<P>() {
+                (ColorType::Rgba, 8)
+            } else if TypeId::of::<SRgba16>() == TypeId::of::<P>() {
+                (ColorType::Rgba, 16)
+            } else {
+                panic!("Invalid Color Type + Bit Depth Combination For PNG");
+            };
         ImageHeader {
             width: self.width(),
             height: self.height(),
@@ -169,7 +175,7 @@ pub(super) fn encode<W: Write>(
         header,
         enc.filter_strategy(),
         enc.level(),
-    )?;
+    );
 
     header.write(enc)?;
 
@@ -283,7 +289,7 @@ fn pre_process_scanlines(
     header: &ImageHeader,
     filter_strategy: Option<FilterStrategy>,
     level: u8,
-) -> Result<Vec<u8>> {
+) -> Vec<u8> {
     let width = header.width;
     let height = header.height;
     let bit_depth = header.bit_depth;
@@ -319,19 +325,11 @@ fn pre_process_scanlines(
                 header,
                 filter_strategy,
                 level,
-            )?;
+            );
         } else {
-            filter::filter(
-                &mut out,
-                inp,
-                w,
-                h,
-                header,
-                filter_strategy,
-                level,
-            )?;
+            filter::filter(&mut out, inp, w, h, header, filter_strategy, level);
         }
-        Ok(out)
+        out
     } else {
         let (passw, passh, filter_passstart, padded_passstart, passstart) =
             adam7::get_pass_values(width, height, bpp);
@@ -363,7 +361,7 @@ fn pre_process_scanlines(
                     header,
                     filter_strategy,
                     level,
-                )?;
+                );
             } else {
                 filter::filter(
                     &mut out[filter_passstart[i] as usize..],
@@ -373,9 +371,9 @@ fn pre_process_scanlines(
                     header,
                     filter_strategy,
                     level,
-                )?;
+                );
             }
         }
-        Ok(out)
+        out
     }
 }

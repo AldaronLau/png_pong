@@ -45,7 +45,7 @@ impl<R: Read> Chunks<R> {
         let chunk = match name {
             IMAGE_HEADER => ImageHeader::parse(&mut self.dec),
             IMAGE_DATA => ImageData::parse(&mut self.dec),
-            IMAGE_END => ImageEnd::parse(),
+            IMAGE_END => Ok(ImageEnd::parse()),
             PALETTE => Palette::parse(&mut self.dec),
             BACKGROUND => Background::parse(&mut self.dec),
             ITEXT => InternationalText::parse(&mut self.dec),

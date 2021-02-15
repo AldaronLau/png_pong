@@ -12,7 +12,6 @@
 
 use crate::{
     chunk::{ColorType, ImageHeader},
-    encode::Error as EncoderError,
     zlib,
 };
 
@@ -127,7 +126,7 @@ pub(super) fn filter(
     header: &ImageHeader,
     filter_strategy: Option<FilterStrategy>,
     level: u8,
-) -> Result<(), EncoderError> {
+) {
     let color_type = header.color_type;
     let bit_depth = header.bit_depth;
 
@@ -320,7 +319,6 @@ pub(super) fn filter(
             }
         }
     };
-    Ok(())
 }
 
 #[cfg(test)]

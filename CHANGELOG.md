@@ -4,6 +4,14 @@ All notable changes to PNG Pong will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 
+## 0.8.0 - 2021-02-14
+Thanks to [wezm](https://github.com/wezm) for adding these features!
+
+### Added
+ - `chunk::Unknown`
+ - Implemented `std::error::Error` on `encode::Error`
+ - Implemented `std::error::Error` on `decode::Error`
+
 ## 0.7.0 - 2020-09-19
 ### Added
  - Sealed trait: `AsRaster`

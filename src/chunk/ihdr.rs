@@ -44,7 +44,7 @@ impl ColorType {
     /// get the total amount of bits per pixel, based on colortype and bitdepth
     /// in the struct
     pub(crate) fn bpp(self, bit_depth: u8) -> u8 {
-        assert!(bit_depth >= 1 && bit_depth <= 16);
+        assert!((1..=16).contains(&bit_depth));
         /*bits per pixel is amount of channels * bits per channel*/
         let ch = self.channels();
         ch * if ch > 1 {

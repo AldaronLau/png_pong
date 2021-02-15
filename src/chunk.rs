@@ -138,16 +138,10 @@ pub enum Chunk {
 
 impl Chunk {
     pub(super) fn is_idat(&self) -> bool {
-        match self {
-            Chunk::ImageData(_) => true,
-            _ => false,
-        }
+        matches!(self, Chunk::ImageData(_))
     }
 
     pub(super) fn is_iend(&self) -> bool {
-        match self {
-            Chunk::ImageEnd(_) => true,
-            _ => false,
-        }
+        matches!(self, Chunk::ImageEnd(_))
     }
 }

@@ -7,7 +7,7 @@
 // or http://opensource.org/licenses/Zlib>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use super::{Chunk, DecoderResult, EncoderError};
+use super::{Chunk, EncoderError};
 use crate::{consts, encoder::Enc};
 use std::io::Write;
 
@@ -16,8 +16,8 @@ use std::io::Write;
 pub struct ImageEnd;
 
 impl ImageEnd {
-    pub(crate) fn parse() -> DecoderResult<Chunk> {
-        Ok(Chunk::ImageEnd(ImageEnd))
+    pub(crate) fn parse() -> Chunk {
+        Chunk::ImageEnd(ImageEnd)
     }
 
     pub(crate) fn write<W: Write>(
