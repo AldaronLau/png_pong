@@ -11,9 +11,10 @@ use crate::{
     chunk::{
         Background, Chunk, CompressedText, ImageData, ImageEnd, ImageHeader,
         InternationalText, Palette, Physical, Text, Time, Transparency,
+        Unknown,
     },
     consts,
-    decode::{Error, Result},
+    decode::Result,
     decoder::Parser,
 };
 use std::io::Read;
@@ -53,11 +54,7 @@ impl<R: Read> Chunks<R> {
             TIME => Time::parse(&mut self.dec),
             TRANSPARENCY => Transparency::parse(&mut self.dec),
             ZTEXT => CompressedText::parse(&mut self.dec),
-            id => {
-                self.dec.unknown_chunk()?;
-                self.dec.check_crc(&name)?;
-                return Err(Error::UnknownChunkType(id));
-            }
+            id => Unknown::parse(&mut self.dec, id),
         }?;
         // Check the CRC Checksum at the end of the chunk.
         self.dec.check_crc(&name)?;

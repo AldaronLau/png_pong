@@ -67,11 +67,8 @@ impl<R: Read> Parser<R> {
     }
 
     /// Read and ignore the entire chunk.
-    pub(crate) fn unknown_chunk(&mut self) -> Result<()> {
-        for _ in 0..self.length {
-            self.u8()?;
-        }
-        Ok(())
+    pub(crate) fn unknown_chunk(&mut self) -> Result<Vec<u8>> {
+        self.vec(self.len())
     }
 
     /// Read into a `Vec<u8>`.
