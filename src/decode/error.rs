@@ -19,7 +19,7 @@ impl From<std::io::Error> for Error {
 }
 
 /// Decoding Errors.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[allow(variant_size_differences)]
 pub enum Error {
     /// A wrapped I/O error.
@@ -91,11 +91,11 @@ pub enum Error {
     Crc32([u8; 4]),
 }
 
-impl std::fmt::Debug for Error {
+impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use Error::*;
         match self {
-            Io(io) => write!(f, "I/O Error: {:?}", io),
+            Io(io) => write!(f, "I/O Error: {}", io),
             ColorType(_) => write!(f, "Unrecognized color type"),
             BitDepth(_) => write!(f, "Out of bounds bit depth"),
             ColorMode(_ct, _bd) => write!(f, "Invalid color type / bit depth combination"),
@@ -120,14 +120,16 @@ impl std::fmt::Debug for Error {
             NoEnd => write!(f, "Chunk was expected to end, but didn't"), // FIXME: Replace with ChunkLength
             PhysUnits => write!(f, "Unknown physical units (must be unspecified or meter)"),
             NulTerm => write!(f, "Expected null terminator, but not found"),
-            ChunkLength(bytes) => write!(f, "{:?} chunk wrong length", String::from_utf8_lossy(bytes)),
-            UnknownChunkType(bytes) => write!(f, "{:?} chunk unrecognized", String::from_utf8_lossy(bytes)),
+            ChunkLength(bytes) => write!(f, "{} chunk wrong length", String::from_utf8_lossy(bytes)),
+            UnknownChunkType(bytes) => write!(f, "{} chunk unrecognized", String::from_utf8_lossy(bytes)),
             Eof => write!(f, "Unexpected end of file"),
             ChunkOrder => write!(f, "PNG chunks are out of order"),
             NoImageData => write!(f, "No IDAT chunk exists, invalid PNG file"),
             TrailingChunk => write!(f, "Trailing chunks were found after IEND, which is invalid"),
-            Multiple(bytes) => write!(f, "Only one {:?} chunk allowed, but found multiple", String::from_utf8_lossy(bytes)),
-            Crc32(bytes) => write!(f, "CRC32 Checksum failed for {:?} chunk", String::from_utf8_lossy(bytes)),
+            Multiple(bytes) => write!(f, "Only one {} chunk allowed, but found multiple", String::from_utf8_lossy(bytes)),
+            Crc32(bytes) => write!(f, "CRC32 Checksum failed for {} chunk", String::from_utf8_lossy(bytes)),
         }
     }
 }
+
+impl std::error::Error for Error {}
