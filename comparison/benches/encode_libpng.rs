@@ -19,7 +19,7 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                 // 1. Declare png_image struct, 2. Set members to describe image
                 let mut png_image = libpng_sys::ffi::png_image {
                     opaque: std::ptr::null_mut(),
-                    version: 0,
+                    version: libpng_sys::ffi::PNG_IMAGE_VERSION as u32,
                     width: raster.width(),
                     height: raster.height(),
                     format: libpng_sys::ffi::PNG_FORMAT_RGBA as u32,
@@ -37,7 +37,7 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                     &mut memory_bytes,
                     0,
                     raster.as_u8_slice().as_ptr().cast(),
-                    raster.width() as i32,
+                    raster.width() as i32 * 4, // 0 probably has the same effect.
                     std::ptr::null(),
                 );
             })
@@ -52,7 +52,7 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                 // 1. Declare png_image struct, 2. Set members to describe image
                 let mut png_image = libpng_sys::ffi::png_image {
                     opaque: std::ptr::null_mut(),
-                    version: 0,
+                    version: libpng_sys::ffi::PNG_IMAGE_VERSION as u32,
                     width: raster.width(),
                     height: raster.height(),
                     format: libpng_sys::ffi::PNG_FORMAT_RGB as u32,
@@ -70,10 +70,9 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                     &mut memory_bytes,
                     0,
                     raster.as_u8_slice().as_ptr().cast(),
-                    raster.width() as i32,
+                    raster.width() as i32 * 3, // 0 probably has the same effect.
                     std::ptr::null(),
                 );
-                memory.set_len(memory_bytes);
             })
         });
     }
