@@ -17,11 +17,11 @@ fn libpng(group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::Wall
                 message: [0; 64],
             };
             // 2. Begin read
-            let _r = libpng_sys::ffi::png_image_begin_read_from_memory(
+            let _r = unsafe {libpng_sys::ffi::png_image_begin_read_from_memory(
                 &mut png_image,
                 data.as_ptr().cast(),
                 data.len(),
-            );
+            ) };
             if alpha {
                 // 3. Set required sample format
                 png_image.format = libpng_sys::ffi::PNG_FORMAT_RGBA as u32;
@@ -37,13 +37,13 @@ fn libpng(group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::Wall
                     green: 0,
                     blue: 0,
                 };
-                let _r = libpng_sys::ffi::png_image_finish_read(
+                let _r = unsafe { libpng_sys::ffi::png_image_finish_read(
                     &mut png_image,
                     &bg,
                     raster.as_u8_slice_mut().as_mut_ptr().cast(),
                     row_stride,
                     std::ptr::null_mut(),
-                );
+                ) };
                 let _ = raster;
             } else {
                 // 3. Set required sample format
@@ -60,13 +60,13 @@ fn libpng(group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::Wall
                     green: 0,
                     blue: 0,
                 };
-                let _r = libpng_sys::ffi::png_image_finish_read(
+                let _r = unsafe { libpng_sys::ffi::png_image_finish_read(
                     &mut png_image,
                     &bg,
                     raster.as_u8_slice_mut().as_mut_ptr().cast(),
                     row_stride,
                     std::ptr::null_mut(),
-                );
+                ) };
                 let _ = raster;
             }
         })
@@ -76,7 +76,7 @@ fn libpng(group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::Wall
 fn libpng_decode(c: &mut criterion::Criterion) {
     let mut group = c.benchmark_group("png");
     group.sample_size(10);
-    for file in comparison::FILE_PATHS {
+    for (i, file) in comparison::FILE_PATHS.iter().enumerate() {
         let data = std::fs::read(file).expect("Failed to open PNG");
         libpng(&mut group, file, &data, i % 2 != 0 /* FIXME: Detect? */);
     }

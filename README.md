@@ -70,7 +70,7 @@ predicted to take longer than a half hour with criterion with the message
 #### Decoder
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   |          |           |            |             |              |               |                |                 |
+| png_pong   | 7.7520   | 3.9459    | 77.981     | 99.384      | 752.95       | 901.98        | 178\_880       | 570\_200        |
 | png        |          |           |            |             |              |               |                |                 |
 | lodepng    |          |           |            |             |              |               |                |                 |
 | imagefmt   |          |           |            |             |              |               |                |                 |
@@ -81,7 +81,7 @@ predicted to take longer than a half hour with criterion with the message
 #### Encoder
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   |          |           |            |             |              |               |                |                 |
+| png_pong   | 41.956   | 8.2661    | 1\_025.7   | 700.80      | 2\_646.1     | 5\_061.5      | 587\_320       | 3\_587\_100     |
 | png        |          |           |            |             |              |               |                |                 |
 | lodepng    |          |           |            |             |              |               |                |                 |
 | imagefmt   |          |           |            |             |              |               |                |                 |
