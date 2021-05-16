@@ -37,7 +37,7 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                     &mut memory_bytes,
                     0,
                     raster.as_u8_slice().as_ptr().cast(),
-                    raster.width() as i32 * 4, // 0 probably has the same effect.
+                    0, // raster.width() as i32 * 4, // 0 probably has the same effect.
                     std::ptr::null(),
                 );
             })
@@ -70,7 +70,7 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
                     &mut memory_bytes,
                     0,
                     raster.as_u8_slice().as_ptr().cast(),
-                    raster.width() as i32 * 3, // 0 probably has the same effect.
+                    0, // raster.width() as i32 * 3, // 0 probably has the same effect.
                     std::ptr::null(),
                 );
             })

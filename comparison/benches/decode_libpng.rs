@@ -1,11 +1,9 @@
 #[macro_use]
 extern crate criterion;
 
-fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
-    let data = std::fs::read(file).expect("Failed to open PNG");
-
-    c.bench_function(file, |b| {
-        b.iter(|| unsafe {
+fn libpng(group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::WallTime>, file: &str, data: &[u8], alpha: bool) {
+    group.bench_function(&format!("PNG Decoder: {}", file), |b| {
+        b.iter(|| {
             // 1. Declare png_image struct
             let mut png_image = libpng_sys::ffi::png_image {
                 opaque: std::ptr::null_mut(),
@@ -75,11 +73,15 @@ fn libpng(c: &mut criterion::Criterion, file: &str, alpha: bool) {
     });
 }
 
-fn decode(c: &mut criterion::Criterion) {
-    for (i, f) in comparison::FILE_PATHS.iter().enumerate() {
-        libpng(c, f, i % 2 != 0)
+fn libpng_decode(c: &mut criterion::Criterion) {
+    let mut group = c.benchmark_group("png");
+    group.sample_size(10);
+    for file in comparison::FILE_PATHS {
+        let data = std::fs::read(file).expect("Failed to open PNG");
+        libpng(&mut group, file, &data, i % 2 != 0 /* FIXME: Detect? */);
     }
+    group.finish();
 }
 
-criterion_group!(benches, decode);
+criterion_group!(benches, libpng_decode);
 criterion_main!(benches);

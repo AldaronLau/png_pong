@@ -54,7 +54,7 @@ C's malloc and free).  Then, I rewrote the entire library, based on
  - More test cases to test against.
 
 ### Benchmarks And Comparisons
-Using Rust 1.45.0, criterion and 4 different PNG sizes with PNGs from
+Using Rust 1.50.0, criterion and 4 different PNG sizes with PNGs from
 "./tests/png/" (units are: us / microseconds).  I stopped anything that was
 predicted to take longer than a half hour with criterion with the message
 "TIMEOUT".
@@ -71,24 +71,24 @@ predicted to take longer than a half hour with criterion with the message
 #### Decoder
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   | 7.7904   | 4.1947    | 82.783     | 101.75      | 864.58       | 905.51        | 174,040        | 542,570         |
-| png        | 10.656   | 6.5267    | 52.879     | 70.930      | 634.74       | 686.75        | 119,790        | 300,980         |
-| lodepng    | 9.0110   | 8.5484    | 193.79     | 200.67      | 856.78       | 1,280.4       | 196,740        | 1,722,800       |
-| imagefmt   | 4.0710   | 3.8689    | 63.258     | 69.192      | 491.58       | 637.12        | 67,663         | 464,730         |
-| imagine    | 2.8407   | 0.52495   | 3,135.8    | 1,938.7     | 1,655.4      | 9,473.0       | 404,520        | TIMEOUT         |
-| aci_png    | 3.9223   | 4.1440    | 212.54     | 177.63      | 1,395.7      | 1,674.3       | 373,510        | 1,242,000       |
-| libpng-sys | 3.2617   | 0.43611   | 1.8694     | 0.58886     | 24.782       | 4.1214        | 17,539         | 17,259          |
+| png_pong   | 7.3996   | 3.7362    | 76.279     | 98.082      | 758.61       | 861.22        | 166,210        | 522,010         |
+| png        | 13.464   | 6.3796    | 51.258     | 75.310      | 688.85       | 683.58        | 119,470        | 325,320         |
+| lodepng    |          |           |            |             |              |               |                |                 |
+| imagefmt   |          |           |            |             |              |               |                |                 |
+| imagine    |          |           |            |             |              |               |                |                 |
+| aci_png    |          |           |            |             |              |               |                |                 |
+| libpng-sys |          |           |            |             |              |               |                |                 |
 
 #### Encoder
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   | 42.012   | 9.9705    | 1,038.2    | 721.43      | 2,575.2      | 5,105.4       | 579,200        | 3,201,900       |
-| png        | 25.448   | 9.1111    | 192.52     | 190.61      | 868.28       | 1,432.2       | 184,340        | 1,384,400       |
-| lodepng    | 12.241   | 11.915    | 2,005.2    | 4,361.0     | 24,595       | 162,510       | TIMEOUT        | TIMEOUT         |
-| imagefmt   | 8.1248   | 9.7751    | 151.89     | 140.72      | 819.41       | 1,483.4       | 214,010        | 770,080         |
+| png_pong   |          |           |            |             |              |               |                |                 |
+| png        |          |           |            |             |              |               |                |                 |
+| lodepng    |          |           |            |             |              |               |                |                 |
+| imagefmt   |          |           |            |             |              |               |                |                 |
 | imagine    | ---      | ---       | ---        | ---         | ---          | ---           | ---            | ---             |
-| aci_png    | FAILS    | 28.228    | FAILS      | 245.12      | FAILS        | 2,167.0       | FAILS          | 1,823,400       |                |                 |
-| libpng-sys | 3.0473   | 0.038876  | 3.0797     | 0.039217    | 2.7762       | 0.039250      | 3.7263         | 0.039266        |
+| aci_png    | FAILS    |           | FAILS      |             | FAILS        |               | FAILS          |                 |
+| libpng-sys |          |           |            |             |              |               |                |                 |
 
 ## Table of Contents
 - [API](#api)

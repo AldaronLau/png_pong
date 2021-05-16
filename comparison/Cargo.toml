@@ -8,9 +8,9 @@ edition = "2018"
 
 [dependencies]
 png_pong = { path = "../" }
-png = "=0.16.7"
+png = "=0.16.8"
 imagine = "=0.0.5"
-lodepng = "=3.0.0"
+lodepng = "=3.4.5"
 imagefmt = "=4.0.0"
 aci_png = "=0.8.0-pre0"
 libpng-sys = "=1.1.8"
