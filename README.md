@@ -49,12 +49,11 @@ C's malloc and free).  Then, I rewrote the entire library, based on
 ### TODO
  - Implement APNG reading.
  - Implement Chunk reading (with all the different chunk structs).
- - StepDecoder should wrap StepDecoder & RasterEncoder should wrap ChunkEncoder
- - Replace `ParseError` with Rust-style enum instead of having a C integer.
+ - StepDecoder should wrap StepDecoder, RasterEncoder should wrap ChunkEncoder
  - More test cases to test against.
 
 ### Benchmarks And Comparisons
-Using Rust 1.50.0, criterion and 4 different PNG sizes with PNGs from
+Using Rust 1.52.1, criterion and 4 different PNG sizes with PNGs from
 "./tests/png/" (units are: us / microseconds).  I stopped anything that was
 predicted to take longer than a half hour with criterion with the message
 "TIMEOUT".
@@ -71,8 +70,8 @@ predicted to take longer than a half hour with criterion with the message
 #### Decoder
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   | 7.3996   | 3.7362    | 76.279     | 98.082      | 758.61       | 861.22        | 166,210        | 522,010         |
-| png        | 13.464   | 6.3796    | 51.258     | 75.310      | 688.85       | 683.58        | 119,470        | 325,320         |
+| png_pong   |          |           |            |             |              |               |                |                 |
+| png        |          |           |            |             |              |               |                |                 |
 | lodepng    |          |           |            |             |              |               |                |                 |
 | imagefmt   |          |           |            |             |              |               |                |                 |
 | imagine    |          |           |            |             |              |               |                |                 |

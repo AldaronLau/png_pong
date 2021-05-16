@@ -327,9 +327,6 @@ pub(crate) fn decode(
         &header,
     )?;
 
-    /*let input = input.as_ref();
-    let (buf, header, palette, transparency) =
-        decode_generic(true, input)?;*/
     let width = header.width;
     let height = header.height;
     let color_type = header.color_type;
@@ -378,8 +375,9 @@ pub(crate) fn decode(
         }
         (ColorType::Palette, 8) => {
             let palette_slice = palette.as_ref().unwrap().palette.as_slice();
-            let palette_alpha = match transparency.unwrap() {
-                Transparency::Palette(p) => p,
+            let palette_alpha = match transparency {
+                None => Vec::new(),
+                Some(Transparency::Palette(p)) => p.to_vec(),
                 _ => unreachable!(),
             };
             let mut palette = Palette::new(palette_slice.len());
@@ -390,7 +388,7 @@ pub(crate) fn decode(
             PngRaster::Palette(
                 Raster::with_u8_buffer(width, height, buf),
                 Box::new(palette),
-                palette_alpha.to_vec(),
+                palette_alpha,
             )
         }
         (ct, bd) => return Err(DecoderError::ColorMode(ct, bd)),
