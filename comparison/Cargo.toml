@@ -21,53 +21,25 @@ afi = "=0.8.0-pre0"
 version = "0.3"
 
 [[bench]]
-name = "encode_png_pong"
+name = "png"
 harness = false
 
 [[bench]]
-name = "decode_png_pong"
+name = "lodepng"
 harness = false
 
 [[bench]]
-name = "decode_libpng"
+name = "imagefmt"
 harness = false
 
 [[bench]]
-name = "encode_libpng"
+name = "imagine"
 harness = false
 
 [[bench]]
-name = "decode_png"
+name = "aci_png"
 harness = false
 
 [[bench]]
-name = "encode_png"
-harness = false
-
-[[bench]]
-name = "decode_lodepng"
-harness = false
-
-[[bench]]
-name = "encode_lodepng"
-harness = false
-
-[[bench]]
-name = "decode_imagefmt"
-harness = false
-
-[[bench]]
-name = "encode_imagefmt"
-harness = false
-
-[[bench]]
-name = "decode_aci"
-harness = false
-
-[[bench]]
-name = "encode_aci"
-harness = false
-
-[[bench]]
-name = "decode_imagine"
+name = "libpng"
 harness = false
