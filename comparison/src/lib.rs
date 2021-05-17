@@ -8,11 +8,3 @@ pub const FILE_PATHS: &[&str] = &[
     "../tests/png/plopgrizzly.png",
     "../tests/png/noise.png",
 ];
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}

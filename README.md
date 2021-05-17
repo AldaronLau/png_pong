@@ -49,12 +49,11 @@ C's malloc and free).  Then, I rewrote the entire library, based on
 ### TODO
  - Implement APNG reading.
  - Implement Chunk reading (with all the different chunk structs).
- - StepDecoder should wrap StepDecoder & RasterEncoder should wrap ChunkEncoder
- - Replace `ParseError` with Rust-style enum instead of having a C integer.
+ - StepDecoder should wrap StepDecoder, RasterEncoder should wrap ChunkEncoder
  - More test cases to test against.
 
 ### Benchmarks And Comparisons
-Using Rust 1.50.0, criterion and 4 different PNG sizes with PNGs from
+Using Rust 1.52.1, criterion and 4 different PNG sizes with PNGs from
 "./tests/png/" (units are: us / microseconds).  I stopped anything that was
 predicted to take longer than a half hour with criterion with the message
 "TIMEOUT".
@@ -68,27 +67,27 @@ predicted to take longer than a half hour with criterion with the message
 - sRGB 4096x4096: `tests/png/plopgrizzly.png`
 - sRGBA 4096x4096: Uses `tests/png/noise.png`
 
-#### Decoder
-| Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
-|------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   | 7.3996   | 3.7362    | 76.279     | 98.082      | 758.61       | 861.22        | 166,210        | 522,010         |
-| png        | 13.464   | 6.3796    | 51.258     | 75.310      | 688.85       | 683.58        | 119,470        | 325,320         |
-| lodepng    |          |           |            |             |              |               |                |                 |
-| imagefmt   |          |           |            |             |              |               |                |                 |
-| imagine    |          |           |            |             |              |               |                |                 |
-| aci_png    |          |           |            |             |              |               |                |                 |
-| libpng-sys |          |           |            |             |              |               |                |                 |
-
 #### Encoder
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
-| png_pong   |          |           |            |             |              |               |                |                 |
-| png        |          |           |            |             |              |               |                |                 |
-| lodepng    |          |           |            |             |              |               |                |                 |
-| imagefmt   |          |           |            |             |              |               |                |                 |
+| png_pong   | 41.956   | 8.2661    | 1\_025.7   | 700.80      | 2\_646.1     | 5\_061.5      | 587\_320       | 3\_587\_100     |
+| png        | 29.538   | 9.4122    | 213.49     | 203.02      | 944.99       | 1\_534.3      | 201\_680       | 1\_535\_300     |
+| lodepng    | 59.989   | 10.700    | 1\_399.3   | 982.63      | 3\_391.3     | 6\_664.7      | 831\_190       | 3\_394\_900     |
+| imagefmt   | 8.7942   | 8.7399    | 211.01     | 177.82      | 901.22       | 1\_569.4      | 218\_550       | 1\_285\_700     |
 | imagine    | ---      | ---       | ---        | ---         | ---          | ---           | ---            | ---             |
-| aci_png    | FAILS    |           | FAILS      |             | FAILS        |               | FAILS          |                 |
-| libpng-sys |          |           |            |             |              |               |                |                 |
+| aci_png    | FAILS    | 30.987    | FAILS      | 289.24      | FAILS        | 2\_298.1      | FAILS          | 2\_135\_400     |
+| libpng-sys | 6.8443   | 2.9461    | 1\_613.5   | 769.70      | 2\_261.1     | 4\_745.2      | 520\_770       | 2\_926\_900     |
+
+#### Decoder
+| Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
+|------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
+| png_pong   | 7.7520   | 3.9459    | 77.981     | 99.384      | 752.95       | 901.98        | 178\_880       | 570\_200        |
+| png        | 8.1195   | 6.6107    | 54.834     | 71.873      | 643.09       | 686.29        | 128\_000       | 355\_080        |
+| lodepng    | 5.8958   | 5.4527    | 77.050     | 97.762      | 882.83       | 982.76        | 230\_570       | 563\_210        |
+| imagefmt   | 4.2864   | 4.8706    | 74.715     | 82.026      | 566.86       | 758.27        | 69\_465        | 545\_060        |
+| imagine    | 2.8809   | 0.44822   | 3\_202.3   | 2\_266.4    | 2\_056.1     | 10\_753       | 442\_750       | 27\_944\_000    |
+| aci_png    | 5.0243   | 4.3516    | 201.29     | 174.30      | 1\_500.6     | 1\_689.8      | 398\_340       | 1\_323\_600     |
+| libpng-sys | 3.6011   | 0.48747   | 1.8175     | 0.67344     | 25.809       | 4.4175        | 19\_400        | 18\_262         |
 
 ## Table of Contents
 - [API](#api)
