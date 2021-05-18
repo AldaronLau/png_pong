@@ -382,7 +382,8 @@ pub(crate) fn decode(
             };
             let mut palette = Palette::new(palette_slice.len());
             for (i, color) in palette_slice.iter().enumerate() {
-                debug_assert_eq!(i, palette.set_entry(*color).unwrap());
+                let j = palette.set_entry(*color).unwrap();
+                debug_assert_eq!(i, j);
             }
             debug_assert_eq!(palette_slice.len(), palette.len());
             PngRaster::Palette(
