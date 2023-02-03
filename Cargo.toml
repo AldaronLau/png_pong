@@ -33,7 +33,7 @@ maintenance = { status = "actively-developed" }
 version = "0.13"
 
 [dependencies.miniz_oxide]
-version = "0.5"
+version = "0.7"
 
 [build-dependencies]
 
