@@ -116,7 +116,10 @@ impl<P: Pixel> AsRaster for Raster<P> {
 #[derive(Debug)]
 pub struct StepEnc<W: Write> {
     encoder: ChunkEnc<W>,
+    // FIXME
+    #[allow(dead_code)]
     coldepth: Option<(ColorType, u32)>,
+    #[allow(dead_code)]
     header: Option<ImageHeader>,
 }
 

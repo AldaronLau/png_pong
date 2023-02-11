@@ -4,6 +4,14 @@ All notable changes to PNG Pong will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 
+## 0.9.0 - Unreleased
+### Changed
+ - Updated dependencies
+ - Result type aliases are now more flexible
+
+### Fixed
+ - Warnings, clippy lints
+
 ## 0.8.2 - 2021-05-18
 ### Fixed
  - Palette PNGs returning empty palette when compiled in release mode.

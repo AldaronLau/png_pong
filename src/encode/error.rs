@@ -8,7 +8,7 @@
 // copied, modified, or distributed except according to those terms.
 
 /// PNG Pong Encoder Result Type
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 impl From<std::io::Error> for Error {
     fn from(err: std::io::Error) -> Error {

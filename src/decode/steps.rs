@@ -25,8 +25,11 @@ mod unfilter;
 
 #[derive(Debug)]
 struct TextEntry {
+    #[allow(dead_code)] // FIXME
     text: String,
+    #[allow(dead_code)] // FIXME
     langtag: Option<String>,
+    #[allow(dead_code)] // FIXME
     transkey: Option<String>,
 }
 
@@ -35,12 +38,15 @@ struct TextEntry {
 pub struct Steps<R: Read> {
     decoder: Peekable<Chunks<R>>,
     // FIXME: This is a workaround for not supporting APNG yet.
+    #[allow(dead_code)]
     has_decoded: bool,
     // None if haven't decoded a frame yet.
     header: Option<ImageHeader>,
     // Is the file an APNG animation?
+    #[allow(dead_code)]
     is_animation: bool,
     // Is IDAT part of the animation?
+    #[allow(dead_code)]
     idat_anim: bool,
     //
     palette: Option<PaletteChunk>,
@@ -324,7 +330,7 @@ pub(crate) fn decode(
         &mut scanlines,
         header.width,
         header.height,
-        &header,
+        header,
     )?;
 
     let width = header.width;

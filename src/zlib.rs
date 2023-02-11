@@ -39,7 +39,7 @@ pub(crate) fn decompress(inp: &[u8]) -> Result<Vec<u8>, Error> {
     let out = match decompress_to_vec(&inp[2..(inp.len() - 4)]) {
         Ok(rtn) => rtn,
         Err(e) => {
-            return Err(Error::Inflate(e));
+            return Err(Error::Inflate(e.status));
         }
     };
 
