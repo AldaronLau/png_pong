@@ -79,6 +79,7 @@ pub(crate) fn compress(outv: &mut Vec<u8>, inp: &[u8], level: u8) {
 }
 
 /// Return the Adler32 of the bytes data[0..len-1]
+#[cfg(not(feature = "simd"))]
 fn adler32(data: &[u8]) -> u32 {
     let adler = 1u32;
     let mut s1 = adler & u32::from(u16::MAX);
@@ -94,4 +95,12 @@ fn adler32(data: &[u8]) -> u32 {
         s2 %= 65521;
     }
     (s2 << 16) | s1
+}
+
+/// Return the Adler32 of the bytes data[0..len-1] (simd)
+#[cfg(feature = "simd")]
+fn adler32(data: &[u8]) -> u32 {
+    let mut adler = simd_adler32::Adler32::new();
+    adler.write(data);
+    adler.finish()
 }
