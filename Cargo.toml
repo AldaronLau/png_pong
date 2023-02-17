@@ -37,6 +37,7 @@ version = "0.3"
 
 [dependencies.miniz_oxide]
 version = "0.7"
+features = ["simd"]
 
 [build-dependencies]
 
