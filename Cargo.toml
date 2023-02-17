@@ -64,4 +64,4 @@ opt-level = 2
 
 [features]
 default = []
-simd = ['simd-adler32']
+simd = ['simd-adler32', 'miniz_oxide/simd']
