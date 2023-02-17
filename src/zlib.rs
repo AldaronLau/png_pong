@@ -80,18 +80,7 @@ pub(crate) fn compress(outv: &mut Vec<u8>, inp: &[u8], level: u8) {
 
 /// Return the Adler32 of the bytes data[0..len-1]
 fn adler32(data: &[u8]) -> u32 {
-    let adler = 1u32;
-    let mut s1 = adler & u32::from(u16::MAX);
-    let mut s2 = (adler >> 16) & u32::from(u16::MAX);
-    // At least 5550 sums can be done before the sums overflow, saving a lot of
-    // modulo divisions
-    for part in data.chunks(5550) {
-        for &v in part {
-            s1 += v as u32;
-            s2 += s1;
-        }
-        s1 %= 65521;
-        s2 %= 65521;
-    }
-    (s2 << 16) | s1
+    let mut adler = simd_adler32::Adler32::new();
+    adler.write(data);
+    adler.finish()
 }
