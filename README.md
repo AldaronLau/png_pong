@@ -108,6 +108,8 @@ You can use the
 to facilitate upgrading this crate as a dependency.
 
 ## License
+Copyright © 2019-2023 The PNG Pong Crate Contributor(s)
+
 Licensed under either of
  - Apache License, Version 2.0,
    ([LICENSE-APACHE](https://github.com/AldaronLau/png_pong/blob/master/LICENSE-APACHE)
