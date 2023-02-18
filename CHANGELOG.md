@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 ### Changed
  - Updated dependencies
  - Result type aliases are now more flexible
+ - Upgraded to the 2021 edition
+ - Depend on `simd-adler32` crate for speed improvements
 
 ### Fixed
  - Warnings, clippy lints
