@@ -1,3 +1,5 @@
+use std::io::Read;
+
 use crate::{
     chunk::{
         Background, Chunk, CompressedText, ImageData, ImageEnd, ImageHeader,
@@ -8,7 +10,6 @@ use crate::{
     decode::Result,
     decoder::Parser,
 };
-use std::io::Read;
 
 /// Iterator over [`Chunk`](struct.Chunk.html)s - Decoder for PNG files.
 #[derive(Debug)]

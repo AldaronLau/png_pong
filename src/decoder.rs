@@ -1,10 +1,10 @@
+use std::io::{ErrorKind, Read};
+
 use crate::{
     consts,
     decode::{Chunks, Error, Result, Steps},
     Step,
 };
-use std::convert::TryInto;
-use std::io::{ErrorKind, Read};
 
 /// Chunk parser.
 #[derive(Debug)]
@@ -219,8 +219,8 @@ impl<R: Read> Decoder<R> {
 }
 
 impl<R: Read> IntoIterator for Decoder<R> {
-    type Item = Result<Step>;
     type IntoIter = Steps<R>;
+    type Item = Result<Step>;
 
     /// Convert into a raster step `Iterator`
     fn into_iter(self) -> Self::IntoIter {

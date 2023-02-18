@@ -1,8 +1,9 @@
+use std::io::Write;
+
 use crate::{
     consts,
     encode::{ChunkEnc, Error, FilterStrategy, Result, StepEnc},
 };
-use std::{convert::TryInto, io::Write};
 
 /// Chunk encoder.
 #[derive(Debug)]

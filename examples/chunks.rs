@@ -1,6 +1,6 @@
+use std::{fs::File, io::BufReader};
+
 use png_pong::{decode::Error, Decoder};
-use std::fs::File;
-use std::io::BufReader;
 
 fn main() {
     let reader = BufReader::new(File::open("res/icon.png").unwrap());

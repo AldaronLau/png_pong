@@ -1,6 +1,7 @@
+use std::{fs::File, io::BufWriter};
+
 use pix::{hwb::SHwb8, rgb::SRgb8, Raster};
 use png_pong::Encoder;
-use std::{fs::File, io::BufWriter};
 
 fn main() {
     let mut r = Raster::with_clear(256, 256);

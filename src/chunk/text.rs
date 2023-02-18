@@ -1,6 +1,7 @@
+use std::io::{Read, Write};
+
 use super::{Chunk, DecoderError, EncoderError};
 use crate::{consts, decoder::Parser, encoder::Enc};
-use std::io::{Read, Write};
 
 /// Non-International Text Chunk Data (tEXt and zTXt)
 #[derive(Clone, Debug)]
@@ -9,8 +10,8 @@ pub struct Text {
     /// represents, e.g. Title, Author, Description, or anything else.  Minimum
     /// of 1 character, and maximum 79 characters long.
     pub key: String,
-    /// The actual message.  It's discouraged to use a single line length longer
-    /// than 79 characters
+    /// The actual message.  It's discouraged to use a single line length
+    /// longer than 79 characters
     pub val: String,
 }
 

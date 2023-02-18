@@ -1,9 +1,10 @@
+use std::io::{Read, Write};
+
 use super::Chunk;
 use crate::{
     consts, decode::Error as DecoderError, decoder::Parser,
     encode::Error as EncoderError, encoder::Enc, zlib,
 };
-use std::io::{Read, Write};
 
 /// International Text Chunk Data (iTXt)
 #[derive(Clone, Debug)]
@@ -16,15 +17,15 @@ pub struct InternationalText {
     pub langtag: String,
     /// Additional string "transkey"
     pub transkey: String,
-    /// The actual message.  It's discouraged to use a single line length longer
-    /// than 79 characters
+    /// The actual message.  It's discouraged to use a single line length
+    /// longer than 79 characters
     pub val: String,
     /// If the text should be compressed
     pub compressed: bool,
 }
 
 impl InternationalText {
-    /*international text chunk (iTXt)*/
+    /* international text chunk (iTXt) */
     pub(crate) fn parse<R: Read>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {

@@ -24,9 +24,10 @@ impl<W: Write> BitstreamWriter<W> {
     }
 
     pub(super) fn write(&mut self, bit: bool) -> Result<()> {
-        /*the current bit in bitstream must be 0 for this to work*/
+        /* the current bit in bitstream must be 0 for this to work */
         if bit {
-            /*earlier bit of huffman code is in a lesser significant bit of an earlier byte*/
+            /* earlier bit of huffman code is in a lesser significant bit of
+             * an earlier byte */
             self.byte |= 1 << (7 - self.bitpointer);
         }
         self.bitpointer += 1;

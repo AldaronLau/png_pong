@@ -1,6 +1,7 @@
+use std::io::{Read, Write};
+
 use super::{Chunk, DecoderError, EncoderError};
 use crate::{consts, decoder::Parser, encoder::Enc};
-use std::io::{Read, Write};
 
 /// Time chunk (tIME)
 #[derive(Copy, Clone, Debug)]

@@ -1,7 +1,9 @@
+use std::io::{Read, Write};
+
+use pix::rgb::{Rgb, SRgb8};
+
 use super::{Chunk, DecoderError, EncoderError};
 use crate::{consts, decoder::Parser, encoder::Enc};
-use pix::rgb::{Rgb, SRgb8};
-use std::io::{Read, Write};
 
 /// Palette Chunk Data (PLTE)
 #[derive(Clone, Debug)]

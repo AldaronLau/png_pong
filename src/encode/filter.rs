@@ -123,9 +123,10 @@ pub(super) fn filter(
 
     let bpp = color_type.bpp(bit_depth) as usize;
 
-    /*the width of a scanline in bytes, not including the filter type*/
+    /* the width of a scanline in bytes, not including the filter type */
     let linebytes = (w * bpp + 7) / 8;
-    /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
+    /* bytewidth is used for filtering, is 1 when bpp < 8, number of bytes
+     * per pixel otherwise */
     let bytewidth = (bpp + 7) / 8;
     let mut prevline = None;
     /*
@@ -205,19 +206,20 @@ pub(super) fn filter(
                             )
                             .sum()
                     };
-                    /*check if this is smallest sum (or if type == 0 it's the first case so always store the values)*/
+                    /* check if this is smallest sum (or if type == 0 it's
+                     * the first case so always store the values) */
                     if type_ == 0 || sum[type_] < smallest {
-                        best_type = type_; /*now fill the out values*/
+                        best_type = type_; /* now fill the out values */
                         smallest = sum[type_];
                     };
                 }
                 prevline = Some(&inp[(y * linebytes)..]);
                 out[y * (linebytes + 1)] = best_type as u8;
-                /*the first byte of a scanline will be the filter type*/
+                /* the first byte of a scanline will be the filter type */
                 for x in 0..linebytes {
                     out[y * (linebytes + 1) + 1 + x] = attempt[best_type][x];
-                } /*try the 5 filter types*/
-            } /*the filter type itself is part of the scanline*/
+                } /* try the 5 filter types */
+            } /* the filter type itself is part of the scanline */
         }
         FilterStrategy::Entropy => {
             let mut sum: [f32; 5] = [0., 0., 0., 0., 0.];
@@ -251,11 +253,14 @@ pub(super) fn filter(
                         sum[type_] +=
                             if c == 0 { 0. } else { (1. / p).log2() * p };
                     }
-                    /*check if this is smallest sum (or if type == 0 it's the first case so always store the values)*/
+                    /* check if this is smallest sum (or if type == 0 it's
+                     * the first case so always store the values) */
                     if type_ == 0 || sum[type_] < smallest {
-                        best_type = type_; /*now fill the out values*/
-                        smallest = sum[type_]; /*the first byte of a scanline will be the filter type*/
-                    }; /*the extra filterbyte added to each row*/
+                        best_type = type_; /* now fill the out values */
+                        smallest = sum[type_]; /* the first byte of a
+                                                * scanline will be the filter
+                                                * type */
+                    }; /* the extra filterbyte added to each row */
                 }
                 prevline = Some(&inp[(y * linebytes)..]);
                 out[y * (linebytes + 1)] = best_type as u8;
@@ -268,7 +273,7 @@ pub(super) fn filter(
             /*brute force filter chooser.
             deflate the scanline after every filter attempt to see which one deflates best.
             This is very slow and gives only slightly smaller, sometimes even larger, result*/
-            let mut size: [usize; 5] = [0, 0, 0, 0, 0]; /*five filtering attempts, one for each filter type*/
+            let mut size: [usize; 5] = [0, 0, 0, 0, 0]; /* five filtering attempts, one for each filter type */
             let mut smallest = 0;
             let mut best_type = 0;
             /*use fixed tree on the attempts so that the tree is not adapted to the filter_type on purpose,
@@ -284,7 +289,8 @@ pub(super) fn filter(
             ];
             for y in 0..h {
                 for type_ in 0..5 {
-                    /*it already works good enough by testing a part of the row*/
+                    /* it already works good enough by testing a part of the
+                     * row */
                     filter_scanline(
                         &mut attempt[type_],
                         &inp[(y * linebytes)..],
@@ -296,9 +302,11 @@ pub(super) fn filter(
                     size[type_] = 0;
                     let mut _unused = Vec::new();
                     zlib::compress(&mut _unused, &attempt[type_], level);
-                    /*check if this is smallest size (or if type == 0 it's the first case so always store the values)*/
+                    /* check if this is smallest size (or if type == 0 it's
+                     * the first case so always store the values) */
                     if type_ == 0 || size[type_] < smallest {
-                        best_type = type_; /*the first byte of a scanline will be the filter type*/
+                        best_type = type_; /* the first byte of a scanline will be the filter
+                                            * type */
                         smallest = size[type_]; /* unknown filter strategy */
                     }
                 }

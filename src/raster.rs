@@ -1,4 +1,3 @@
-use crate::chunk::{ColorType, ImageHeader};
 use pix::{
     chan::{Ch16, Ch8},
     el::Pixel,
@@ -6,6 +5,8 @@ use pix::{
     rgb::{SRgb16, SRgb8, SRgba16, SRgba8},
     Palette, Raster,
 };
+
+use crate::chunk::{ColorType, ImageHeader};
 
 /// A Raster of one of the PNG types (all are sRGB gamma).
 /// PNGs with less than 8 bits per channel are scaled up to 8 bits per channel.

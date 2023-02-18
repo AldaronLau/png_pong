@@ -1,3 +1,5 @@
+use std::io::Cursor;
+
 use pix::{
     chan::Ch8,
     el::Pixel,
@@ -6,7 +8,6 @@ use pix::{
     Raster,
 };
 use png_pong::{Decoder, Encoder, PngRaster};
-use std::io::Cursor;
 
 fn roundtrip_core<F: Pixel<Chan = Ch8>>(raster_a: PngRaster) -> Raster<F> {
     // Encode as SRgba8

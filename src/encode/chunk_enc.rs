@@ -1,5 +1,6 @@
-use crate::{chunk::Chunk, encode::Error, encoder::Enc};
 use std::io::Write;
+
+use crate::{chunk::Chunk, encode::Error, encoder::Enc};
 
 /// Chunk Encoder for PNG files.
 ///

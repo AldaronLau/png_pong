@@ -10,8 +10,8 @@ pub struct CompressedText {
     /// represents, e.g. Title, Author, Description, or anything else.  Minimum
     /// of 1 character, and maximum 79 characters long.
     pub key: String,
-    /// The actual message.  It's discouraged to use a single line length longer
-    /// than 79 characters
+    /// The actual message.  It's discouraged to use a single line length
+    /// longer than 79 characters
     pub val: String,
 }
 

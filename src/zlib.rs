@@ -9,16 +9,18 @@ pub(crate) fn decompress(inp: &[u8]) -> Result<Vec<u8>, Error> {
     if inp.len() < 2 {
         return Err(Error::ZlibTooSmall);
     }
-    /*read information from zlib header*/
+    /* read information from zlib header */
     if (inp[0] as u32 * 256 + inp[1] as u32) % 31 != 0 {
-        /*error: 256 * in[0] + in[1] must be a multiple of 31, the FCHECK value is supposed to be made that way*/
+        /* error: 256 * in[0] + in[1] must be a multiple of 31, the FCHECK
+         * value is supposed to be made that way */
         return Err(Error::ZlibHeader);
     }
     let cm = inp[0] as u32 & 15;
     let cinfo = ((inp[0] as u32) >> 4) & 15;
     let fdict = ((inp[1] as u32) >> 5) & 1;
     if cm != 8 || cinfo > 7 {
-        /*error: only compression method 8: inflate with sliding window of 32k is supported by the PNG spec*/
+        /* error: only compression method 8: inflate with sliding window of
+         * 32k is supported by the PNG spec */
         return Err(Error::CompressionMethod);
     }
     if fdict != 0 {
@@ -52,15 +54,17 @@ pub(crate) fn decompress(inp: &[u8]) -> Result<Vec<u8>, Error> {
 pub(crate) fn compress(outv: &mut Vec<u8>, inp: &[u8], level: u8) {
     /*initially, *out must be NULL and outsize 0, if you just give some random *out
     that's pointing to a non allocated buffer, this'll crash*/
-    /*zlib data: 1 byte CMF (cm+cinfo), 1 byte FLG, deflate data, 4 byte adler32_val checksum of the Decompressed data*/
+    /* zlib data: 1 byte CMF (cm+cinfo), 1 byte FLG, deflate data, 4 byte
+     * adler32_val checksum of the Decompressed data */
     let cmf = 120;
-    /*0b01111000: CM 8, cinfo 7. With cinfo 7, any window size up to 32768 can be used.*/
+    /* 0b01111000: CM 8, cinfo 7. With cinfo 7, any window size up to 32768
+     * can be used. */
     let flevel = 0;
     let fdict = 0;
     let mut cmfflg = 256 * cmf + fdict * 32 + flevel * 64;
     let fcheck = 31 - cmfflg % 31;
     cmfflg += fcheck;
-    /*Vec<u8>-controlled version of the output buffer, for dynamic array*/
+    /* Vec<u8>-controlled version of the output buffer, for dynamic array */
     outv.push((cmfflg >> 8) as u8);
     outv.push((cmfflg & 255) as u8);
     let deflated = compress_to_vec(inp, level);
