@@ -33,7 +33,7 @@ features = ["simd"]
 [build-dependencies]
 
 [dev-dependencies.criterion]
-version = "0.4"
+version = "0.5"
 
 [package.metadata.docs.rs]
 all-features = true
