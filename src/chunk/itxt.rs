@@ -77,8 +77,13 @@ impl InternationalText {
         };
 
         // Encode
+        let len = if let Some(ref zdata) = zdata {
+            zdata.len()
+        } else {
+            self.val.len()
+        };
         enc.prepare(
-            self.key.len() + self.langtag.len() + self.transkey.len() + 5,
+            self.key.len() + self.langtag.len() + self.transkey.len() + len + 5,
             consts::ITEXT,
         )?;
         enc.str(&self.key)?;

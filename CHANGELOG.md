@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
 ### Fixed
  - Warnings, clippy lints
  - Lifted 79 byte restriction on tEXt chunk payload
+ - Incorrect length of iTXt chunk
 
 ## 0.8.2 - 2021-05-18
 ### Fixed
