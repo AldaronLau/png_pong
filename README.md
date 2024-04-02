@@ -107,8 +107,12 @@ You can use the
 [changelog](https://github.com/AldaronLau/png_pong/blob/master/CHANGELOG.md)
 to facilitate upgrading this crate as a dependency.
 
+## MSRV Policy
+The current MSRV policy only supports the most recent Rust.  This will be
+changed in the future.
+
 ## License
-Copyright © 2019-2023 The PNG Pong Crate Contributor(s)
+Copyright © 2019-2024 The PNG Pong Crate Contributor(s)
 
 Licensed under either of
  - Apache License, Version 2.0,
