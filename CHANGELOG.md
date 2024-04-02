@@ -10,9 +10,11 @@ and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
  - Result type aliases are now more flexible
  - Upgraded to the 2021 edition
  - Depend on `simd-adler32` crate for speed improvements
+ - Rename `TextSize` variant to `KeySize` on `encode::Error` and `decode::Error`
 
 ### Fixed
  - Warnings, clippy lints
+ - Lifted 79 byte restriction on tEXt chunk payload
 
 ## 0.8.2 - 2021-05-18
 ### Fixed

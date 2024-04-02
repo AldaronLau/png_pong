@@ -21,7 +21,7 @@ impl Text {
     ) -> Result<Chunk, DecoderError> {
         let key = parse.str()?;
         if key.is_empty() || key.len() > 79 {
-            return Err(DecoderError::TextSize(key.len()));
+            return Err(DecoderError::KeySize(key.len()));
         }
         let val = parse.string(parse.len() - (key.len() + 1))?;
 
@@ -33,8 +33,8 @@ impl Text {
         enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
         // Checks
-        if self.key.as_bytes().is_empty() || self.val.as_bytes().len() > 79 {
-            return Err(EncoderError::TextSize(self.val.as_bytes().len()));
+        if self.key.as_bytes().is_empty() {
+            return Err(EncoderError::KeySize(0));
         }
 
         // 1 Null-terminated string, 1 string

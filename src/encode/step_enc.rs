@@ -217,7 +217,7 @@ pub(super) fn encode<W: Write>(
     // FIXME: Text
     /*for ntext in info.text.iter() {
         if ntext.key.len() > 79 || ntext.key.is_empty() {
-            return Err(EncoderError::TextSize(ntext.key.len()));
+            return Err(EncoderError::KeySize(ntext.key.len()));
         }
         Text {
             key: ntext.key.clone(),
@@ -227,7 +227,7 @@ pub(super) fn encode<W: Write>(
     }
     for ztext in info.ztext.iter() {
         if ztext.key.len() > 79 || ztext.key.is_empty() {
-            return Err(EncoderError::TextSize(ztext.key.len()));
+            return Err(EncoderError::KeySize(ztext.key.len()));
         }
         ZText {
             key: ztext.key.clone(),
@@ -237,7 +237,7 @@ pub(super) fn encode<W: Write>(
     }
     for chunk in info.itext.iter() {
         if chunk.key.len() > 79 || chunk.key.is_empty() {
-            return Err(EncoderError::TextSize(chunk.key.len()));
+            return Err(EncoderError::KeySize(chunk.key.len()));
         }
         chunk.write(
             &mut outv,

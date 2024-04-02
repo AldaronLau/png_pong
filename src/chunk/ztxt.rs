@@ -22,7 +22,7 @@ impl CompressedText {
     ) -> EncoderResult<()> {
         // Checks
         if self.key.as_bytes().is_empty() || self.key.as_bytes().len() > 79 {
-            return Err(EncoderError::TextSize(self.key.len()));
+            return Err(EncoderError::KeySize(self.key.len()));
         }
 
         // Compress text
@@ -47,7 +47,7 @@ impl CompressedText {
         let ztxt = parse.vec(parse.len() - (key.len() + 2))?;
         let decoded = zlib::decompress(&ztxt)?;
         if key.is_empty() || key.len() > 79 {
-            return Err(DecoderError::TextSize(key.len()));
+            return Err(DecoderError::KeySize(key.len()));
         }
         let val = String::from_utf8_lossy(&decoded).to_string();
 

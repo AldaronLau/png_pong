@@ -31,7 +31,7 @@ impl InternationalText {
     ) -> Result<Chunk, DecoderError> {
         let key = parse.str()?;
         if key.is_empty() || key.len() > 79 {
-            return Err(DecoderError::TextSize(key.len()));
+            return Err(DecoderError::KeySize(key.len()));
         }
         let compressed = parse.u8()? != 0;
         if parse.u8()? != 0 {
@@ -64,7 +64,7 @@ impl InternationalText {
         // Checks
         let k_len = self.key.len();
         if !(1..=79).contains(&k_len) {
-            return Err(EncoderError::TextSize(k_len));
+            return Err(EncoderError::KeySize(k_len));
         }
 
         // Maybe compress

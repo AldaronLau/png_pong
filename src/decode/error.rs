@@ -46,8 +46,8 @@ pub enum Error {
     ImageDimensions,
     /// File doesn't contain any chunks.
     Empty,
-    /// Text is not between 1-79 characters
-    TextSize(usize),
+    /// Key is not between 1-79 characters
+    KeySize(usize),
     /// The length of the END symbol 256 in the Huffman tree is 0
     HuffmanEnd,
     /// Unrecognized filter type
@@ -102,7 +102,7 @@ impl std::fmt::Display for Error {
             FilterMethod => write!(f, "Invalid filter method"),
             ImageDimensions => write!(f, "Invalid image dimensions, must be greater than 0"),
             Empty => write!(f, "File doesn't contain any chunks."), // FIXME: NoImageData
-            TextSize(size) => write!(f, "Text size ({}) doesn't fit inequality 1 ≤ x ≤ 79", size),
+            KeySize(size) => write!(f, "Text size ({}) doesn't fit inequality 1 ≤ x ≤ 79", size),
             HuffmanEnd => write!(f, "The length of the END symbol 256 in the Huffman tree is 0"),
             IllegalFilterType => write!(f, "Unrecognized filter type"),
             AlphaPaletteLen => write!(f, "Alpha palette is larger than the palette."),
