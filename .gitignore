@@ -1,6 +1,5 @@
+/**/*.rs.bk
 /**/target/
 /.cargo-ok
-/**/Cargo.lock
-/**/*.rs.bk
 /graphic.png
 /out.png

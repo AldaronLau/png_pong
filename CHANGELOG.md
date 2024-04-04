@@ -1,8 +1,12 @@
 # Changelog
 All notable changes to PNG Pong will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://jeronlau.tk/semver/).
+The format is based on [Keep a Changelog], and this project adheres to
+[Semantic Versioning].
+
+## 0.9.1 - 2024-04-03
+### Changed
+ - Lowered MSRV to 1.70
 
 ## 0.9.0 - 2024-04-01
 ### Changed
@@ -121,3 +125,8 @@ Thanks to [wezm](https://github.com/wezm) for adding these features!
 ## 0.0.1 - 2019-07-24
 ### Added
 - Support for reading writing PNGs.
+
+[Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
+[Semantic Versioning]: https://github.com/AldaronLau/semver/blob/stable/README.md
+
+

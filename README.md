@@ -27,8 +27,8 @@ scratch so I decided to take `lodepng` which has more features (and more low
 level features) and clean up the code, upgrade to 2018 edition of Rust, depend
 on the miniz\_oxide crate (because it can decompress faster than lodepng's
 INFLATE implementation) and get rid of the libc dependency so it *actually*
-becomes pure Rust (lodepng claims to be, but calls C's malloc and free).  Then,
-I rewrote the entire library, based on [gift] and [pix].
+becomes pure Rust (lodepng claimed to be, but called C's malloc and free).
+Then, I rewrote the entire library, based on [gift] and [pix].
 
 ### Goals
 
@@ -51,6 +51,8 @@ I rewrote the entire library, based on [gift] and [pix].
  - More test cases to test against.
 
 ### Benchmarks And Comparisons
+
+TODO: Update, ran on older png\_pong and Rust 1.52.1
 
 Using Rust 1.52.1, criterion and 4 different PNG sizes with PNGs from
 "./tests/png/" (units are: us / microseconds).  I stopped anything that was
@@ -112,7 +114,7 @@ You can use the [changelog] to facilitate upgrading this crate as a dependency.
 
 ## MSRV
 
-The current MSRV is Rust 1.65.
+The current MSRV is Rust 1.70.
 
 MSRV is updated according to the [Ardaku MSRV guidelines].
 
