@@ -1,4 +1,4 @@
-# ![PNG Pong](https://raw.githubusercontent.com/AldaronLau/png_pong/master/res/icon.png)
+# ![PNG Pong]
 
 #### A pure Rust PNG/APNG encoder & decoder
 
@@ -11,27 +11,27 @@ lodepng.  This crate allows easy reading and writing of PNG files without any
 system dependencies.
 
 ### Why another PNG crate?
-These are the 4 Rust PNG encoder/decoder crates I know of:
-- [png](https://crates.io/crates/png) - The one everyone uses (used to be able
-  to load less pngs than png_pong and slower, but has caught up).
-- [lodepng](https://crates.io/crates/lodepng) - Loads all the PNGs, code
-  is ported from C, therefore code is hard read & maintain, also uses
-  slow implementation of deflate/inflate algorithm.
-- [imagefmt](https://crates.io/crates/imagefmt) - Abandoned, and
-  limited in what files it can open, but with a lot less lines of code.
-- [imagine](https://crates.io/crates/imagine) - PNG decoding only.
 
-Originally I made the [aci_png](https://crates.io/crates/aci_png) based
-on imagefmt, and intended to add more features.  At the time, I didn't want to
-write a PNG encoder/decoder from scratch so I decided to take `lodepng` which
-has more features (and more low level features) and clean up the code, upgrade
-to 2018 edition of Rust, depend on the miniz\_oxide crate (because it can
-decompress faster than lodepng's INFLATE implementation) and get rid of the libc
-dependency so it *actually* becomes pure Rust (lodepng claims to be, but calls
-C's malloc and free).  Then, I rewrote the entire library, based on
-[gift](https://crates.io/crates/gift) and [pix](https://crates.io/crates/pix).
+These are the 4 Rust PNG encoder/decoder crates I know of:
+- [png] - The one everyone uses (used to be able to load less pngs than
+  png\_pong and slower, but has caught up).
+- [lodepng] - Loads all the PNGs, code is ported from C, therefore code is hard
+  read & maintain, also uses slow implementation of deflate/inflate algorithm.
+- [imagefmt] - Abandoned, and limited in what files it can open, but with a lot
+  less lines of code.
+- [imagine] - PNG decoding only.
+
+Originally I made the [aci\_png] based on imagefmt, and intended to add more
+features.  At the time, I didn't want to write a PNG encoder/decoder from
+scratch so I decided to take `lodepng` which has more features (and more low
+level features) and clean up the code, upgrade to 2018 edition of Rust, depend
+on the miniz\_oxide crate (because it can decompress faster than lodepng's
+INFLATE implementation) and get rid of the libc dependency so it *actually*
+becomes pure Rust (lodepng claims to be, but calls C's malloc and free).  Then,
+I rewrote the entire library, based on [gift] and [pix].
 
 ### Goals
+
  - Forbid unsafe.
  - APNG support as iterator.
  - Fast.
@@ -40,19 +40,18 @@ C's malloc and free).  Then, I rewrote the entire library, based on
  - Save crushed PNG files.
  - Clean, well-documented, concise code.
  - Implement all completed, non-deprecated chunks in the
-   [PNG 1.2 Specification](http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html),
-   including the
-   [PNG 1.2 Extensions](https://pmt.sourceforge.io/specs/pngext-1.2.0-pdg-h20.html)
-   and the
-   [APNG Specification](https://wiki.mozilla.org/APNG_Specification)
+   [PNG 1.2 Specification], including the [PNG 1.2 Extensions] and the
+   [APNG Specification]
 
 ### TODO
+
  - Implement APNG reading.
  - Implement Chunk reading (with all the different chunk structs).
  - StepDecoder should wrap StepDecoder, RasterEncoder should wrap ChunkEncoder
  - More test cases to test against.
 
 ### Benchmarks And Comparisons
+
 Using Rust 1.52.1, criterion and 4 different PNG sizes with PNGs from
 "./tests/png/" (units are: us / microseconds).  I stopped anything that was
 predicted to take longer than a half hour with criterion with the message
@@ -68,6 +67,7 @@ predicted to take longer than a half hour with criterion with the message
 - sRGBA 4096x4096: Uses `tests/png/noise.png`
 
 #### Encoder
+
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
 | png_pong   | 41.956   | 8.2661    | 1\_025.7   | 700.80      | 2\_646.1     | 5\_061.5      | 587\_320       | 3\_587\_100     |
@@ -79,6 +79,7 @@ predicted to take longer than a half hour with criterion with the message
 | libpng-sys | 6.8443   | 2.9461    | 1\_613.5   | 769.70      | 2\_261.1     | 4\_745.2      | 520\_770       | 2\_926\_900     |
 
 #### Decoder
+
 | Library    | sRGB 1x1 | sRGBA 1x1 | sRGB 64x64 | sRGBA 64x64 | sRGB 256x256 | sRGBA 256x256 | sRGB 4096x4096 | sRGBA 4096x4096 |
 |------------|----------|-----------|------------|-------------|--------------|---------------|----------------|-----------------|
 | png_pong   | 7.7520   | 3.9459    | 77.981     | 99.384      | 752.95       | 901.98        | 178\_880       | 570\_200        |
@@ -90,46 +91,71 @@ predicted to take longer than a half hour with criterion with the message
 | libpng-sys | 3.6011   | 0.48747   | 1.8175     | 0.67344     | 25.809       | 4.4175        | 19\_400        | 18\_262         |
 
 ## Table of Contents
-- [API](#api)
-- [Features](#features)
-- [Upgrade](#upgrade)
-- [License](#license)
-   - [Contribution](#contribution)
+
+ - [API]
+ - [Features]
+ - [Upgrade]
+ - [License]
+   - [Contribution]
 
 ## API
-API documentation can be found on [docs.rs](https://docs.rs/png_pong).
+
+API documentation can be found on [docs.rs].
 
 ## Features
+
 There are no optional features.
 
 ## Upgrade
-You can use the
-[changelog](https://github.com/AldaronLau/png_pong/blob/master/CHANGELOG.md)
-to facilitate upgrading this crate as a dependency.
 
-## MSRV Policy
-The current MSRV policy only supports the most recent Rust.  This will be
-changed in the future.
+You can use the [changelog] to facilitate upgrading this crate as a dependency.
+
+## MSRV
+
+The current MSRV is Rust 1.65.
+
+MSRV is updated according to the [Ardaku MSRV guidelines].
 
 ## License
+
 Copyright © 2019-2024 The PNG Pong Crate Contributor(s)
 
 Licensed under either of
- - Apache License, Version 2.0,
-   ([LICENSE-APACHE](https://github.com/AldaronLau/png_pong/blob/master/LICENSE-APACHE)
-   or https://www.apache.org/licenses/LICENSE-2.0)
- - Zlib License,
-   ([LICENSE-ZLIB](https://github.com/AldaronLau/png_pong/blob/master/LICENSE-ZLIB)
-   or https://opensource.org/licenses/Zlib)
+ - Apache License, Version 2.0, ([LICENSE-APACHE] or
+   <https://www.apache.org/licenses/LICENSE-2.0>)
+ - Zlib License, ([LICENSE-ZLIB] or <https://opensource.org/licenses/Zlib>)
 
 at your option.
 
 ### Contribution
+
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
-Before contributing, check out the
-[contribution guidelines](https://github.com/AldaronLau/png_pong/blob/master/CONTRIBUTING.md),
-and, as always, make sure to always follow the
-[code of conduct](https://github.com/AldaronLau/png_pong/blob/master/CODE_OF_CONDUCT.md).
+Before contributing, check out the [contribution guidelines], and, as always,
+make sure to always follow the [code of conduct].
+
+[Ardaku MSRV guidelines]: https://github.com/ardaku/.github/blob/v1/profile/MSRV.md
+[PNG Pong]: https://raw.githubusercontent.com/AldaronLau/png_pong/v0/res/icon.png
+[code of conduct]: https://github.com/AldaronLau/png_pong/blob/v0/CODE_OF_CONDUCT.md
+[contribution guidelines]: https://github.com/AldaronLau/png_pong/blob/v0/CONTRIBUTING.md
+[LICENSE-APACHE]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE-APACHE
+[LICENSE-ZLIB]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE-ZLIB
+[changelog]: https://github.com/AldaronLau/png_pong/blob/v0/CHANGELOG.md
+[docs.rs]: https://docs.rs/png_pong
+[API]: #api
+[Features]: #features
+[Upgrade]: #upgrade
+[License]: #license
+[Contribution]: #contribution
+[PNG 1.2 Specification]: http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
+[PNG 1.2 Extensions]: https://pmt.sourceforge.io/specs/pngext-1.2.0-pdg-h20.html
+[APNG Specification]: https://wiki.mozilla.org/APNG_Specification
+[gift]: https://crates.io/crates/gift
+[pix]: https://crates.io/crates/pix
+[aci\_png]: https://crates.io/crates/aci_png
+[png]: https://crates.io/crates/png
+[lodepng]: https://crates.io/crates/lodepng
+[imagefmt]: https://crates.io/crates/imagefmt
+[imagine]: https://crates.io/crates/imagine
