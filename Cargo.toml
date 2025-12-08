@@ -37,7 +37,7 @@ version = "0.2"
 version = "0.3"
 
 [dev-dependencies.criterion]
-version = "0.5"
+version = "0.8"
 
 [package.metadata.docs.rs]
 all-features = true
