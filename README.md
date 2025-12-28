@@ -125,7 +125,7 @@ MSRV is updated according to the [Ardaku MSRV guidelines].
 
 ## License
 
-Copyright © 2019-2024 The PNG Pong Crate Contributor(s)
+Copyright © 2019-2025 The PNG Pong Crate Contributor(s)
 
 Licensed under either of
  - Apache License, Version 2.0, ([LICENSE-APACHE] or
