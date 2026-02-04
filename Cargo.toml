@@ -1,6 +1,6 @@
 [package]
 name = "png_pong"
-version = "0.9.3"
+version = "0.10.0"
 license = "Apache-2.0 OR Zlib"
 description = "A pure Rust PNG/APNG encoder & decoder"
 repository = "https://github.com/AldaronLau/png_pong"
