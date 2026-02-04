@@ -119,13 +119,13 @@ You can use the [changelog] to facilitate upgrading this crate as a dependency.
 
 ## MSRV
 
-The current MSRV is Rust 1.85.
+The current MSRV is Rust 1.86.
 
 MSRV is updated according to the [Ardaku MSRV guidelines].
 
 ## License
 
-Copyright © 2019-2025 The PNG Pong Crate Contributor(s)
+Copyright © 2019-2026 The PNG Pong Crate Contributor(s)
 
 Licensed under either of
  - Apache License, Version 2.0, ([LICENSE-APACHE] or
