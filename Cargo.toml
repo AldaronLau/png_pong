@@ -17,7 +17,7 @@ include = [
 categories = ["multimedia::encoding", "multimedia::images"]
 keywords = ["png", "encoder", "decoder", "apng", "image"]
 readme = "README.md"
-edition = "2021"
+edition = "2024"
 rust-version = "1.86"
 
 [dependencies.pix]
