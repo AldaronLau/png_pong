@@ -95,36 +95,84 @@ impl std::fmt::Display for Error {
             Io(io) => write!(f, "I/O Error: {}", io),
             ColorType(_) => write!(f, "Unrecognized color type"),
             BitDepth(_) => write!(f, "Out of bounds bit depth"),
-            ColorMode(_ct, _bd) => write!(f, "Invalid color type / bit depth combination"),
-            BackgroundSize(_) => write!(f, "Background color type mismatch with image color type"),
+            ColorMode(_ct, _bd) => {
+                write!(f, "Invalid color type / bit depth combination")
+            }
+            BackgroundSize(_) => write!(
+                f,
+                "Background color type mismatch with image color type"
+            ),
             InvalidSignature => write!(f, "Not a PNG file"),
-            AdlerChecksum => write!(f, "Adler checksum not correct, data must be corrupted"),
+            AdlerChecksum => {
+                write!(f, "Adler checksum not correct, data must be corrupted")
+            }
             Inflate(e) => write!(f, "Inflate: {:?}", e),
-            PresetDict => write!(f, "ZLib compression using preset dictionary, PNG doesn't allow"),
-            CompressionMethod => write!(f, "Invalid compression method in zlib header"),
+            PresetDict => write!(
+                f,
+                "ZLib compression using preset dictionary, PNG doesn't allow"
+            ),
+            CompressionMethod => {
+                write!(f, "Invalid compression method in zlib header")
+            }
             ZlibHeader => write!(f, "Invalid FCHECK in zlib header"),
             ZlibTooSmall => write!(f, "ZLib data is too small"),
             InterlaceMethod => write!(f, "Invalid interlace method"),
             FilterMethod => write!(f, "Invalid filter method"),
-            ImageDimensions => write!(f, "Invalid image dimensions, must be greater than 0"),
-            Empty => write!(f, "File doesn't contain any chunks."), // FIXME: NoImageData
-            KeySize(size) => write!(f, "Text size ({}) doesn't fit inequality 1 ≤ x ≤ 79", size),
-            HuffmanEnd => write!(f, "The length of the END symbol 256 in the Huffman tree is 0"),
+            ImageDimensions => {
+                write!(f, "Invalid image dimensions, must be greater than 0")
+            }
+            Empty => write!(f, "File doesn't contain any chunks."), /* FIXME: NoImageData */
+            KeySize(size) => write!(
+                f,
+                "Text size ({}) doesn't fit inequality 1 ≤ x ≤ 79",
+                size
+            ),
+            HuffmanEnd => write!(
+                f,
+                "The length of the END symbol 256 in the Huffman tree is 0"
+            ),
             IllegalFilterType => write!(f, "Unrecognized filter type"),
-            AlphaPaletteLen => write!(f, "Alpha palette is larger than the palette."),
-            ChunkSize => write!(f, "Chunk is the wrong size"), // FIXME: Replace with ChunkLength
-            AlphaPaletteWithAlphaMode => write!(f, "Mode has an alpha channel, but also an alpha palette (must pick one)"),
-            NoEnd => write!(f, "Chunk was expected to end, but didn't"), // FIXME: Replace with ChunkLength
-            PhysUnits => write!(f, "Unknown physical units (must be unspecified or meter)"),
+            AlphaPaletteLen => {
+                write!(f, "Alpha palette is larger than the palette.")
+            }
+            ChunkSize => write!(f, "Chunk is the wrong size"), /* FIXME: Replace with ChunkLength */
+            AlphaPaletteWithAlphaMode => write!(
+                f,
+                "Mode has an alpha channel, but also an alpha palette (must pick one)"
+            ),
+            NoEnd => write!(f, "Chunk was expected to end, but didn't"), /* FIXME: Replace with ChunkLength */
+            PhysUnits => write!(
+                f,
+                "Unknown physical units (must be unspecified or meter)"
+            ),
             NulTerm => write!(f, "Expected null terminator, but not found"),
-            ChunkLength(bytes) => write!(f, "{} chunk wrong length", String::from_utf8_lossy(bytes)),
-            UnknownChunkType(bytes) => write!(f, "{} chunk unrecognized", String::from_utf8_lossy(bytes)),
+            ChunkLength(bytes) => write!(
+                f,
+                "{} chunk wrong length",
+                String::from_utf8_lossy(bytes)
+            ),
+            UnknownChunkType(bytes) => write!(
+                f,
+                "{} chunk unrecognized",
+                String::from_utf8_lossy(bytes)
+            ),
             Eof => write!(f, "Unexpected end of file"),
             ChunkOrder => write!(f, "PNG chunks are out of order"),
             NoImageData => write!(f, "No IDAT chunk exists, invalid PNG file"),
-            TrailingChunk => write!(f, "Trailing chunks were found after IEND, which is invalid"),
-            Multiple(bytes) => write!(f, "Only one {} chunk allowed, but found multiple", String::from_utf8_lossy(bytes)),
-            Crc32(bytes) => write!(f, "CRC32 Checksum failed for {} chunk", String::from_utf8_lossy(bytes)),
+            TrailingChunk => write!(
+                f,
+                "Trailing chunks were found after IEND, which is invalid"
+            ),
+            Multiple(bytes) => write!(
+                f,
+                "Only one {} chunk allowed, but found multiple",
+                String::from_utf8_lossy(bytes)
+            ),
+            Crc32(bytes) => write!(
+                f,
+                "CRC32 Checksum failed for {} chunk",
+                String::from_utf8_lossy(bytes)
+            ),
         }
     }
 }

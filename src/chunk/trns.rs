@@ -1,6 +1,6 @@
 use std::io::{Read, Write};
 
-use parsenic::{be::Read as _, Read as _, Reader};
+use parsenic::{Read as _, Reader, be::Read as _};
 
 use super::{Chunk, DecoderError, DecoderResult, EncoderResult};
 use crate::{consts, decoder::Parser, encoder::Enc};

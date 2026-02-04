@@ -1,22 +1,21 @@
 use std::{any::TypeId, io::Write};
 
 use pix::{
-    el::Pixel,
-    gray::{SGray16, SGray8, SGraya16, SGraya8},
-    rgb::{SRgb16, SRgb8, SRgba16, SRgba8},
     Raster,
+    el::Pixel,
+    gray::{SGray8, SGray16, SGraya8, SGraya16},
+    rgb::{SRgb8, SRgb16, SRgba8, SRgba16},
 };
 
 use crate::{
-    adam7,
+    PngRaster, Step, adam7,
     bitstream::{BitstreamReader, BitstreamWriter},
     chunk::{
         ColorType, ImageData, ImageEnd, ImageHeader, Palette as PaletteChunk,
         Transparency,
     },
-    encode::{filter, ChunkEnc, Error as EncoderError, FilterStrategy, Result},
+    encode::{ChunkEnc, Error as EncoderError, FilterStrategy, Result, filter},
     encoder::Enc,
-    PngRaster, Step,
 };
 
 pub trait AsRaster {
@@ -308,7 +307,7 @@ fn pre_process_scanlines(
         /* image size plus an extra byte per scanline + possible padding bits */
         if bpp < 8 && w * bpp != ((w * bpp + 7) / 8) * 8 {
             let mut padded = vec![0u8; h * ((w * bpp + 7) / 8)]; /* we can immediately filter into the out buffer, no other steps
-                                                                  * needed */
+             * needed */
             add_padding_bits(
                 &mut padded,
                 inp,

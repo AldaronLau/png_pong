@@ -1,11 +1,11 @@
 use std::io::Cursor;
 
 use pix::{
+    Raster,
     chan::Ch8,
     el::Pixel,
     gray::SGray8,
     rgb::{SRgb8, SRgba8},
-    Raster,
 };
 use png_pong::{Decoder, Encoder, PngRaster};
 

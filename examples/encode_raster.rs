@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufWriter};
 
-use pix::{hwb::SHwb8, rgb::SRgb8, Raster};
+use pix::{Raster, hwb::SHwb8, rgb::SRgb8};
 use png_pong::Encoder;
 
 fn main() {

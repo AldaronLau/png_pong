@@ -3,13 +3,14 @@ use std::{collections::HashMap, io::Read, iter::Peekable};
 use pix::{Palette, Raster};
 
 use crate::{
+    PngRaster, Step,
     chunk::{
         Background, Chunk, ColorType, ImageHeader, Palette as PaletteChunk,
         Physical, Time, Transparency,
     },
     consts,
     decode::{Chunks, Error as DecoderError},
-    zlib, PngRaster, Step,
+    zlib,
 };
 
 mod unfilter;
@@ -187,7 +188,7 @@ where
                         self.transparency = Some(chunk);
                     }
                     ImageHeader(_) => {
-                        return Some(Err(DecoderError::ChunkOrder))
+                        return Some(Err(DecoderError::ChunkOrder));
                     }
                     ImageEnd(_) => return Some(Err(DecoderError::NoImageData)),
                     ImageData(_) => unreachable!(),
@@ -297,7 +298,7 @@ where
                 Unknown(unknown) => {
                     return Some(Err(DecoderError::UnknownChunkType(
                         unknown.name,
-                    )))
+                    )));
                 }
             }
         }
