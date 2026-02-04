@@ -1,9 +1,9 @@
 use pix::{
-    chan::{Ch16, Ch8},
-    el::Pixel,
-    gray::{Gray8, SGray16, SGray8, SGraya16, SGraya8},
-    rgb::{SRgb16, SRgb8, SRgba16, SRgba8},
     Palette, Raster,
+    chan::{Ch8, Ch16},
+    el::Pixel,
+    gray::{Gray8, SGray8, SGray16, SGraya8, SGraya16},
+    rgb::{SRgb8, SRgb16, SRgba8, SRgba16},
 };
 
 use crate::chunk::{ColorType, ImageHeader};

@@ -3,7 +3,7 @@ use std::{
     num::NonZeroU32,
 };
 
-use parsenic::{be::Read as _, Read as _, Reader};
+use parsenic::{Read as _, Reader, be::Read as _};
 
 use crate::{
     chunk::Chunk, consts, decode::Error as DecoderError, decoder::Parser,
@@ -44,11 +44,7 @@ impl ColorType {
         /* bits per pixel is amount of channels * bits per channel */
         let ch = self.channels();
         ch * if ch > 1 {
-            if bit_depth == 8 {
-                8
-            } else {
-                16
-            }
+            if bit_depth == 8 { 8 } else { 16 }
         } else {
             bit_depth
         }

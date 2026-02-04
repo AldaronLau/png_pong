@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 use parsenic::{Read as _, Reader};
 
 use super::{Chunk, DecoderError, DecoderResult, EncoderError, EncoderResult};
-use crate::{consts, decoder::Parser, encoder::Enc, zlib, parsing::Read as _};
+use crate::{consts, decoder::Parser, encoder::Enc, parsing::Read as _, zlib};
 
 /// Compressed Text Chunk Data (zTXt)
 #[derive(Clone, Debug)]

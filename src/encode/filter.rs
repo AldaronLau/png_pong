@@ -258,8 +258,8 @@ pub(super) fn filter(
                     if type_ == 0 || sum[type_] < smallest {
                         best_type = type_; /* now fill the out values */
                         smallest = sum[type_]; /* the first byte of a
-                                                * scanline will be the filter
-                                                * type */
+                         * scanline will be the filter
+                         * type */
                     }; /* the extra filterbyte added to each row */
                 }
                 prevline = Some(&inp[(y * linebytes)..]);
@@ -306,7 +306,7 @@ pub(super) fn filter(
                      * the first case so always store the values) */
                     if type_ == 0 || size[type_] < smallest {
                         best_type = type_; /* the first byte of a scanline will be the filter
-                                            * type */
+                         * type */
                         smallest = size[type_]; /* unknown filter strategy */
                     }
                 }

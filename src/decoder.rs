@@ -1,9 +1,8 @@
 use std::io::{ErrorKind, Read};
 
 use crate::{
-    consts,
+    Step, consts,
     decode::{Chunks, Error, Result, Steps},
-    Step,
 };
 
 /// Chunk parser.
@@ -25,7 +24,7 @@ impl<R: Read> Parser<R> {
         let first = match self.u8() {
             Ok(first) => first,
             Err(Error::Io(e)) if e.kind() == ErrorKind::UnexpectedEof => {
-                return Ok(None)
+                return Ok(None);
             }
             Err(e) => return Err(e),
         };
