@@ -302,16 +302,16 @@ fn pre_process_scanlines(
 
     if !header.interlace {
         let bpp = bpp as usize;
-        let outsize = h + (h * ((w * bpp + 7) / 8));
+        let outsize = h + (h * (w * bpp).div_ceil(8));
         let mut out = vec![0u8; outsize];
         /* image size plus an extra byte per scanline + possible padding bits */
-        if bpp < 8 && w * bpp != ((w * bpp + 7) / 8) * 8 {
-            let mut padded = vec![0u8; h * ((w * bpp + 7) / 8)]; /* we can immediately filter into the out buffer, no other steps
+        if bpp < 8 && w * bpp != (w * bpp).div_ceil(8) * 8 {
+            let mut padded = vec![0u8; h * (w * bpp).div_ceil(8)]; /* we can immediately filter into the out buffer, no other steps
              * needed */
             add_padding_bits(
                 &mut padded,
                 inp,
-                ((w * bpp + 7) / 8) * 8,
+                (w * bpp).div_ceil(8) * 8,
                 w * bpp,
                 h,
             );
@@ -347,7 +347,7 @@ fn pre_process_scanlines(
                 add_padding_bits(
                     &mut padded,
                     &adam7[passstart[i] as usize..],
-                    ((passw[i] as usize * bpp + 7) / 8) * 8,
+                    (passw[i] as usize * bpp).div_ceil(8) * 8,
                     passw[i] as usize * bpp,
                     passh[i] as usize,
                 );

@@ -46,7 +46,7 @@ impl Text {
         enc: &mut Enc<W>,
     ) -> Result<(), EncoderError> {
         // Checks
-        if self.key.as_bytes().is_empty() {
+        if self.key.is_empty() {
             return Err(EncoderError::KeySize(0));
         }
 

@@ -28,14 +28,14 @@ pub(super) fn postprocess_scanlines(
     if !header.interlace {
         if bpp < 8
             && w as usize * bpp as usize
-                != ((w as usize * bpp as usize + 7) / 8) * 8
+                != (w as usize * bpp as usize).div_ceil(8) * 8
         {
             unfilter_aliased(inp, 0, 0, w as usize, h as usize, bpp as usize)?;
             remove_padding_bits(
                 out,
                 inp,
                 w as usize * bpp as usize,
-                ((w as usize * bpp as usize + 7) / 8) * 8,
+                (w as usize * bpp as usize).div_ceil(8) * 8,
                 h as usize,
             );
         } else {
@@ -61,7 +61,7 @@ pub(super) fn postprocess_scanlines(
                     passstart[i] as usize,
                     padded_passstart[i] as usize,
                     passw[i] as usize * bpp as usize,
-                    ((passw[i] as usize * bpp as usize + 7) / 8) * 8,
+                    (passw[i] as usize * bpp as usize).div_ceil(8) * 8,
                     passh[i] as usize,
                 );
             };
@@ -114,8 +114,8 @@ fn unfilter_aliased(
     let mut prevline = None;
     // bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per
     // pixel otherwise
-    let bytewidth = (bpp + 7) / 8;
-    let linebytes = (w * bpp + 7) / 8;
+    let bytewidth = bpp.div_ceil(8);
+    let linebytes = (w * bpp).div_ceil(8);
     for y in 0..h {
         let outindex = linebytes * y;
         let inindex = (1 + linebytes) * y; /* the extra filterbyte added to each row */
@@ -192,8 +192,8 @@ fn unfilter(
 
     /* bytewidth is used for filtering, is 1 when bpp < 8, number of bytes
      * per pixel otherwise */
-    let bytewidth = (bpp as usize + 7) / 8;
-    let linebytes = (width as usize * bpp as usize + 7) / 8;
+    let bytewidth = (bpp as usize).div_ceil(8);
+    let linebytes = (width as usize * bpp as usize).div_ceil(8);
     let in_linebytes = 1 + linebytes; /* the extra filterbyte added to each row */
 
     for (out_line, in_line) in out

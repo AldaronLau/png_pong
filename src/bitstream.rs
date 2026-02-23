@@ -1,6 +1,6 @@
 //! Read and write from a reversed bit stream
 
-use std::io::{Bytes, Read, Result, Write};
+use std::io::{BufReader, Bytes, Read, Result, Write};
 
 /// A reversed bit stream writer.
 pub(super) struct BitstreamWriter<W: Write> {
@@ -45,7 +45,7 @@ pub(super) struct BitstreamReader<R: Read> {
     /// Pointer within the stream.
     bitpointer: usize,
     /// Reader
-    stream: Bytes<R>,
+    stream: Bytes<BufReader<R>>,
     /// Current byte
     byte: Option<u8>,
 }
@@ -54,15 +54,16 @@ impl<R: Read> BitstreamReader<R> {
     /// Create a new `BitstreamReader` from a type that implements `Read`.
     #[inline(always)]
     pub(super) fn new(stream: R) -> Result<Self> {
-        let mut stream = stream.bytes();
+        let buf_reader = BufReader::new(stream);
+        let mut bytes = buf_reader.bytes();
+        let byte = match bytes.next() {
+            Some(Ok(v)) => Some(v),
+            _ => None,
+        };
         Ok(BitstreamReader {
             bitpointer: 0,
-            byte: match stream.next() {
-                Some(Ok(v)) => Ok(Some(v)),
-                Some(Err(e)) => Err(e),
-                None => Ok(None),
-            }?,
-            stream,
+            byte,
+            stream: bytes,
         })
     }
 
@@ -72,18 +73,19 @@ impl<R: Read> BitstreamReader<R> {
         stream: R,
         bitpointer: usize,
     ) -> Result<Self> {
-        let mut stream = stream.bytes();
+        let buf_reader = BufReader::new(stream);
+        let mut bytes = buf_reader.bytes();
         for _ in 0..bitpointer / 8 {
-            stream.next().unwrap().unwrap();
+            bytes.next();
         }
+        let byte = match bytes.next() {
+            Some(Ok(v)) => Some(v),
+            _ => None,
+        };
         Ok(BitstreamReader {
             bitpointer: bitpointer % 8,
-            byte: match stream.next() {
-                Some(Ok(v)) => Ok(Some(v)),
-                Some(Err(e)) => Err(e),
-                None => Ok(None),
-            }?,
-            stream,
+            byte,
+            stream: bytes,
         })
     }
 
