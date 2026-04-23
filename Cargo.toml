@@ -36,20 +36,26 @@ version = "0.2"
 [dependencies.traitful]
 version = "0.3"
 
-[dev-dependencies.criterion]
+# Currently not a dev-dependency since it's required for miri to be optional
+#
+# dev-dependencies are not allowed to be optional, though ):
+[dependencies.criterion]
 version = "0.8.2"
+optional = true
 
 [package.metadata.docs.rs]
-all-features = true
+all-features = false
 default-target = "x86_64-unknown-linux-gnu"
 
 [[bench]]
 name = "encode"
 harness = false
+required-features = ["criterion"]
 
 [[bench]]
 name = "decode"
 harness = false
+required-features = ["criterion"]
 
 [profile.test]
 opt-level = 2

@@ -198,16 +198,16 @@ where
         }
 
         // Check for ImageEnd
-        if let Some(Ok(chunk)) = self.decoder.peek() {
-            if chunk.is_iend() {
-                if let Err(e) = self.decoder.next().unwrap() {
-                    return Some(Err(e));
-                }
-                if self.decoder.next().is_some() {
-                    return Some(Err(DecoderError::TrailingChunk));
-                }
-                return None;
+        if let Some(Ok(chunk)) = self.decoder.peek()
+            && chunk.is_iend()
+        {
+            if let Err(e) = self.decoder.next().unwrap() {
+                return Some(Err(e));
             }
+            if self.decoder.next().is_some() {
+                return Some(Err(DecoderError::TrailingChunk));
+            }
+            return None;
         }
 
         // Image data for consecutive IDAT chunks.

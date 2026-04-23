@@ -124,10 +124,10 @@ pub(super) fn filter(
     let bpp = color_type.bpp(bit_depth) as usize;
 
     /* the width of a scanline in bytes, not including the filter type */
-    let linebytes = (w * bpp + 7) / 8;
+    let linebytes = (w * bpp).div_ceil(8);
     /* bytewidth is used for filtering, is 1 when bpp < 8, number of bytes
      * per pixel otherwise */
-    let bytewidth = (bpp + 7) / 8;
+    let bytewidth = bpp.div_ceil(8);
     let mut prevline = None;
     /*
     There is a heuristic called the minimum sum of absolute differences heuristic, suggested by the PNG standard:

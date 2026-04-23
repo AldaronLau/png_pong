@@ -183,6 +183,6 @@ impl ImageHeader {
         /* will not overflow for any color type if roughly w * h < 268435455 */
         let bpp = self.bpp() as usize;
         let n = self.width as usize * self.height as usize;
-        ((n / 8) * bpp) + ((n & 7) * bpp + 7) / 8
+        ((n / 8) * bpp) + ((n & 7) * bpp).div_ceil(8)
     }
 }
