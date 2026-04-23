@@ -127,10 +127,17 @@ MSRV is updated according to the [Ardaku MSRV guidelines].
 
 Copyright © 2019-2026 The PNG Pong Crate Contributor(s)
 
-Licensed under either of
- - Apache License, Version 2.0, ([LICENSE-APACHE] or
+Dual licensed under the:
+
+ - Zlib License, ([LICENSE\_ZLIB] or <https://opensource.org/licenses/Zlib>)
+
+And any of:
+
+ - Apache License, Version 2.0, ([LICENSE\_APACHE] or
    <https://www.apache.org/licenses/LICENSE-2.0>)
- - Zlib License, ([LICENSE-ZLIB] or <https://opensource.org/licenses/Zlib>)
+ - Boost Software License, Version 1.0, ([LICENSE\_BOOST] or
+   <https://www.boost.org/LICENSE_1_0.txt>)
+ - MIT License, ([LICENSE\_MIT] or <https://mit-license.org/>)
 
 at your option.
 
@@ -147,8 +154,10 @@ make sure to always follow the [code of conduct].
 [PNG Pong]: https://raw.githubusercontent.com/AldaronLau/png_pong/v0/res/icon.png
 [code of conduct]: https://github.com/AldaronLau/png_pong/blob/v0/CODE_OF_CONDUCT.md
 [contribution guidelines]: https://github.com/AldaronLau/png_pong/blob/v0/CONTRIBUTING.md
-[LICENSE-APACHE]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE-APACHE
-[LICENSE-ZLIB]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE-ZLIB
+[LICENSE\_APACHE]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE-APACHE
+[LICENSE\_BOOST]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE_BOOST
+[LICENSE\_MIT]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE_MIT
+[LICENSE\_ZLIB]: https://github.com/AldaronLau/png_pong/blob/v0/LICENSE-ZLIB
 [changelog]: https://github.com/AldaronLau/png_pong/blob/v0/CHANGELOG.md
 [docs.rs]: https://docs.rs/png_pong
 [API]: #api
