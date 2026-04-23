@@ -23,7 +23,7 @@ impl CompressedText {
         enc: &mut Enc<W>,
     ) -> EncoderResult<()> {
         // Checks
-        if self.key.as_bytes().is_empty() || self.key.as_bytes().len() > 79 {
+        if self.key.is_empty() || self.key.len() > 79 {
             return Err(EncoderError::KeySize(self.key.len()));
         }
 

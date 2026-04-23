@@ -10,7 +10,7 @@ pub(crate) fn decompress(inp: &[u8]) -> Result<Vec<u8>, Error> {
         return Err(Error::ZlibTooSmall);
     }
     /* read information from zlib header */
-    if (inp[0] as u32 * 256 + inp[1] as u32) % 31 != 0 {
+    if !(inp[0] as u32 * 256 + inp[1] as u32).is_multiple_of(31) {
         /* error: 256 * in[0] + in[1] must be a multiple of 31, the FCHECK
          * value is supposed to be made that way */
         return Err(Error::ZlibHeader);

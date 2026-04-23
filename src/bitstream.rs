@@ -54,6 +54,7 @@ impl<R: Read> BitstreamReader<R> {
     /// Create a new `BitstreamReader` from a type that implements `Read`.
     #[inline(always)]
     pub(super) fn new(stream: R) -> Result<Self> {
+        #[expect(clippy::unbuffered_bytes)]
         let mut stream = stream.bytes();
         Ok(BitstreamReader {
             bitpointer: 0,
@@ -72,6 +73,7 @@ impl<R: Read> BitstreamReader<R> {
         stream: R,
         bitpointer: usize,
     ) -> Result<Self> {
+        #[expect(clippy::unbuffered_bytes)]
         let mut stream = stream.bytes();
         for _ in 0..bitpointer / 8 {
             stream.next().unwrap().unwrap();

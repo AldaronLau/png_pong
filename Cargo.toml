@@ -1,7 +1,7 @@
 [package]
 name = "png_pong"
 version = "0.10.0"
-license = "Apache-2.0 OR Zlib"
+license = "(Apache-2.0 OR BSL-1.0 OR MIT) AND Zlib"
 description = "A pure Rust PNG/APNG encoder & decoder"
 repository = "https://github.com/AldaronLau/png_pong"
 documentation = "https://docs.rs/png_pong"
@@ -36,20 +36,26 @@ version = "0.2"
 [dependencies.traitful]
 version = "0.3"
 
-[dev-dependencies.criterion]
+# Currently not a dev-dependency since it's required for miri to be optional
+#
+# dev-dependencies are not allowed to be optional, though ):
+[dependencies.criterion]
 version = "0.8.2"
+optional = true
 
 [package.metadata.docs.rs]
-all-features = true
+all-features = false
 default-target = "x86_64-unknown-linux-gnu"
 
 [[bench]]
 name = "encode"
 harness = false
+required-features = ["criterion"]
 
 [[bench]]
 name = "decode"
 harness = false
+required-features = ["criterion"]
 
 [profile.test]
 opt-level = 2

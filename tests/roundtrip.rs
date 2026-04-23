@@ -82,6 +82,21 @@ fn random() {
     roundtrip_core::<SRgb8>(raster);
 }
 
+#[test]
+fn miri_random() {
+    let mut data = vec![0u8; 15 * 10 * 3];
+    for (i, px) in data.iter_mut().enumerate() {
+        *px = ((i ^ (13 + i * 17) ^ (i * 13) ^ (i / 113 * 11)) >> 5) as u8;
+    }
+
+    let raster = PngRaster::Rgb8(Raster::<SRgb8>::with_u8_buffer(
+        15,
+        10,
+        data.as_slice(),
+    ));
+    roundtrip_core::<SRgb8>(raster);
+}
+
 // FIXME: Text
 /*
 #[test]
