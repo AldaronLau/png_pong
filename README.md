@@ -119,7 +119,7 @@ You can use the [changelog] to facilitate upgrading this crate as a dependency.
 
 ## MSRV
 
-The current MSRV is Rust 1.86.
+The current MSRV is Rust 1.91.
 
 MSRV is updated according to the [Ardaku MSRV guidelines].
 
