@@ -52,13 +52,14 @@ pub(crate) fn get_pass_values(
     for i in 0..7 {
         filter_passstart[i + 1] = filter_passstart[i]
             + if passw[i] != 0 && passh[i] != 0 {
-                passh[i] * (1 + (passw[i] * bpp + 7) / 8)
+                passh[i] * (1 + (passw[i] * bpp).div_ceil(8))
             } else {
                 0
             };
         padded_passstart[i + 1] =
-            padded_passstart[i] + passh[i] * ((passw[i] * bpp + 7) / 8);
-        passstart[i + 1] = passstart[i] + (passh[i] * passw[i] * bpp + 7) / 8;
+            padded_passstart[i] + passh[i] * (passw[i] * bpp).div_ceil(8);
+        passstart[i + 1] =
+            passstart[i] + (passh[i] * passw[i] * bpp).div_ceil(8);
     }
     (passw, passh, filter_passstart, padded_passstart, passstart)
 }
