@@ -1,5 +1,5 @@
 use std::{
-    io::{Read, Write},
+    io::{BufRead, Write},
     num::NonZeroU32,
 };
 
@@ -107,7 +107,7 @@ impl ImageHeader {
         enc.write_crc()
     }
 
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {
         let buffer: [u8; 13] = parse.bytes()?;

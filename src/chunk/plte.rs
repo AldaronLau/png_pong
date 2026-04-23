@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 use parsenic::{Read as _, Reader};
 use pix::rgb::{Rgb, SRgb8};
@@ -15,7 +15,7 @@ pub struct Palette {
 }
 
 impl Palette {
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {
         parse.set_palette();

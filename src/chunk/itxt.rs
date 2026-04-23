@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 use parsenic::{Read as _, Reader};
 
@@ -28,7 +28,7 @@ pub struct InternationalText {
 
 impl InternationalText {
     /* international text chunk (iTXt) */
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {
         let buffer = parse.raw()?;

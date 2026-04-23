@@ -1,6 +1,6 @@
 //! Read and write from a reversed bit stream
 
-use std::io::{Bytes, Read, Result, Write};
+use std::io::{BufRead, Bytes, Result, Write};
 
 /// A reversed bit stream writer.
 pub(super) struct BitstreamWriter<W: Write> {
@@ -41,7 +41,7 @@ impl<W: Write> BitstreamWriter<W> {
 }
 
 /// A reversed bit stream reader.
-pub(super) struct BitstreamReader<R: Read> {
+pub(super) struct BitstreamReader<R: BufRead> {
     /// Pointer within the stream.
     bitpointer: usize,
     /// Reader
@@ -50,11 +50,10 @@ pub(super) struct BitstreamReader<R: Read> {
     byte: Option<u8>,
 }
 
-impl<R: Read> BitstreamReader<R> {
+impl<R: BufRead> BitstreamReader<R> {
     /// Create a new `BitstreamReader` from a type that implements `Read`.
     #[inline(always)]
     pub(super) fn new(stream: R) -> Result<Self> {
-        #[expect(clippy::unbuffered_bytes)]
         let mut stream = stream.bytes();
         Ok(BitstreamReader {
             bitpointer: 0,
@@ -73,7 +72,6 @@ impl<R: Read> BitstreamReader<R> {
         stream: R,
         bitpointer: usize,
     ) -> Result<Self> {
-        #[expect(clippy::unbuffered_bytes)]
         let mut stream = stream.bytes();
         for _ in 0..bitpointer / 8 {
             stream.next().unwrap().unwrap();

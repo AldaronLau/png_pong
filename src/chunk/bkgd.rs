@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 use parsenic::{Read as _, Reader, be::Read as _};
 
@@ -17,7 +17,7 @@ pub enum Background {
 }
 
 impl Background {
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {
         match parse.len() {
