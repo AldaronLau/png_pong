@@ -2,8 +2,8 @@ use pix::{
     Palette, Raster,
     chan::{Ch8, Ch16},
     el::Pixel,
-    gray::{Gray8, SGray8, SGray16, SGraya8, SGraya16},
-    rgb::{SRgb8, SRgb16, SRgba8, SRgba16},
+    gray::{Gray8, SGray8, SGray16, SGraya8, SGraya16, Gray},
+    rgb::{SRgb8, SRgb16, SRgba8, SRgba16, Rgb},
 };
 
 use crate::chunk::{ColorType, ImageHeader};
@@ -116,14 +116,14 @@ where
             Rgb16(r) => Raster::with_raster(&r),
             Palette(raster, pal, pa) => {
                 let mut pixels = Vec::with_capacity(raster.pixels().len());
-                for pixel in raster.pixels() {
-                    let i: u8 = pixel.one().into();
+                for &pixel in raster.pixels() {
+                    let i: u8 = Gray::value(pixel).into();
                     let i = i as usize;
                     let px: SRgb8 = pal.entry(i).unwrap();
                     let px = SRgba8::new(
-                        px.one(),
-                        px.two(),
-                        px.three(),
+                        Rgb::red(px),
+                        Rgb::green(px),
+                        Rgb::blue(px),
                         Ch8::new(pa[i]),
                     );
                     pixels.push(px.convert());
