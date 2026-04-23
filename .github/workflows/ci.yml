@@ -9,7 +9,7 @@ defaults:
     working-directory: .
 env:
   cargo_hack_flags: >
-    --all-features
+    --features default
 jobs:
   miri:
     name: "Miri"

@@ -44,7 +44,7 @@ version = "0.8.2"
 optional = true
 
 [package.metadata.docs.rs]
-all-features = true
+all-features = false
 default-target = "x86_64-unknown-linux-gnu"
 
 [[bench]]
