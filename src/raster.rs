@@ -2,8 +2,8 @@ use pix::{
     Palette, Raster,
     chan::{Ch8, Ch16},
     el::Pixel,
-    gray::{Gray8, SGray8, SGray16, SGraya8, SGraya16, Gray},
-    rgb::{SRgb8, SRgb16, SRgba8, SRgba16, Rgb},
+    gray::{Gray, Gray8, SGray8, SGray16, SGraya8, SGraya16},
+    rgb::{Rgb, SRgb8, SRgb16, SRgba8, SRgba16},
 };
 
 use crate::chunk::{ColorType, ImageHeader};
