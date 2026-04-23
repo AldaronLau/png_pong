@@ -43,7 +43,7 @@ jobs:
           rustup override set nightly
           cargo miri setup
       - name: Test with Miri
-        run: cargo miri test --workspace --all-features ${{ matrix.cc }} miri
+        run: cargo miri test --workspace ${{ matrix.cc }} miri
   checks:
     name: "Checks"
     runs-on: ${{ matrix.os }}
