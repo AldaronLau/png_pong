@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::io::BufRead;
 
 use crate::{
     chunk::{
@@ -13,12 +13,12 @@ use crate::{
 
 /// Iterator over [`Chunk`](struct.Chunk.html)s - Decoder for PNG files.
 #[derive(Debug)]
-pub struct Chunks<R: Read> {
+pub struct Chunks<R: BufRead> {
     /// Decoder
     dec: Parser<R>,
 }
 
-impl<R: Read> Chunks<R> {
+impl<R: BufRead> Chunks<R> {
     /// Create a new encoder.  Will return an error if it's not a PNG file.
     pub(crate) fn new(dec: Parser<R>) -> Self {
         Chunks { dec }
@@ -55,7 +55,7 @@ impl<R: Read> Chunks<R> {
     }
 }
 
-impl<R: Read> Iterator for Chunks<R> {
+impl<R: BufRead> Iterator for Chunks<R> {
     type Item = Result<Chunk>;
 
     fn next(&mut self) -> Option<Self::Item> {

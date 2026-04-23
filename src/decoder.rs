@@ -1,4 +1,4 @@
-use std::io::{ErrorKind, Read};
+use std::io::{BufRead, ErrorKind};
 
 use crate::{
     Step, consts,
@@ -7,7 +7,7 @@ use crate::{
 
 /// Chunk parser.
 #[derive(Debug)]
-pub(crate) struct Parser<R: Read> {
+pub(crate) struct Parser<R: BufRead> {
     /// Chunk length
     length: u32,
     /// CRC32
@@ -18,7 +18,7 @@ pub(crate) struct Parser<R: Read> {
     palette: bool,
 }
 
-impl<R: Read> Parser<R> {
+impl<R: BufRead> Parser<R> {
     /// Prepare a chunk for reading, returning it's name.
     pub(crate) fn prepare(&mut self) -> Result<Option<[u8; 4]>> {
         let first = match self.u8() {
@@ -121,12 +121,12 @@ impl<R: Read> Parser<R> {
 /// [Step]: struct.Step.html
 /// [Chunk]: chunk/enum.Chunk.html
 #[derive(Debug)]
-pub struct Decoder<R: Read> {
+pub struct Decoder<R: BufRead> {
     // The source of PNG input.
     reader: R,
 }
 
-impl<R: Read> Decoder<R> {
+impl<R: BufRead> Decoder<R> {
     /// Create a new PNG decoder.  Returns `Err` if it's not a PNG file.
     pub fn new(mut reader: R) -> Result<Self> {
         // Read first 8 bytes (PNG Signature)
@@ -160,7 +160,7 @@ impl<R: Read> Decoder<R> {
     }
 }
 
-impl<R: Read> IntoIterator for Decoder<R> {
+impl<R: BufRead> IntoIterator for Decoder<R> {
     type IntoIter = Steps<R>;
     type Item = Result<Step>;
 

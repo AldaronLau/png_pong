@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 use super::{Chunk, DecoderResult, EncoderResult};
 use crate::{decoder::Parser, encoder::Enc};
@@ -22,7 +22,7 @@ impl Unknown {
         enc.write_crc()
     }
 
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
         name: [u8; 4],
     ) -> DecoderResult<Chunk> {

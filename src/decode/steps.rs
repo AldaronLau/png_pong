@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io::Read, iter::Peekable};
+use std::{collections::HashMap, io::BufRead, iter::Peekable};
 
 use pix::{Palette, Raster};
 
@@ -27,7 +27,7 @@ struct TextEntry {
 
 /// Iterator over `Step`s for PNG files.
 #[derive(Debug)]
-pub struct Steps<R: Read> {
+pub struct Steps<R: BufRead> {
     decoder: Peekable<Chunks<R>>,
     // FIXME: This is a workaround for not supporting APNG yet.
     #[allow(dead_code)]
@@ -56,7 +56,7 @@ pub struct Steps<R: Read> {
     reject_pal: bool,
 }
 
-impl<R: Read> Steps<R> {
+impl<R: BufRead> Steps<R> {
     /// Create a new decoder.
     pub(crate) fn new(chunks: Chunks<R>) -> Self {
         let decoder = chunks.peekable();
@@ -80,7 +80,7 @@ impl<R: Read> Steps<R> {
 
 impl<R> Iterator for Steps<R>
 where
-    R: Read,
+    R: BufRead,
 {
     type Item = Result<Step, DecoderError>;
 

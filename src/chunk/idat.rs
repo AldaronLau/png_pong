@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 use crate::{
     chunk::Chunk, consts, decode::Result as DecoderResult, decoder::Parser,
@@ -13,7 +13,7 @@ pub struct ImageData {
 }
 
 impl ImageData {
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
     ) -> DecoderResult<Chunk> {
         let data = parse.raw()?;

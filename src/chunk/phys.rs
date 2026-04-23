@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 use parsenic::{Read as _, Reader, be::Read as _};
 
@@ -28,7 +28,7 @@ impl Physical {
         enc.write_crc()
     }
 
-    pub(crate) fn parse<R: Read>(
+    pub(crate) fn parse<R: BufRead>(
         parse: &mut Parser<R>,
     ) -> Result<Chunk, DecoderError> {
         let buffer: [u8; 9] = parse.bytes()?;
