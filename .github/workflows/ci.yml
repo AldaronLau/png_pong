@@ -1,13 +1,16 @@
 name: tests
 on:
   push:
-    branches: ['v*']
+    branches:
+      - 'v[0-9]+'
+      - 'v[0-9]+.[0-9]+'
   pull_request:
 defaults:
   run:
     shell: bash
     working-directory: .
 env:
+  RUSTUP_AUTO_INSTALL: 0
   cargo_hack_flags: >
     --features default
 jobs:
