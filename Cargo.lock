@@ -302,9 +302,9 @@ dependencies = [
 
 [[package]]
 name = "pix"
-version = "0.15.0"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34562662ab2f62a6c12ba289d0df3bb045324503f51cdb3e929d026042ba9f68"
+checksum = "f1fd24e925049f369a437a68431d7fc3b59861a42c9249fa8c5a17883c121bd7"
 
 [[package]]
 name = "plotters"
