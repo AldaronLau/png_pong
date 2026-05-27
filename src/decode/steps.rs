@@ -13,8 +13,6 @@ use crate::{
     zlib,
 };
 
-mod unfilter;
-
 #[derive(Debug)]
 struct TextEntry {
     #[allow(dead_code)] // FIXME
@@ -314,64 +312,104 @@ pub(crate) fn decode(
     palette: Option<&PaletteChunk>,
     transparency: Option<&Transparency>,
 ) -> Result<PngRaster, DecoderError> {
-    // Decompress and unfilter pixel data.
+    // Decompress pixel data.
     let mut scanlines = zlib::decompress(buffer)?;
-    let mut buf = vec![0; header.raw_size()];
-    unfilter::postprocess_scanlines(
-        &mut buf,
-        &mut scanlines,
-        header.width,
-        header.height,
-        header,
-    )?;
-
     let width = header.width;
     let height = header.height;
     let color_type = header.color_type;
     let bit_depth = header.bit_depth;
 
+    // Unfilter pixel data and build the raster types
     Ok(match (color_type, bit_depth) {
         (ColorType::Grey, 8) => {
-            PngRaster::Gray8(Raster::with_u8_buffer(width, height, buf))
+            let mut raster = Raster::with_clear(width, height);
+
+            unfilter_scanlines::<1>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
+            PngRaster::Gray8(raster)
         }
         (ColorType::GreyAlpha, 8) => {
-            PngRaster::Graya8(Raster::with_u8_buffer(width, height, buf))
+            let mut raster = Raster::with_clear(width, height);
+
+            unfilter_scanlines::<2>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
+            PngRaster::Graya8(raster)
         }
         (ColorType::Rgb, 8) => {
-            PngRaster::Rgb8(Raster::with_u8_buffer(width, height, buf))
+            let mut raster = Raster::with_clear(width, height);
+
+            unfilter_scanlines::<3>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
+            PngRaster::Rgb8(raster)
         }
         (ColorType::Rgba, 8) => {
-            PngRaster::Rgba8(Raster::with_u8_buffer(width, height, buf))
+            let mut raster = Raster::with_clear(width, height);
+
+            unfilter_scanlines::<4>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
+            PngRaster::Rgba8(raster)
         }
         (ColorType::Grey, 16) => {
             let mut raster = Raster::with_clear(width, height);
-            for (i, v) in raster.as_u8_slice_mut().iter_mut().enumerate() {
-                *v = buf[i];
-            }
+
+            unfilter_scanlines::<2>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
             PngRaster::Gray16(raster)
         }
         (ColorType::GreyAlpha, 16) => {
             let mut raster = Raster::with_clear(width, height);
-            for (i, v) in raster.as_u8_slice_mut().iter_mut().enumerate() {
-                *v = buf[i];
-            }
+
+            unfilter_scanlines::<4>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
             PngRaster::Graya16(raster)
         }
         (ColorType::Rgb, 16) => {
             let mut raster = Raster::with_clear(width, height);
-            for (i, v) in raster.as_u8_slice_mut().iter_mut().enumerate() {
-                *v = buf[i];
-            }
+
+            unfilter_scanlines::<6>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
             PngRaster::Rgb16(raster)
         }
         (ColorType::Rgba, 16) => {
             let mut raster = Raster::with_clear(width, height);
-            for (i, v) in raster.as_u8_slice_mut().iter_mut().enumerate() {
-                *v = buf[i];
-            }
+
+            unfilter_scanlines::<8>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
             PngRaster::Rgba16(raster)
         }
         (ColorType::Palette, 8) => {
+            let mut raster = Raster::with_clear(width, height);
+
+            unfilter_scanlines::<1>(
+                raster.as_u8_slice_mut(),
+                scanlines.as_mut_slice(),
+                (width, height),
+            );
+
             let palette_slice = palette.as_ref().unwrap().palette.as_slice();
             let palette_alpha = match transparency {
                 None => Vec::new(),
@@ -383,13 +421,31 @@ pub(crate) fn decode(
                 let j = palette.set_entry(*color).unwrap();
                 debug_assert_eq!(i, j);
             }
+
             debug_assert_eq!(palette_slice.len(), palette.len());
-            PngRaster::Palette(
-                Raster::with_u8_buffer(width, height, buf),
-                Box::new(palette),
-                palette_alpha,
-            )
+            PngRaster::Palette(raster, Box::new(palette), palette_alpha)
         }
         (ct, bd) => return Err(DecoderError::ColorMode(ct, bd)),
     })
+}
+
+fn unfilter_scanlines<const BYTES_PER_PIXEL: usize>(
+    raster: &mut [u8],
+    scanlines: &mut [u8],
+    (width, height): (u32, u32),
+) {
+    let width = usize::try_from(width).unwrap();
+    let height = usize::try_from(height).unwrap();
+    let line_bytes = width * BYTES_PER_PIXEL;
+    let scanline_bytes = 1 + line_bytes;
+
+    png_filters::unfilter_lines::<BYTES_PER_PIXEL>(
+        scanlines.chunks_exact_mut(scanline_bytes),
+    );
+
+    for line in 0..height {
+        raster[line * line_bytes..][..line_bytes].copy_from_slice(
+            &scanlines[(1 + (line * scanline_bytes))..][..line_bytes],
+        );
+    }
 }

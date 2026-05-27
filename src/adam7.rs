@@ -64,66 +64,6 @@ pub(crate) fn get_pass_values(
     (passw, passh, filter_passstart, padded_passstart, passstart)
 }
 
-/// in: Adam7 interlaced image, with no padding bits between scanlines, but
-/// between reduced images so that each reduced image starts at a byte.
-/// out: the same pixels, but re-ordered so that they're now a non-interlaced
-/// image with size w * h bpp: bits per pixel out has the following size in
-/// bits: w * h * bpp.  in is possibly bigger due to padding bits between
-/// reduced images.  out must be big enough AND must be 0 everywhere if bpp < 8
-/// in the current implementation (because that's likely a little bit faster)
-///
-/// NOTE: comments about padding bits are only relevant if bpp < 8
-pub(crate) fn deinterlace(out: &mut [u8], inp: &[u8], w: u32, h: u32, bpp: u8) {
-    let (passw, passh, _, _, passstart) = get_pass_values(w, h, bpp);
-    let bpp = bpp as u32;
-    if bpp >= 8 {
-        for i in 0..7 {
-            let bytewidth = bpp / 8;
-            for y in 0..passh[i] {
-                for x in 0..passw[i] {
-                    let pixelinstart = (passstart[i]
-                        + (y * passw[i] + x) * bytewidth)
-                        as usize;
-                    let bytewidth = bytewidth as usize;
-                    let pixeloutstart =
-                        ((IY[i] + y * DY[i]) * w + IX[i] + x * DX[i]) as usize
-                            * bytewidth;
-
-                    out[pixeloutstart..(bytewidth + pixeloutstart)]
-                        .clone_from_slice(
-                            &inp[pixelinstart..(bytewidth + pixelinstart)],
-                        )
-                }
-            }
-        }
-    } else {
-        for i in 0..7 {
-            let ilinebits = bpp * passw[i];
-            let olinebits = bpp * w;
-            for y in 0..passh[i] {
-                for x in 0..passw[i] {
-                    let mut obp = ((IY[i] + y * DY[i]) * olinebits
-                        + (IX[i] + x * DX[i]) * bpp)
-                        as usize;
-                    let mut in_stream = BitstreamReader::with_bitpointer(
-                        std::io::Cursor::new(inp),
-                        ((8 * passstart[i]) + (y * ilinebits + x * bpp))
-                            as usize,
-                    )
-                    .unwrap();
-                    for _ in 0..bpp {
-                        let bit = in_stream.read().unwrap().unwrap();
-                        // note that this function assumes the out buffer is
-                        // completely 0, use set_bit_of_reversed_stream
-                        // otherwise
-                        set_bit_of_reversed_stream0(&mut obp, out, bit);
-                    }
-                }
-            }
-        }
-    };
-}
-
 /// in: non-interlaced image with size w*h
 /// out: the same pixels, but re-ordered according to PNG's Adam7 interlacing,
 /// with no padding bits between scanlines, but between reduced images so that
@@ -177,23 +117,6 @@ pub(crate) fn interlace(out: &mut [u8], inp: &[u8], w: u32, h: u32, bpp: u8) {
             }
         }
     };
-}
-
-/// Like `set_bit_of_reversed_stream()`, except assumes the current value of the
-/// bit is `false`.
-#[inline(always)]
-pub(crate) fn set_bit_of_reversed_stream0(
-    bitpointer: &mut usize,
-    bitstream: &mut [u8],
-    bit: bool,
-) {
-    /* the current bit in bitstream must be 0 for this to work */
-    if bit {
-        /* earlier bit of huffman code is in a lesser significant bit of an
-         * earlier byte */
-        bitstream[(*bitpointer) >> 3] |= 1 << (7 - ((*bitpointer) & 7));
-    }
-    *bitpointer += 1;
 }
 
 #[inline(always)]

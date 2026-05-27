@@ -33,6 +33,9 @@ features = ["simd"]
 [dependencies.parsenic]
 version = "0.2.1"
 
+[dependencies.png_filters]
+version = "0.1.2"
+
 [dependencies.traitful]
 version = "0.3.0"
 

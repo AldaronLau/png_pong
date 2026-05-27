@@ -173,12 +173,14 @@ impl ImageHeader {
 
     /// get the total amount of bits per pixel, based on colortype and bitdepth
     /// in the struct
+    #[allow(dead_code)]
     pub(crate) fn bpp(&self) -> u8 {
         self.color_type.bpp(self.bit_depth) /* 4 or 6 */
     }
 
     /// Returns the byte size of a raw image buffer with given width, height and
     /// color mode
+    #[allow(dead_code)]
     pub(crate) fn raw_size(&self) -> usize {
         /* will not overflow for any color type if roughly w * h < 268435455 */
         let bpp = self.bpp() as usize;
