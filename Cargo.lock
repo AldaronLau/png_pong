@@ -334,9 +334,9 @@ checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
 name = "pix"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1fd24e925049f369a437a68431d7fc3b59861a42c9249fa8c5a17883c121bd7"
+checksum = "193abc7f41904036e50a389a6298b3f4f49f0be03756bbfa1b3d3f3cb34be3ee"
 
 [[package]]
 name = "plotters"
